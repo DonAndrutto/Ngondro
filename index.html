@@ -654,8 +654,16 @@
       </div>
 
       <div class="bar-group">
+        <button class="bar-btn" id="btnFS" onclick="toggleFullScreen()" title="Fullscreen">
+          <svg id="iconFSEnter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          <svg id="iconFSExit" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
         <button class="bar-btn" id="btnTilt" onclick="toggleTiltScroll()" title="Tilt scroll">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </button>
+        <button class="bar-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
+          <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
       </div>
 
@@ -665,17 +673,6 @@
         </button>
         <button class="bar-btn" onclick="changeFontSize(1)" title="Larger text">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-        </button>
-      </div>
-
-      <div class="bar-group">
-        <button class="bar-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
-          <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-        <button class="bar-btn" id="btnFS" onclick="toggleFullScreen()" title="Fullscreen">
-          <svg id="iconFSEnter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-          <svg id="iconFSExit" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
         </button>
       </div>
 
@@ -3085,6 +3082,45 @@ function esc(s) {
 }
 
 // ══════════════════════════════════════════════════════
+// MANUAL-SCROLL DETECTION (pause auto/tilt while user touches)
+// ══════════════════════════════════════════════════════
+
+let userScrollPaused = false;
+let userScrollResumeTimer = null;
+const USER_SCROLL_RESUME_MS = 500;
+
+function pauseForUserInput() {
+  userScrollPaused = true;
+  if (userScrollResumeTimer) {
+    clearTimeout(userScrollResumeTimer);
+    userScrollResumeTimer = null;
+  }
+  // Reset auto-scroll timing so it doesn't lurch on resume
+  lastScrollTime = 0;
+  scrollAccumulator = 0;
+  // Re-baseline tilt so current device angle becomes neutral on resume
+  tiltReferenceBeta = null;
+}
+
+function scheduleResumeAfterUserInput() {
+  if (userScrollResumeTimer) clearTimeout(userScrollResumeTimer);
+  userScrollResumeTimer = setTimeout(() => {
+    userScrollPaused = false;
+    userScrollResumeTimer = null;
+    lastScrollTime = 0;
+  }, USER_SCROLL_RESUME_MS);
+}
+
+window.addEventListener('touchstart', pauseForUserInput, { passive: true });
+window.addEventListener('touchmove', pauseForUserInput, { passive: true });
+window.addEventListener('touchend', scheduleResumeAfterUserInput, { passive: true });
+window.addEventListener('touchcancel', scheduleResumeAfterUserInput, { passive: true });
+window.addEventListener('wheel', () => {
+  pauseForUserInput();
+  scheduleResumeAfterUserInput();
+}, { passive: true });
+
+// ══════════════════════════════════════════════════════
 // AUTO-SCROLL (rAF + time-delta engine)
 // ══════════════════════════════════════════════════════
 
@@ -3115,6 +3151,14 @@ function stopAutoScroll() {
 
 function autoScrollLoop(ts) {
   if (!isAutoScrolling) return;
+
+  if (userScrollPaused) {
+    lastScrollTime = 0;
+    scrollAccumulator = 0;
+    autoScrollRaf = requestAnimationFrame(autoScrollLoop);
+    return;
+  }
+
   if (!lastScrollTime) lastScrollTime = ts;
 
   const dt = ts - lastScrollTime;
@@ -3210,13 +3254,16 @@ function handleTilt(e) {
   if (tiltReferenceBeta === null) tiltReferenceBeta = e.beta;
 
   const tilt = e.beta - tiltReferenceBeta;
-  // Inverted, more sensitive: tilt forward (toward you) = scroll down
-  tiltSpeed = -Math.pow(Math.abs(tilt) / 4, 2) * Math.sign(tilt) * (state.scrollSpeed * 1.2);
+  // Tilt forward (toward you) = scroll down. Sensitivity tuned high so
+  // small wrist movements produce noticeable scroll.
+  const deadzone = 0.5;
+  const t = Math.abs(tilt) < deadzone ? 0 : (tilt - Math.sign(tilt) * deadzone);
+  tiltSpeed = -Math.pow(Math.abs(t) / 1.2, 2) * Math.sign(t) * (state.scrollSpeed * 2.2);
 }
 
 function tiltLoop() {
   if (!isTiltScrolling) return;
-  if (Math.abs(tiltSpeed) > 0.1) {
+  if (!userScrollPaused && Math.abs(tiltSpeed) > 0.1) {
     window.scrollBy({ top: tiltSpeed, behavior: 'auto' });
   }
   tiltRafId = requestAnimationFrame(tiltLoop);
