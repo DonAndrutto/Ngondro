@@ -3319,7 +3319,7 @@ function handleTilt(e) {
     targetTiltSpeed = 0;
   } else {
     const t = tilt - Math.sign(tilt) * deadzone;
-    targetTiltSpeed = -Math.sign(t) * Math.pow(Math.abs(t) / 1.2, 1.5) * (state.scrollSpeed * 0.12);
+    targetTiltSpeed = Math.sign(t) * Math.pow(Math.abs(t) / 1.2, 1.5) * (state.scrollSpeed * 0.12);
   }
 }
 
@@ -3354,9 +3354,18 @@ function updateFSIcon() {
 }
 
 function toggleFullScreen() {
+  const anchor = document.querySelector('.content-area .section-block') || document.getElementById('contentArea');
+  const beforeTop = anchor ? anchor.getBoundingClientRect().top : 0;
+
   isFullScreen = !isFullScreen;
   document.body.classList.toggle('fullscreen', isFullScreen);
   updateFSIcon();
+
+  if (anchor) {
+    const afterTop = anchor.getBoundingClientRect().top;
+    const delta = afterTop - beforeTop;
+    if (delta) window.scrollBy(0, delta);
+  }
 
   if (isFullScreen && document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
