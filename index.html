@@ -72,7 +72,14 @@
       transition: background 0.3s, color 0.3s;
       -webkit-user-select: none;
       user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: pan-y;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
     }
+
+    html { -webkit-overflow-scrolling: touch; }
 
     /* Hide scrollbar */
     ::-webkit-scrollbar { display: none; }
@@ -441,12 +448,14 @@
     }
 
     .bar-inner {
-      max-width: 28rem;
+      max-width: 36rem;
       margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 0.5rem;
       pointer-events: auto;
+      flex-wrap: wrap;
     }
 
     .bar-group {
@@ -561,14 +570,17 @@
        ══════════════════════════════════════════ */
     .donate-link {
       font-family: 'Inter', sans-serif;
-      font-size: 0.6rem;
-      font-weight: 500;
+      font-size: 0.7rem;
+      font-weight: 600;
       color: var(--accent);
       text-decoration: none;
-      padding: 0.15rem 0.45rem;
+      padding: 0.25rem 0.6rem;
       border: 1px solid var(--accent);
       border-radius: 4px;
+      letter-spacing: 0.02em;
       transition: background 0.2s, color 0.2s;
+      display: inline-flex;
+      align-items: center;
     }
 
     .donate-link:hover {
@@ -591,16 +603,7 @@
 
         <div class="header-divider"></div>
 
-        <a class="donate-link" href="https://www.paypal.com/donate/?hosted_button_id=YOUR_ID" target="_blank" rel="noopener">Donate</a>
-
-        <button class="icon-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
-          <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-
-        <button class="icon-btn" id="btnFS" onclick="toggleFullScreen()" title="Fullscreen">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-        </button>
+        <a class="donate-link" href="https://www.paypal.com/donate/?business=JZS5LVZKPPY5J&no_recurring=0&item_name=Help+fund+Dharma+translation+projects.&currency_code=USD" target="_blank" rel="noopener">Donate</a>
       </div>
     </div>
   </header>
@@ -662,6 +665,17 @@
         </button>
         <button class="bar-btn" onclick="changeFontSize(1)" title="Larger text">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+      </div>
+
+      <div class="bar-group">
+        <button class="bar-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
+          <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="bar-btn" id="btnFS" onclick="toggleFullScreen()" title="Fullscreen">
+          <svg id="iconFSEnter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          <svg id="iconFSExit" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
         </button>
       </div>
 
@@ -2793,6 +2807,52 @@ const TABS_DATA = {
           tibetan: 'དོན་གཉིས་ལྷུན་གྱིས་གྲུབ་པར་ཤོག།',
           phonetics: 'dön nyi lhun gyi drup par shok',
           translation: 'and may the two benefits be spontaneously accomplished.'
+        },
+        {
+          id: 'ng-9-5',
+          type: 'RECITATION',
+          tibetan: 'སེམས་ཅན་རྣམས་ནི་ཐམས་ཅད་ཀྱི༔',
+          phonetics: 'sem chen nam ni tam che kyi',
+          translation: 'For all beings, the basic ground of everything'
+        },
+        {
+          id: 'ng-9-6',
+          type: 'RECITATION',
+          tibetan: 'གཞི་ནི་ལྷུན་གྱིས་གྲུབ་པ་ལ༔',
+          phonetics: 'zhi ni lhun gyi drup pa la',
+          translation: 'is spontaneous presence, upon which'
+        },
+        {
+          id: 'ng-9-7',
+          type: 'RECITATION',
+          tibetan: 'ལམ་ནི་མངོན་སུམ་སྣང་བར་ཤར༔',
+          phonetics: 'lam ni ngön sum nang war shar',
+          translation: 'the path arises as actual appearances.'
+        },
+        {
+          id: 'ng-9-8',
+          type: 'RECITATION',
+          tibetan: 'འབྲས་བུ་གཞི་ལ་རྫོགས་གྱུར་ཅིག༔',
+          phonetics: 'dre bu shi la dzok gyur chik',
+          translation: 'May the fruition be consummated in the basic ground.'
+        },
+        {
+          id: 'ng-9-9',
+          type: 'INSTRUCTION',
+          tibetan: 'ཅེས་དགེ་བ་བསྔོས་ཏེ་སྨོན་ལམ་གྱིས་རྒྱས་བཏབ་ཅིང༌། སྤྱོད་ལམ་ཀུན་ཏུ་ཚོགས་གཉིས་ཟུང་འཇུག་གི་རྣལ་འབྱོར་ལས་མི་འདའ་བས་གཏན་གྱི་འདུན་མ་བཟང་པོ་ཉམས་འོག་ཏུ་ཚུད་པར་བྱའོ།།',
+          translation: 'So dedicating the virtue, seal it with the prayer. During all activities, do not neglect the yoga of the union of the two accumulations, and totally integrate a noble, lasting resolution.'
+        },
+        {
+          id: 'ng-9-10',
+          type: 'INSTRUCTION',
+          tibetan: 'ཀུན་བཟང་དགོངས་འདུས་རྫོགས་པ་ཆེའི། །ཐོགས་མེད་སྒོ་བྱེད་སྔོན་འགྲོའི་ཆོས། །གསལ་བདེར་སྤེལ་ལས་ཐོབ་པའི་དགེ །སྐན་ལྡན་སྨིན་གྲོལ་དཔལ་དུ་ཤོག །',
+          translation: 'May the virtue accrued from clearly propounding this Dharma of the preliminary that initially opens the door to the Great Completion’s Synthesis of Samantabhadra\'s Entire Wisdom Mind bring fortunate ones the glory of maturation and liberation.'
+        },
+        {
+          id: 'ng-9-11',
+          type: 'INSTRUCTION',
+          tibetan: 'ཅེས་པའང་སྔན་ལུང་སྒང་སྟེང་གསང་སྔགས་ཆོས་གླིང་གི་བསྟན་པའི་བདག་པོ་རྒྱལ་སྲས་པདྨ་ཕྲིན་ལས་ཀྱི་སྐུ་ཕྲེང་དགུ་པ་ཀུན་བཟང་པདྨ་རྣམ་པར་རྒྱལ་བའི་སྡེའི་བཞེད་པ་བཞིན་ལམ་འདིའི་གདུལ་བྱ་རྗེས་འཇུག་རྣམས་ལ་ཕན་པའི་བསམ་པས། རིག་འཛིན་གཏེར་བདག་གླིང་པའི་ཁྲིད་ཡིག་སྙིང་པོ་རབ་གསལ་གྱི་དགོངས་པ་གཞིར་བཟུང། སྔར་གྱི་ཆོས་སྤྱོད་གསུང་རྒྱུན་དག་ལས་འཇུག་བདེའི་ངག་འདོན་བཅུད་དུ་དྲིལ་ཏེ། རྒྱལ་ཁམས་པ་འཇིགས་བྲལ་ཡེ་ཤེས་རྡོ་རྗེས་སྤེལ་བ་ལམ་འདིའི་རིང་ལུགས་ཕྱོགས་མཐར་ཁྱབ་ཅིང་འབྲེལ་ཚད་སྨིན་སྒྲོལ་མཐར་ཕྱིན་པའི་རྒྱུར་གྱུར་ཅིག །',
+          translation: 'In accordance with the wishes of Kunzang Pema Nampar Gyalwa, the ninth incarnation of Gyalse Pema Trinley and holder of the doctrine of the ancient Gangteng Sang-ngak Choling Monastery, with the intention to benefit the followers of this path, this easy-to-practice, pleasant liturgy has been composed using the perspective of Terdak Lingpa\'s guidance text, Clear Elucidation of the Essence, as a basis and included the legacy of Speech of former liturgical practices. Composed by the world traveler, Jigdral Yeshe Dorje (Dudjom Rinpoche). May the long tradition of the path increase and pervade everywhere and through its exposure become the cause for ultimate ripening and liberation. SARVA MANGALAM'
         }
       ]
     }
@@ -2883,21 +2943,62 @@ function toggleIndex() {
   btn.classList.toggle('active', panel.classList.contains('open'));
 }
 
-function renderIndex() {
-  const sections = TABS_DATA[state.activeTab] || [];
-  const container = document.getElementById('indexList');
+const INDEX_LINKS = [
+  { label: 'Yoga of Arising',                      tab: 'YOGA',    sectionIdx: 0 },
+  { label: 'Initial Prayer',                       tab: 'NGONDRO', sectionIdx: 0 },
+  { label: 'The Four Thoughts That Turn the Mind', tab: 'NGONDRO', sectionIdx: 1 },
+  { label: 'Refuge',                               tab: 'NGONDRO', sectionIdx: 2 },
+  { label: 'Bodhichitta',                          tab: 'NGONDRO', sectionIdx: 3 },
+  { label: 'Vajrasattva',                          tab: 'NGONDRO', sectionIdx: 4 },
+  { label: 'Mandala',                              tab: 'NGONDRO', sectionIdx: 5 },
+  { label: 'Guru Yoga',                            tab: 'NGONDRO', sectionIdx: 6 }
+];
 
+function renderIndex() {
+  const container = document.getElementById('indexList');
   container.innerHTML =
-    '<div class="index-heading">' + state.activeTab + ' — Sections</div>' +
-    sections.map((sec, i) =>
-      '<button class="index-item" onclick="jumpToSection(' + i + ')">' + sec.title + '</button>'
+    '<div class="index-heading">Sections</div>' +
+    INDEX_LINKS.map((link, i) =>
+      '<button class="index-item" onclick="jumpToIndex(' + i + ')">' + esc(link.label) + '</button>'
     ).join('');
+}
+
+function jumpToIndex(i) {
+  const link = INDEX_LINKS[i];
+  if (!link) return;
+
+  document.getElementById('indexPanel').classList.remove('open');
+  document.querySelector('.tab-btn[data-tab="INDEX"]').classList.remove('active');
+
+  const needsTabSwitch = state.activeTab !== link.tab;
+
+  if (needsTabSwitch) {
+    state.activeTab = link.tab;
+    saveState();
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.tab === link.tab);
+    });
+    renderContent();
+    stopAutoScroll();
+    stopTiltScroll();
+  }
+
+  // Wait for layout/render before scrolling
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const el = document.getElementById('section-' + link.sectionIdx);
+      if (el) {
+        const offset = 100; // header + tab height
+        window.scrollTo({ top: el.offsetTop - offset, behavior: 'smooth' });
+      }
+    });
+  });
 }
 
 function jumpToSection(idx) {
   const el = document.getElementById('section-' + idx);
   if (el) {
-    const offset = 100; // header + tab height
+    const offset = 100;
     window.scrollTo({ top: el.offsetTop - offset, behavior: 'smooth' });
   }
   document.getElementById('indexPanel').classList.remove('open');
@@ -3109,8 +3210,8 @@ function handleTilt(e) {
   if (tiltReferenceBeta === null) tiltReferenceBeta = e.beta;
 
   const tilt = e.beta - tiltReferenceBeta;
-  // Non-linear: small tilts = slow, large tilts = fast
-  tiltSpeed = Math.pow(Math.abs(tilt) / 8, 2) * Math.sign(tilt) * (state.scrollSpeed * 0.5);
+  // Inverted, more sensitive: tilt forward (toward you) = scroll down
+  tiltSpeed = -Math.pow(Math.abs(tilt) / 4, 2) * Math.sign(tilt) * (state.scrollSpeed * 1.2);
 }
 
 function tiltLoop() {
@@ -3127,9 +3228,16 @@ function tiltLoop() {
 
 let isFullScreen = false;
 
+function updateFSIcon() {
+  document.getElementById('iconFSEnter').style.display = isFullScreen ? 'none' : 'block';
+  document.getElementById('iconFSExit').style.display = isFullScreen ? 'block' : 'none';
+  document.getElementById('btnFS').classList.toggle('active', isFullScreen);
+}
+
 function toggleFullScreen() {
   isFullScreen = !isFullScreen;
   document.body.classList.toggle('fullscreen', isFullScreen);
+  updateFSIcon();
 
   if (isFullScreen && document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
@@ -3143,6 +3251,7 @@ document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement && isFullScreen) {
     isFullScreen = false;
     document.body.classList.remove('fullscreen');
+    updateFSIcon();
   }
 });
 
@@ -3168,14 +3277,6 @@ document.addEventListener('copy', e => e.preventDefault());
 
 (function init() {
   applyTheme();
-
-  // Respect system dark mode if no saved preference
-  if (!localStorage.getItem(STORAGE_KEY)) {
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      state.isDark = true;
-      applyTheme();
-    }
-  }
 
   // Set active tab buttons
   document.querySelectorAll('.tab-btn').forEach(b => {
