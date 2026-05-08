@@ -61,8 +61,6 @@
 
     ::selection { background: var(--selection); }
 
-    html { scroll-behavior: smooth; }
-
     body {
       font-family: 'EB Garamond', Georgia, serif;
       background: var(--bg);
@@ -686,8 +684,16 @@
       </div>
 
       <div class="bar-group">
+        <button class="bar-btn" id="btnFS" onclick="toggleFullScreen()" title="Fullscreen">
+          <svg id="iconFSEnter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          <svg id="iconFSExit" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
         <button class="bar-btn" id="btnTilt" onclick="toggleTiltScroll()" title="Tilt scroll">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </button>
+        <button class="bar-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
+          <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
       </div>
 
@@ -697,17 +703,6 @@
         </button>
         <button class="bar-btn" onclick="changeFontSize(1)" title="Larger text">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-        </button>
-      </div>
-
-      <div class="bar-group">
-        <button class="bar-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
-          <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-        <button class="bar-btn" id="btnFS" onclick="toggleFullScreen()" title="Fullscreen">
-          <svg id="iconFSEnter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-          <svg id="iconFSExit" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
         </button>
       </div>
 
@@ -3177,7 +3172,7 @@ function autoScrollLoop(ts) {
 
   if (scrollAccumulator >= 1) {
     const px = Math.floor(scrollAccumulator);
-    window.scrollBy(0, px);
+    window.scrollBy({ top: px, behavior: 'auto' });
     scrollAccumulator -= px;
   }
 
@@ -3202,17 +3197,18 @@ function updatePlayIcon() {
 }
 
 // ══════════════════════════════════════════════════════
-// TILT-TO-SCROLL
+// TILT-TO-SCROLL (SMOOTH & BALANCED FIX)
 // ══════════════════════════════════════════════════════
 
 let isTiltScrolling = false;
 let tiltPermissionGranted = false;
 let tiltReferenceBeta = null;
 let tiltRafId = null;
-let tiltSpeed = 0;          // pixels per second
-let tiltLastTs = 0;
-let tiltStartTime = 0;       // ignore tilts immediately after toggle on
-let tiltScrollAccum = 0;
+
+let userScrollPaused = false;
+let targetTiltSpeed = 0;
+let currentTiltSpeed = 0;
+let tiltScrollAccumulator = 0;
 
 async function toggleTiltScroll() {
   if (isAutoScrolling) stopAutoScroll();
@@ -3222,7 +3218,6 @@ async function toggleTiltScroll() {
     return;
   }
 
-  // Request iOS permission if needed
   if (typeof DeviceOrientationEvent !== 'undefined' &&
       typeof DeviceOrientationEvent.requestPermission === 'function') {
     try {
@@ -3247,15 +3242,13 @@ async function toggleTiltScroll() {
 function startTiltScroll() {
   isTiltScrolling = true;
   tiltReferenceBeta = null;
-  tiltSpeed = 0;
-  tiltLastTs = 0;
-  tiltScrollAccum = 0;
-  tiltStartTime = performance.now();
+  targetTiltSpeed = 0;
+  currentTiltSpeed = 0;
+  tiltScrollAccumulator = 0;
+  document.documentElement.style.scrollBehavior = 'auto';
   window.addEventListener('deviceorientation', handleTilt);
-  tiltRafId = requestAnimationFrame(tiltLoop);
+  tiltLoop();
   document.getElementById('btnTilt').classList.add('active');
-  // Drop hover/focus visual remnant on touch devices
-  document.getElementById('btnTilt').blur();
 }
 
 function stopTiltScroll() {
@@ -3263,74 +3256,40 @@ function stopTiltScroll() {
   window.removeEventListener('deviceorientation', handleTilt);
   if (tiltRafId) cancelAnimationFrame(tiltRafId);
   tiltRafId = null;
-  tiltSpeed = 0;
-  tiltScrollAccum = 0;
-  tiltLastTs = 0;
-  tiltReferenceBeta = null;
-  const btn = document.getElementById('btnTilt');
-  btn.classList.remove('active');
-  btn.blur();
+  document.getElementById('btnTilt').classList.remove('active');
+  document.documentElement.style.scrollBehavior = '';
 }
 
-const TILT_DEADZONE_DEG = 3;
-const TILT_MAX_DEG = 30;
-const TILT_MAX_PX_PER_SEC = 1500;
-const TILT_WARMUP_MS = 350;
-
 function handleTilt(e) {
-  if (e.beta === null || e.beta === undefined) return;
-
-  // Re-baseline a few hundred ms after enabling, so the act of tapping
-  // the button doesn't get interpreted as a tilt and jump the page.
-  if (performance.now() - tiltStartTime < TILT_WARMUP_MS) {
-    tiltReferenceBeta = e.beta;
-    tiltSpeed = 0;
-    return;
-  }
-
+  if (e.beta === null) return;
   if (tiltReferenceBeta === null) tiltReferenceBeta = e.beta;
 
   let tilt = e.beta - tiltReferenceBeta;
+  tilt = Math.max(-30, Math.min(30, tilt));
 
-  // Dead zone so resting on the table doesn't drift
-  if (Math.abs(tilt) < TILT_DEADZONE_DEG) {
-    tiltSpeed = 0;
-    return;
+  const deadzone = 1.5;
+
+  if (Math.abs(tilt) < deadzone) {
+    targetTiltSpeed = 0;
+  } else {
+    const t = tilt - Math.sign(tilt) * deadzone;
+    targetTiltSpeed = -Math.sign(t) * Math.pow(Math.abs(t), 1.5) * (state.scrollSpeed * 0.12);
   }
-
-  const sign = Math.sign(tilt);
-  const mag = Math.min(Math.abs(tilt) - TILT_DEADZONE_DEG, TILT_MAX_DEG);
-  const norm = mag / TILT_MAX_DEG; // 0..1
-  // Quadratic curve: small tilts gentle, larger tilts ramp up.
-  const curve = norm * norm;
-
-  // Inverted: tilt toward you (positive beta change) -> scroll down.
-  tiltSpeed = -sign * curve * TILT_MAX_PX_PER_SEC * (0.4 + state.scrollSpeed * 0.06);
 }
 
-function tiltLoop(ts) {
-  if (!isTiltScrolling) {
-    tiltRafId = null;
-    return;
-  }
+function tiltLoop() {
+  if (!isTiltScrolling) return;
 
-  if (!tiltLastTs) {
-    tiltLastTs = ts || performance.now();
-    tiltRafId = requestAnimationFrame(tiltLoop);
-    return;
-  }
+  currentTiltSpeed += (targetTiltSpeed - currentTiltSpeed) * 0.08;
 
-  const now = ts || performance.now();
-  let dt = now - tiltLastTs;
-  tiltLastTs = now;
-  if (dt > 100) dt = 100;
+  if (!userScrollPaused && Math.abs(currentTiltSpeed) > 0.05) {
+    tiltScrollAccumulator += currentTiltSpeed;
 
-  tiltScrollAccum += tiltSpeed * (dt / 1000);
-
-  if (Math.abs(tiltScrollAccum) >= 1) {
-    const px = tiltScrollAccum > 0 ? Math.floor(tiltScrollAccum) : Math.ceil(tiltScrollAccum);
-    window.scrollBy(0, px);
-    tiltScrollAccum -= px;
+    if (Math.abs(tiltScrollAccumulator) >= 1) {
+      const pixelsToScroll = Math.trunc(tiltScrollAccumulator);
+      tiltScrollAccumulator -= pixelsToScroll;
+      window.scrollBy({ top: pixelsToScroll, behavior: 'auto' });
+    }
   }
 
   tiltRafId = requestAnimationFrame(tiltLoop);
