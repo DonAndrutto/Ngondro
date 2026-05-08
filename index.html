@@ -3148,7 +3148,10 @@ function scheduleResumeAfterUserInput() {
   }, USER_SCROLL_RESUME_MS);
 }
 
-window.addEventListener('touchstart', pauseForUserInput, { passive: true });
+window.addEventListener('touchstart', (e) => {
+  if (e.target.closest('button, a')) return;
+  pauseForUserInput();
+}, { passive: true });
 window.addEventListener('touchmove', pauseForUserInput, { passive: true });
 window.addEventListener('touchend', scheduleResumeAfterUserInput, { passive: true });
 window.addEventListener('touchcancel', scheduleResumeAfterUserInput, { passive: true });
@@ -3203,8 +3206,6 @@ function autoScrollLoop(ts) {
     return;
   }
 
-  if (!lastScrollTime) lastScrollTime = ts;
-
   if (!lastScrollTime) {
     lastScrollTime = ts;
     autoScrollRaf = requestAnimationFrame(autoScrollLoop);
@@ -3253,7 +3254,6 @@ let tiltPermissionGranted = false;
 let tiltReferenceBeta = null;
 let tiltRafId = null;
 
-let userScrollPaused = false;
 let targetTiltSpeed = 0;
 let currentTiltSpeed = 0;
 let tiltScrollAccumulator = 0;
