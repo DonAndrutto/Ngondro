@@ -3119,6 +3119,45 @@ function esc(s) {
 }
 
 // ══════════════════════════════════════════════════════
+// MANUAL-SCROLL DETECTION (pause auto/tilt while user touches)
+// ══════════════════════════════════════════════════════
+
+let userScrollPaused = false;
+let userScrollResumeTimer = null;
+const USER_SCROLL_RESUME_MS = 500;
+
+function pauseForUserInput() {
+  userScrollPaused = true;
+  if (userScrollResumeTimer) {
+    clearTimeout(userScrollResumeTimer);
+    userScrollResumeTimer = null;
+  }
+  // Reset auto-scroll timing so it doesn't lurch on resume
+  lastScrollTime = 0;
+  scrollAccumulator = 0;
+  // Re-baseline tilt so current device angle becomes neutral on resume
+  tiltReferenceBeta = null;
+}
+
+function scheduleResumeAfterUserInput() {
+  if (userScrollResumeTimer) clearTimeout(userScrollResumeTimer);
+  userScrollResumeTimer = setTimeout(() => {
+    userScrollPaused = false;
+    userScrollResumeTimer = null;
+    lastScrollTime = 0;
+  }, USER_SCROLL_RESUME_MS);
+}
+
+window.addEventListener('touchstart', pauseForUserInput, { passive: true });
+window.addEventListener('touchmove', pauseForUserInput, { passive: true });
+window.addEventListener('touchend', scheduleResumeAfterUserInput, { passive: true });
+window.addEventListener('touchcancel', scheduleResumeAfterUserInput, { passive: true });
+window.addEventListener('wheel', () => {
+  pauseForUserInput();
+  scheduleResumeAfterUserInput();
+}, { passive: true });
+
+// ══════════════════════════════════════════════════════
 // AUTO-SCROLL (rAF + time-delta engine)
 // ══════════════════════════════════════════════════════
 
@@ -3156,6 +3195,15 @@ function stopAutoScroll() {
 
 function autoScrollLoop(ts) {
   if (!isAutoScrolling) return;
+
+  if (userScrollPaused) {
+    lastScrollTime = 0;
+    scrollAccumulator = 0;
+    autoScrollRaf = requestAnimationFrame(autoScrollLoop);
+    return;
+  }
+
+  if (!lastScrollTime) lastScrollTime = ts;
 
   if (!lastScrollTime) {
     lastScrollTime = ts;
