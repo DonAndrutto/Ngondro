@@ -3148,7 +3148,6 @@ function scheduleResumeAfterUserInput() {
   }, USER_SCROLL_RESUME_MS);
 }
 
-window.addEventListener('touchstart', pauseForUserInput, { passive: true });
 window.addEventListener('touchmove', pauseForUserInput, { passive: true });
 window.addEventListener('touchend', scheduleResumeAfterUserInput, { passive: true });
 window.addEventListener('touchcancel', scheduleResumeAfterUserInput, { passive: true });
@@ -3315,13 +3314,13 @@ function handleTilt(e) {
   let tilt = e.beta - tiltReferenceBeta;
   tilt = Math.max(-30, Math.min(30, tilt));
 
-  const deadzone = 1.5;
+  const deadzone = 0.5;
 
   if (Math.abs(tilt) < deadzone) {
     targetTiltSpeed = 0;
   } else {
     const t = tilt - Math.sign(tilt) * deadzone;
-    targetTiltSpeed = -Math.sign(t) * Math.pow(Math.abs(t), 1.5) * (state.scrollSpeed * 0.12);
+    targetTiltSpeed = -Math.sign(t) * Math.pow(Math.abs(t) / 1.2, 2) * (state.scrollSpeed * 2.2);
   }
 }
 
