@@ -1,0 +1,3192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>KGK Ngöndro — Tibetan Prayer Assistant</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&family=Jomolhari&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ══════════════════════════════════════════
+       CSS RESET & VARIABLES
+       ══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FDFBF7;
+      --bg-secondary: #f5f0ea;
+      --text: #1c1917;
+      --text-muted: #78716c;
+      --text-light: #a8a29e;
+      --accent: #8B0000;
+      --accent-glow: #FF9933;
+      --accent-10: rgba(139,0,0,0.1);
+      --accent-glow-10: rgba(255,153,51,0.1);
+      --border: #e7e5e4;
+      --card: #ffffff;
+      --card-hover: #fafaf9;
+      --bar-bg: rgba(255,255,255,0.85);
+      --bar-border: #e7e5e4;
+      --selection: rgba(255,153,51,0.3);
+      --recitation: #1c1917;
+      --recitation-repeated: #5D4037;
+      --recitation-repeated-tib: #5D4037;
+      --instruction: #78716c;
+      --phonetics: #44403c;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1C1917;
+      --bg-secondary: #292524;
+      --text: #e7e5e4;
+      --text-muted: #a8a29e;
+      --text-light: #78716c;
+      --accent: #FF9933;
+      --accent-10: rgba(255,153,51,0.1);
+      --border: #44403c;
+      --card: #292524;
+      --card-hover: #44403c;
+      --bar-bg: rgba(28,25,23,0.85);
+      --bar-border: #44403c;
+      --selection: rgba(255,153,51,0.5);
+      --recitation: #e7e5e4;
+      --recitation-repeated: #D7CCC8;
+      --recitation-repeated-tib: #D7CCC8;
+      --instruction: #a8a29e;
+      --phonetics: #d6d3d1;
+    }
+
+    ::selection { background: var(--selection); }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'EB Garamond', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Hide scrollbar */
+    ::-webkit-scrollbar { display: none; }
+    body { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ══════════════════════════════════════════
+       HEADER
+       ══════════════════════════════════════════ */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s, border 0.3s;
+    }
+
+    .header-inner {
+      max-width: 56rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.4rem 1rem;
+      gap: 0.5rem;
+    }
+
+    .header-title {
+      font-family: 'EB Garamond', serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .lang-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active {
+      background: var(--card);
+      color: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .icon-btn:hover { background: var(--accent-10); color: var(--accent); }
+
+    .header-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+      margin: 0 0.15rem;
+    }
+
+    /* ══════════════════════════════════════════
+       TABS
+       ══════════════════════════════════════════ */
+    .tab-bar {
+      position: sticky;
+      top: 40px;
+      z-index: 40;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: background 0.3s, border 0.3s;
+    }
+
+    .tab-bar-inner {
+      max-width: 56rem;
+      margin: 0 auto;
+      display: flex;
+    }
+
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.6rem 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .tab-btn:hover { color: var(--text); background: var(--accent-10); }
+
+    .tab-btn.active {
+      color: var(--accent);
+      background: var(--bg);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .tab-icon {
+      width: 14px;
+      height: 14px;
+      opacity: 0.7;
+    }
+
+    .tab-btn.active .tab-icon { opacity: 1; }
+
+    /* ══════════════════════════════════════════
+       INDEX PANEL (slide-down)
+       ══════════════════════════════════════════ */
+    .index-panel {
+      max-height: 0;
+      overflow: hidden;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid transparent;
+      transition: max-height 0.35s ease, border 0.3s;
+    }
+
+    .index-panel.open {
+      max-height: 60vh;
+      overflow-y: auto;
+      border-bottom-color: var(--border);
+    }
+
+    .index-inner {
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: 0.75rem 1rem;
+    }
+
+    .index-heading {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .index-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      padding: 0.45rem 0.6rem;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .index-item:hover { background: var(--accent-10); color: var(--accent); }
+
+    /* ══════════════════════════════════════════
+       MAIN CONTENT
+       ══════════════════════════════════════════ */
+    .content-area {
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: 2rem 1rem 8rem;
+    }
+
+    .section-block { margin-bottom: 2.5rem; }
+
+    .section-heading {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Prayer block types */
+    .block { margin-bottom: 1rem; text-align: center; }
+
+    .block-title { margin-bottom: 3rem; }
+
+    .block-title .tib {
+      font-family: 'Jomolhari', serif;
+      font-size: 1.6em;
+      line-height: 1.8;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .block-title .pho {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.05em;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .block-title .eng {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      color: var(--text-muted);
+      font-size: 0.95em;
+      max-width: 32rem;
+      margin: 0 auto;
+    }
+
+    .block-title .divider-line {
+      width: 6rem;
+      height: 2px;
+      background: var(--accent-10);
+      margin: 2rem auto 0;
+      border-radius: 1px;
+    }
+
+    /* Recitation */
+    .block-recitation .tib {
+      font-family: 'Jomolhari', serif;
+      font-size: 1.5em;
+      line-height: 1.8;
+      color: var(--recitation);
+      margin-bottom: 0.4rem;
+    }
+
+    .block-recitation .pho {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.9em;
+      color: var(--phonetics);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.25rem;
+    }
+
+    .block-recitation .eng {
+      font-family: 'EB Garamond', serif;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 36rem;
+      margin: 0 auto;
+    }
+
+    /* Repeated variant */
+    .block-repeated .tib { color: var(--recitation-repeated-tib); }
+    .block-repeated .pho { font-weight: 700; }
+
+    /* Instruction */
+    .block-instruction {
+      opacity: 0.9;
+      padding: 0 0.5rem;
+      white-space: pre-wrap;
+    }
+
+    .block-instruction .tib {
+      font-family: 'Jomolhari', serif;
+      font-size: 1.2em;
+      line-height: 1.8;
+      color: var(--instruction);
+      font-style: italic;
+      margin-bottom: 0.4rem;
+    }
+
+    .block-instruction .eng {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      color: var(--instruction);
+      line-height: 1.6;
+      max-width: 36rem;
+      margin: 0 auto;
+    }
+
+    /* Navigation button */
+    .block-nav {
+      margin: 2rem auto;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 2rem;
+      font-family: 'EB Garamond', serif;
+      font-size: 1.1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .nav-btn svg { transition: transform 0.2s; }
+    .nav-btn:hover svg { transform: translateX(4px); }
+
+    /* Header text formatting for blocks */
+    .block-header-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ══════════════════════════════════════════
+       BOTTOM BAR
+       ══════════════════════════════════════════ */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      padding: 0.75rem 1rem;
+      pointer-events: none;
+    }
+
+    .bar-inner {
+      max-width: 28rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: auto;
+    }
+
+    .bar-group {
+      display: flex;
+      align-items: center;
+      padding: 0.25rem;
+      background: var(--bar-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--bar-border);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      gap: 0;
+    }
+
+    .bar-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .bar-btn:hover { background: var(--accent-10); color: var(--text); }
+
+    .bar-btn.active {
+      background: var(--accent-10);
+      color: var(--accent);
+    }
+
+    /* Speed indicator */
+    .speed-dot {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 600;
+      color: var(--text-light);
+      min-width: 1rem;
+      text-align: center;
+    }
+
+    /* ══════════════════════════════════════════
+       SCROLL-TO-TOP
+       ══════════════════════════════════════════ */
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 5rem;
+      right: 1.2rem;
+      z-index: 45;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bar-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s, background 0.2s;
+    }
+
+    .scroll-top-btn.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .scroll-top-btn:hover { background: var(--accent-10); color: var(--accent); }
+
+    /* ══════════════════════════════════════════
+       FULLSCREEN overrides
+       ══════════════════════════════════════════ */
+    body.fullscreen .app-header,
+    body.fullscreen .tab-bar,
+    body.fullscreen .index-panel { display: none; }
+
+    body.fullscreen .content-area { padding-top: 1rem; }
+
+    body.fullscreen .tab-bar + .index-panel + .content-area { padding-top: 1rem; }
+
+    /* ══════════════════════════════════════════
+       ANIMATIONS
+       ══════════════════════════════════════════ */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .block { animation: fadeIn 0.4s ease both; }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .header-title { font-size: 0.75rem; }
+      .content-area { padding: 1.5rem 0.75rem 8rem; }
+    }
+
+    /* ══════════════════════════════════════════
+       DONATION BANNER
+       ══════════════════════════════════════════ */
+    .donate-link {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 0.15rem 0.45rem;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .donate-link:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="app-header" id="appHeader">
+    <div class="header-inner">
+      <span class="header-title">KGK Ngöndro</span>
+
+      <div class="header-controls">
+        <button class="lang-btn active" id="btnTib" onclick="toggleLang('tibetan')">TIB</button>
+        <button class="lang-btn active" id="btnPho" onclick="toggleLang('phonetics')">PHO</button>
+        <button class="lang-btn active" id="btnEng" onclick="toggleLang('translation')">ENG</button>
+
+        <div class="header-divider"></div>
+
+        <a class="donate-link" href="https://www.paypal.com/donate/?hosted_button_id=YOUR_ID" target="_blank" rel="noopener">Donate</a>
+
+        <button class="icon-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
+          <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+        <button class="icon-btn" id="btnFS" onclick="toggleFullScreen()" title="Fullscreen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tab-bar" id="tabBar">
+    <div class="tab-bar-inner">
+      <button class="tab-btn active" data-tab="YOGA" onclick="switchTab('YOGA')">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        <span>Yoga of Arising</span>
+      </button>
+      <button class="tab-btn" data-tab="INDEX" onclick="toggleIndex()">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span>Index</span>
+      </button>
+      <button class="tab-btn" data-tab="NGONDRO" onclick="switchTab('NGONDRO')">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>Ngöndro</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="index-panel" id="indexPanel">
+    <div class="index-inner" id="indexList">
+      </div>
+  </div>
+
+  <div class="content-area" id="contentArea">
+    </div>
+
+  <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <div class="bottom-bar">
+    <div class="bar-inner">
+
+      <div class="bar-group">
+        <button class="bar-btn" onclick="changeSpeed(-1)" title="Slower">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="bar-btn" id="btnPlay" onclick="toggleAutoScroll()" title="Play/Pause">
+          <svg id="iconPlay" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg id="iconPause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button class="bar-btn" onclick="changeSpeed(1)" title="Faster">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+
+      <div class="bar-group">
+        <button class="bar-btn" id="btnTilt" onclick="toggleTiltScroll()" title="Tilt scroll">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="bar-group">
+        <button class="bar-btn" onclick="changeFontSize(-1)" title="Smaller text">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="bar-btn" onclick="changeFontSize(1)" title="Larger text">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+
+const STORAGE_KEY = 'kgk-ngondro-settings';
+
+let state = loadState();
+
+function defaultState() {
+  return {
+    fontSize: 16,
+    isDark: false,
+    showTibetan: true,
+    showPhonetics: true,
+    showTranslation: true,
+    activeTab: 'YOGA',
+    scrollSpeed: 2
+  };
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? { ...defaultState(), ...JSON.parse(s) } : defaultState();
+  } catch { return defaultState(); }
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+}
+
+// ══════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════
+
+const TABS_DATA = {
+  YOGA: [
+    {
+      id: 'section-1',
+      title: '1. Yoga of Arising',
+      blocks: [
+        {
+          id: '1-1',
+          type: 'INSTRUCTION',
+          tibetan: '༄༅། །དང་པོ་ནི། ཐོ་རེངས་ལྡང་བའི་རྣལ་འབྱོར་ལ་རྣམ་པ་གསལ་བའི་སླད་དུ་འདོན་བསྒོམ་ཆབས་ཅིག་པར།',
+          translation: 'First, The yoga of arising at dawn, which both clarifies and cultivates the meaning.'
+        },
+        {
+          id: '1-2',
+          type: 'RECITATION',
+          tibetan: 'ཆོས་སྐུ་སྟོང་པའི་ངང་ལས་གཟུགས་སྐུ་སྒྱུ་མའི་རོལ་པར་རང་བྱུང་བ་ཙམ་དུ།',
+          phonetics: 'chö ku tong pe ngang le zug ku gyu me rol par rang-jung-wa tsam du',
+          translation: 'Dharmakaya from the state of emptiness; Rupakaya as mere self-arising illusory dance;'
+        },
+        {
+          id: '1-3',
+          type: 'RECITATION',
+          tibetan: 'སྣང་བ་ཐམས་ཅད་བླ་མ་ཡི་དམ་མཁའ་འགྲོའི་ཞིང་ཁམས་ཡེ་ཤེས་ལྔའི་རང་འོད་ཀྱི་རང་བཞིན།',
+          phonetics: 'nang wa tam che la ma yi dam khan drö zhing kam ye she nge rang ö kyi rang zhin',
+          translation: 'all appearances are the nature of the self-luminous five wisdoms, the pure lands of the lama, yidam, and dakini.'
+        },
+        {
+          id: '1-4',
+          type: 'RECITATION',
+          tibetan: 'དཔའ་བོ་དང་དཔའ་མོ་རྣལ་འབྱོར་གྱི་དབང་ཕྱུག་མ་རྣམས་ཀྱིས་ཌཱ་མ་རུ་དང་རོལ་མའི་སྒྲ་བསྒྲགས་ཤིང༌།',
+          phonetics: 'pa-wo-dang pa mo nal-jor-gyi wang chuk ma-nam-kyi da ma ru dang rol me dra drak shing',
+          translation: 'Heroes and heroines, yogis, and powerful goddesses sound the damaru and cymbals.'
+        },
+        {
+          id: '1-5',
+          type: 'RECITATION',
+          tibetan: 'ཆོས་ཐམས་ཅད་རང་བཞིན་གྱི་སྐྱེ་འགག་གནས་བ་མེད་པའོ། །',
+          phonetics: 'cho-tam-che rang-zhin-gyi kye gak ne wa me pa-o',
+          translation: 'All phenomena lack the nature of arising, ceasing, and dwelling.'
+        },
+        {
+          id: '1-6',
+          type: 'RECITATION',
+          tibetan: 'འགྲོ་འོང་དམིགས་པ་མེད་པའོ། །',
+          phonetics: 'dro ong mik pa me pa-o',
+          translation: 'They are without reference points of coming or going.'
+        },
+        {
+          id: '1-7',
+          type: 'RECITATION',
+          tibetan: 'མཚན་མ་བསམ་བརྗོད་དང་བྲལ་བའོ། །',
+          phonetics: 'tsen ma sam jö dang drel wa-o',
+          translation: 'Beyond characteristics, thought or expression.'
+        },
+        {
+          id: '1-8',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་ལྷང་ལྷང་སྒྲོགས་པར་བསམ་པའི་དོན་ལ་བློ་བཞག་ཅིང༌།',
+          translation: 'Recite it loudly and clearly while contemplating the meaning in mind.'
+        },
+        {
+          id: '1-9',
+          type: 'RECITATION',
+          tibetan: 'ན་མོ་གུ་རུ་བྷྱ  ན་མོ་དྷེ་ཝ་བྷྱཿ   ན་མོ་ཌཱ་ཀྐི་ནཱི་བྷྱཿ',
+          phonetics: 'namo guru ja, namo dewa ja, namo dakini ja',
+          translation: ''
+        },
+        {
+          id: '1-10',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་ལན་གསུམ་བརྗོད་ཅིང༌། རྨི་ལམ་སྒྱུ་མ་ཙམ་གྱི་རང་ནས་སྡང་ལ།',
+          translation: 'Recite thus three times. As for dreams, mere illusions arising from oneself:'
+        },
+        {
+          id: '1-11',
+          type: 'RECITATION',
+          tibetan: 'སེམས་ཅན་ཐམས་ཅད་མ་རིག་པའི་གཉིད་ལས་སད་པར་གྱུར་ཅིག །',
+          phonetics: 'sem chen tam che ma-rig-pe nyi le se par gyur chik',
+          translation: 'May all sentient beings be awakened from ignorant sleep.'
+        },
+        {
+          id: '1-12',
+          type: 'RECITATION',
+          tibetan: 'སེམས་ཅན་ཐམས་ཅད་འཁོར་བའི་མལ་ནས་ལྡང་བར་གྱུར་ཅིག །',
+          phonetics: 'sem chen tam che kor we mal ne dang war gyur chik',
+          translation: 'May all sentient beings rise up from samsara\'s bed.'
+        },
+        {
+          id: '1-13',
+          type: 'RECITATION',
+          tibetan: 'སངས་རྒྱས་ཆོས་ཀྱི་སྐུ་ཐོབ་པར་གྱུར་ཅིག །',
+          phonetics: 'sang gye cho-kyi-ku tob par gyur chik',
+          translation: 'May they attain the Buddha Dharmakaya.'
+        },
+        {
+          id: '1-14',
+          type: 'INSTRUCTION',
+          tibetan: 'སྙམ་དུ་འདོན་སྒོམ་བྱ།',
+          translation: 'Contemplate together with the recitation.'
+        }
+      ]
+    },
+    {
+      id: 'section-2',
+      title: '2. Key Point of the Body and Blessing the Speech',
+      blocks: [
+        {
+          id: '2-1',
+          type: 'INSTRUCTION',
+          tibetan: '༄༅། །གཉིས་པ་ནི། བདེ་བའི་སྟན་ལ་ལུས་གནད་རྣམ་སྣང་གི་ཆོས་བདུན་དང་ ལྡན་པས་འདུག་སྟེ། ངག་གནད་ཚེ་རབས་ཐོག་མེད་ནས་ཉོན་མོངས་པ་དུག་ གསུམ་གྱི་ཀུན་ནས་བསླང་བའི་སྡིག་ལྟུང་ཉེས་སྒྲིབ་བག་ཆག་ནད་གདོན་དང་ བཅས་པ་ཐམས་ཅད་འཇའ་ཚོན་སྔོ་དམར་གྱི་རྣམ་པ་ལུས་ཀྱི་ཆ་ཐམས་ཅད་ནས་ འུབ་ཀྱི་འདུས་པ་སྣ་སྒོའི་རླུང་དང་འགྲོགས་ཏེ་ཕྱིར་སང་སང་སོང་བས་སྡིག་སྒྲིབ་ ཐམས་ཅད་སངས་ཀྱིས་དག་པའི་མོས་པ་དང་བཅས། སྣ་བུག་གཡོན་ནས་ གསུམ། གཡས་ནས་གསུམ། ཆ་མཉམ་གསུམ་རེ་སྟེ་དགུ་ཕྲུགས་སམ། ཡང་ན་ ལན་རེ་རེ་སྟེ་གསུམ་ཕྲུགས་སུ་རླུང་རོ་བསལ། ངག་བྱིན་གྱིས་རླབས་པའི་ཕྱིར་བླ་ མ་དགོངས་འདུས་ཀྱི་བཟླས་བརྗོད་ནུས་པ་སྟོབས་བསྐྱེད་ལྟར་བྱ་བའམ།',
+          translation: 'Second is to sit on a comfortable seat, with the body in the seven-point posture of Vairochana. For beginningless successive lives, through the three poisons of conflicting emotions, the speech has sown downfalls, obscurations, tendencies, sickness, and dön. Visualize these as a rainbow of blue and red colors gathering into a mass from all the parts of the body and expel them from the gateway of the nose, aided by the breath. By clearing it out, think that all sins and obscurations are purified. Breathe from the left nostril three times, from the right nostril three times and then from both together three times, for a total of ninefold times. Alternatively, clear the stale breath as a threefold set, one each. By blessing the speech, you cultivate the embodiment of the Lama\'s recitation with its expression, power, and strength:'
+        },
+        {
+          id: '2-2',
+          type: 'RECITATION',
+          tibetan: 'བདག་གི་ལྕེ་སྟེང་རཾ་ཡིག་དམར་པོ་ལས༔',
+          phonetics: 'dak gi che teng ram yig mar po le',
+          translation: 'Fire blazes from the red letter RAM on my tongue,'
+        },
+        {
+          id: '2-3',
+          type: 'RECITATION',
+          tibetan: 'མེ་འབར་བསྲེགས་ནས་འོད་ཀྱི་རྣམ་པའི་ངང་༔',
+          phonetics: 'me bar sek ne ö kyi nam pe ngang',
+          translation: 'and incinerates it, turning it into a form of light,'
+        },
+        {
+          id: '2-4',
+          type: 'RECITATION',
+          tibetan: 'མི་ཤིགས་མི་ཚུགས་སྲ་བརྟན་ཕ་ལམ་གྱི༔',
+          phonetics: 'mi shik mi tsuk sa ten pa lam gyi',
+          translation: 'indestructible, unharmed, diamond-hard,'
+        },
+        {
+          id: '2-5',
+          type: 'RECITATION',
+          tibetan: 'རྒྱ་གྲམ་དམར་པོ་དྭངས་གསལ་ལྟེ་བའི་སྦུབས༔',
+          phonetics: 'gya dram mar po dang sel te we bub',
+          translation: 'inside the hub of a clear red double vajra.'
+        },
+        {
+          id: '2-6',
+          type: 'RECITATION',
+          tibetan: 'དབྱིངས་གསལ་མདོག་དཀར་མུ་ཏིག་ཕྲེང་ལྟར་བསྐོར༔',
+          phonetics: 'ying sel dok kar mu tik treng tar kor',
+          translation: 'In the clear expanse, like a string of white pearls encircling,'
+        },
+        {
+          id: '2-7',
+          type: 'RECITATION',
+          tibetan: 'རྒྱ་གྲམ་མཐའ་མར་ཡེ་དྷར་དཀར་པོས་བསྐོར༔',
+          phonetics: 'gya dram ta mar ye dhar kar pö kor',
+          translation: 'the white "Ye dharma" mantra turns around the outside of the crossed vajra.'
+        },
+        {
+          id: '2-8',
+          type: 'RECITATION',
+          tibetan: 'སྔགས་ཕྲེང་རྣམས་ལས་འོད་ཟེར་ཕྱོགས་བཅུར་འཕྲོས༔',
+          phonetics: 'ngak treng nam le ö zer chok chur trö',
+          translation: 'From the mantra garland, light radiates in the ten directions,'
+        },
+        {
+          id: '2-9',
+          type: 'RECITATION',
+          tibetan: 'རྩ་བརྒྱུད་བླ་མ་རྒྱལ་བ་སྲས་བཅས་ཀྱི༔',
+          phonetics: 'tsa gyü la ma gyel wa se che kyι',
+          translation: 'invoking the root and lineage lamas, the buddhas and their heirs,'
+        },
+        {
+          id: '2-10',
+          type: 'RECITATION',
+          tibetan: 'སྐུ་གསུང་ཐུགས་ཀྱི་བྱིན་རླབས་མ་ལུས་པ༔',
+          phonetics: 'ku sung tuk kyi jin lab ma lü pa',
+          translation: 'The blessings of their body, speech, and mind without exception,'
+        },
+        {
+          id: '2-11',
+          type: 'RECITATION',
+          tibetan: 'འོད་དམར་ཚུར་བཀུག་རྡོ་རྗེའི་སྔགས་ཕྲེང་ལ༔',
+          phonetics: 'ö mar tsur kuk dor je ngak treng la',
+          translation: 'Are gathered as red light into the vajra mantra garland,'
+        },
+        {
+          id: '2-12',
+          type: 'RECITATION',
+          tibetan: 'ཐིམ་པས་དབྱེར་མེད་གཅིག་གྱུར་ངག་སྒྲིབ་སོགས༔',
+          phonetics: 'tim pe yer me chik gyur ngak drip sok',
+          translation: 'dissolving to indivisibly become one, purifying'
+        },
+        {
+          id: '2-13',
+          type: 'RECITATION',
+          tibetan: 'དག་ནས་གསུང་གི་དངོས་གྲུབ་ཐོབ་པར་རྒྱུར༔',
+          phonetics: 'dak ne sung gi ngö drup top par gyur',
+          translation: 'speech obscurations and such, to attain the siddhis of awakened speech.'
+        },
+        {
+          id: '2-14',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་དམིགས་པ་དང་བཅས།',
+          translation: 'Thus, with the visualization, recite:'
+        },
+        {
+          id: '2-15',
+          type: 'RECITATION',
+          tibetan: 'ཨ་ཨཱཿ ཨི་ཨཱི། ཨུ་ཨཱུ། རྀ་རཱྀ། ལྀ་ལཱྀ། ཨེ་ཨཻ། ཨོ་ཨོཾ། ཨཾ་ཨཱཿ',
+          phonetics: 'aa, ii, uū, riri, li li, e ai, o au, am ah',
+          translation: '(Sanskrit vowels)'
+        },
+        {
+          id: '2-16',
+          type: 'RECITATION',
+          tibetan: 'ཀ་ཁ་ག་གྷ་ང༌། ཙ་ཚ་ཛ་ཛྷ་ཉ། ཊ་ཋ་ཌ་ཌྷ་ཎ། ཏ་ཐ་ད་དྷ་ན། པ་ཕ་བ་བྷ་མ། ཡ་ར་ལ་ཝ། ཤ་ཥ་ས་ཧ་ཀྵ།',
+          phonetics: 'ka kha ga gha nga | cha chha ja jha nya | tra t\'hra dra dhra nra | ta t\'ha da dha na | pa p\'ha ba bha ma | ya ra la wa | sha kha sa ha ksha',
+          translation: '(Sanskrit consonants)'
+        },
+        {
+          id: '2-17',
+          type: 'RECITATION',
+          tibetan: 'ཡེ་དྷརྨ་ཧེ་ཏུ་པྲ་བྷ་ཝ་ཧེ་ཏུནྟེ་ཥནྟ་ཐཱ་ག་ཏ་ཧྱ་བ་དཏ། ཏེ་ཥཱཉྩ་ཡོ་ནི་རོ་དྷ་ཡེ་ཝཾ་བ་དཱི་མ་ཧཱ་ཤྲ་མ་ཎ་སྭཱ་ཧཱ།',
+          phonetics: 'ye dharma hetu prabhava hetum tekham tathagato hyavadat tekkham tsa yo nirodha ewam wadi mahashramana soha',
+          translation: '(Ye Dharma Formula)'
+        }
+      ]
+    },
+    {
+      id: 'section-3',
+      title: '3. Consecrating the Mala',
+      blocks: [
+        {
+          id: '3-1',
+          type: 'INSTRUCTION',
+          tibetan: 'བསྙེན་སྒྲུབ་སོགས་ཀྱི་སྐབས་བགྲང་ཕྲེང་རབ་གནས་བྱིན་རླབས་ནི།... གཡོན་བའི་མཐིལ་དུ་ཟླ་བ་ལ་ཨཱཿས་མཚན་པར་གྱུར་པར་བསམ་ལཱ།',
+          translation: 'Blessing the mala beads for the sake of practice of Approach, Accomplishment etc: On the palm of your left hand, on a moon seat, marked with the syllable A…'
+        },
+        {
+          id: '3-2',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་སྭ་བྷཱ་ཝས་སྦྱང༌།',
+          phonetics: 'om sobhava shuddha sarva dharma sobhava shuddho hang',
+          translation: 'Purify with the sobhawa mantra:'
+        },
+        {
+          id: '3-3',
+          type: 'RECITATION',
+          tibetan: 'སྟོང་ལས་པདྨ་ཉི་ཟླའི་སྟེང་༔',
+          phonetics: 'tong le pe ma ni de teng',
+          translation: 'From emptiness, on a lotus, moon and sun seat.'
+        },
+        {
+          id: '3-4',
+          type: 'RECITATION',
+          tibetan: 'མདོ་འཛིན་གཙོ་བོ་ཡབ་ཡུམ་ལ༔',
+          phonetics: 'do dzin tso wo yab yum la',
+          translation: 'the Guru-bead is the principle Deities Yab-Yum.'
+        },
+        {
+          id: '3-5',
+          type: 'RECITATION',
+          tibetan: 'ཕྲེང་བ་འཁོར་གྱི་རྣམ་པས་བསྐོར༔',
+          phonetics: 'treng wa kor gyi nam pe kor',
+          translation: 'completely encircled by a mala.'
+        },
+        {
+          id: '3-6',
+          type: 'RECITATION',
+          tibetan: 'གནས་གསུམ་འབྲུ་གསུམ་མཚན་པ་ལས༔',
+          phonetics: 'ne sum dru sum tsen pa le',
+          translation: 'From the three syllables, in the three places [of the deities],'
+        },
+        {
+          id: '3-7',
+          type: 'RECITATION',
+          tibetan: 'འོད་ཕྲོས་ཡེ་ཤེས་སྤྱན་དྲངས་ཐིམ༔',
+          phonetics: 'ö trö ye she chen drang tim',
+          translation: 'light radiates, invites primordial wisdom deities and melts [into the visualization].'
+        },
+        {
+          id: '3-8',
+          type: 'RECITATION',
+          tibetan: 'ཛཿཧཱུྃ་བཾ་ཧོཿ',
+          phonetics: 'dza hung bam ho',
+          translation: ''
+        },
+        {
+          id: '3-9',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་བཛྲ་ཨརྒ་པཱ་དཾ་པུཥྤ་དྷུབ་པེ་ཨཱ་ལོ་ཀེ་གྷནྣེ་ནཻ་ཝི་དྱེ་ཤབྡ',
+          phonetics: 'om vajra argham padyam pushpe dhupe aloke ghandhe naividye shabda',
+          translation: '(Offerings)'
+        },
+        {
+          id: '3-10',
+          type: 'INSTRUCTION',
+          tibetan: 'ལྷ་ཚོགས་ཐམས་ཅད་བཟླ་བྱའི་ཡིག་འབྲུའི་རྣམ་པར་ཆར་ལྟར་བབས་ནས་ཕྲེང་བ་ལ་ཐིམ་པར་རྒྱུར་མོས་ལ།',
+          translation: 'The entire host of deities takes the form of the recited syllables falling like rain, which dissolve into the mala.'
+        },
+        {
+          id: '3-11',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་རུ་ཙི་པྲ་མརྟ ན ཡེ་རཏྣ་མ་ཎི་དྷ་ར་ཛྙཱ་ན་དེ་བ་ཨ་བྷི་ཥིཉྩ་ཧཱུྃ་སྭཱ་ཧཱ༔',
+          phonetics: 'om rutsi pramarta naye ratna mani dhara jnana dewa abhikhintsa hung soha',
+          translation: ''
+        },
+        {
+          id: '3-12',
+          type: 'RECITATION',
+          tibetan: 'ལྷ་རྣམས་འོད་ཞུ་ཕྲེང་བར་གྱུར། །',
+          phonetics: 'lha nam ö zhu treng war gyur',
+          translation: 'The deities melt into light and become a mala.'
+        },
+        {
+          id: '3-13',
+          type: 'RECITATION',
+          tibetan: 'ཆོས་དབྱིངས་ཀུན་ཁྱབ་རྩ་གསུམ་ལྷ། །',
+          phonetics: 'chö ying kun kyab tsa sum lha',
+          translation: 'The three roots deities that pervade throughout Dharmadhatu'
+        },
+        {
+          id: '3-14',
+          type: 'RECITATION',
+          tibetan: 'གདོད་ནས་ཕྲེང་བའི་ངོ་བོར་ཤར། །',
+          phonetics: 'dö ne treng we ngo wor shar',
+          translation: 'shine as the primordial mala\'s essence.'
+        },
+        {
+          id: '3-15',
+          type: 'RECITATION',
+          tibetan: 'ཐབས་ཤེས་སོར་མོའི་སྦྱར་བ་ཡིས། །',
+          phonetics: 'tab she sor mö jar wa yi',
+          translation: 'Through just counting with the joined fingers of means and wisdom,'
+        },
+        {
+          id: '3-16',
+          type: 'RECITATION',
+          tibetan: 'བགྲང་བ་ཙམ་གྱིས་མཆོག་ཐུན་དངོས། །',
+          phonetics: 'trang wa tsam gyi chok tun ngö',
+          translation: 'supreme and common siddhis'
+        },
+        {
+          id: '3-17',
+          type: 'RECITATION',
+          tibetan: 'ཐོག་མེད་འགྲུབ་པའི་མཐུ་ཅན་གྱུར། །',
+          phonetics: 'thok me drup pe tu chen gyur',
+          translation: 'arise unimpeded, and one becomes powerful.'
+        },
+        {
+          id: '3-18',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་རུ་ཙི་ར་མ་ཎི་པྲ་ཝརྟ་ཡེ་སྭཱཧཱ',
+          phonetics: 'om rutsi ramani prawarta ye soha',
+          translation: ''
+        }
+      ]
+    },
+    {
+      id: 'section-4',
+      title: '4. The Key Point of the Mind',
+      blocks: [
+        {
+          id: '4-1',
+          type: 'INSTRUCTION',
+          tibetan: 'དེ་ནས་སེམས་གྱི་གནད།',
+          translation: 'Then, the key point of the mind:'
+        },
+        {
+          id: '4-2',
+          type: 'RECITATION',
+          tibetan: 'ཆོས་ཐམས་ཅད་ཡེ་ནས་སངས་རྒྱས་ཀྱི་རང་བཞིན་ཡིན་པ་ལ།',
+          phonetics: 'cho-tam-che ye ne sang-gye-kyi rang zhin yin pa la',
+          translation: 'All phenomena are primordially the nature of Buddhahood.'
+        },
+        {
+          id: '4-3',
+          type: 'RECITATION',
+          tibetan: 'དེ་ལྟར་མ་རྟོགས་པས་འཁོར་བ་ན་འཁྱམས་པའི་སེམས་ཅན་ཐམས་ཅད་སྙིང་རེ་རྗེ།',
+          phonetics: 'de tar ma-tok-pe kor-wa-na kyam pe sem chen tam che nying re je',
+          translation: 'By not realizing this, all beings wander around in samsara. How pitiful!'
+        },
+        {
+          id: '4-4',
+          type: 'RECITATION',
+          tibetan: 'དེ་དག་ཐམས་ཅད་རྫོགས་པའི་སངས་རྒྱས་ཀྱི་ས་ལ་འགོད་པར་བྱའོ།།',
+          phonetics: 'de dak tam che dzok pe sang-gye-kyi sa la gö par ja-o',
+          translation: 'I must establish all of them on the level of a perfect Buddha.'
+        },
+        {
+          id: '4-5',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་ཚིག་དོན་སྦྲག་མར་སྙིང་ཐག་པ་ནས་འདུན་པ་ཤུགས་དྲག་ཏུ་གཏོང་བ་བྱང་ཆུབ་སེམས་ཀྱི་ཀུན་སློང་ཏེ། སྒོ་གསུམ་གྱི་དགེ་ཚོགས་མ་ལུས་རྫོགས་བྱང་གི་རྒྱུར་འརྒྱུར་བའི་ཐབས་ཚུལ་བླ་ན་མེད་པའོ། དེ་ནད་དཔལ་ལྡན་རྩ་བའི་སོགས་སྔོན་འགྲོ་དངོས་ལ་བཞུག་པར་བྱ།།',
+          translation: 'Thus, from the depths of one\'s heart, making this aspiration with intense fervor is the bodhicitta motivation. It is the unsurpassable method for accumulation and purification of the three gates as causes for perfect awakening. Having done it before the actual Ngondro practice, recite [the ngondro starting with] PAL DEN TSA WAI…'
+        },
+        {
+          id: '4-6',
+          type: 'NAVIGATION',
+          translation: 'Continue to Ngöndro',
+          targetTab: 'NGONDRO'
+        }
+      ]
+    }
+  ],
+  NGONDRO: [
+    {
+      id: 'ng-1',
+      title: '1. The Common Preliminaries',
+      blocks: [
+        {
+          id: 'ng-title',
+          type: 'TITLE',
+          tibetan: '༄༅། ཀུན་བཟང་དགོངས་པ་ཀུན་འདུས་ཀྱི་སྔོན་འགྲོའི་ངག་འདོན་བྱང་ཆུབ་ལམ་བཟང་ཞེས་བྱ་བ་བཞུགས་སོ།།',
+          phonetics: 'THE EXCELLENT PATH OF AWAKENING',
+          translation: 'The Liturgy for the Preliminary Practice of Kunzang Gongdu - The Synthesis of Samantabhadra\'s Entire Wisdom Mind'
+        },
+        {
+          id: 'ng-note',
+          type: 'INSTRUCTION',
+          tibetan: 'ཨོཾ་སྭ་སྟི། །རབ་འབྱམས་སྐྱབས་ཀུན་འདུས་པའི་བདག །དྲིན་ཅན་བླ་མར་གུས་བཏུད་ནས། \n།ཀུན་བཟང་དགོངས་པ་ཀུན་འདུས་ཀྱི། །སྔོན་འགྲོའི་ངག་འདོན་འཇུག་བདེར་སྤྲོ།།',
+          translation: 'OM SVASTI\nMaster who embodies the profuse refuges, kind root lama, bowing to you with devotion, \nI shall expound this agreeable liturgy of the preliminary practice of the Synthesis of The Entire Wisdom Mind of Samantabhadra.'
+        },
+        {
+          id: 'ng-1-1',
+          type: 'INSTRUCTION',
+          tibetan: 'འདི་ལ་གཉིས། ཐུན་སྤྱིའི་སྔོན་འགྲོ་དང༌། སྐཔས་དོན་སྒོས་ཀྱི་སྔོན་འགྲོའོ། །དང་པོ་ནི། བདེ་བའི་སྟན་ལ་ལུས་གནད་དྲང་པོར་བསྲང་ཞིང་སེམས་རྣལ་དུ་ཕབ་ནས་རླུང་རོ་ལན་གསུམ་ཕྱིར་བསལ། སྤྱི་བོར་རྩ་བའི་བླ་མ་དགྱེས་བཞིན་དུ་བཞུགས་པར་བསྒོམ་ལ། མོས་གུས་གདུང་ཤུགས་དྲག་པོས།',
+          translation: 'In this there are two parts: The general, common preliminary and the particular, pertinent preliminary. For the first, sit upright on a comfortable seat, and after settling the mind naturally, clear out the stale breath three times. Then meditate that your root lama sits cheerfully on the crown of your head and with intense, heartfelt devotion pray as follows:'
+        },
+        {
+          id: 'ng-1-2',
+          type: 'RECITATION',
+          tibetan: 'དཔལ་ལྡན་རྩ་བའི་བླ་མ་རིན་པོ་ཆེ།།',
+          phonetics: 'pal den tsa wai la ma rin po che',
+          translation: 'Glorious, previous root lama'
+        },
+        {
+          id: 'ng-1-3',
+          type: 'RECITATION',
+          tibetan: 'བདག་གི་སྤྱི་བོར་པད་ཟླའི་གདན་བཞུགས་ལ།།',
+          phonetics: 'dak gi chi wor pe day den shuk la',
+          translation: 'seated on a lotus and moon seat above my head'
+        },
+        {
+          id: 'ng-1-4',
+          type: 'RECITATION',
+          tibetan: 'བཀའ་དྲིན་ཆེན་པོའི་སྒོ་ནས་རྗེས་བཟུང་སྟེ།།',
+          phonetics: 'ka drin chen poy go ne je zung te',
+          translation: 'take care of me with great kindness'
+        },
+        {
+          id: 'ng-1-5',
+          type: 'RECITATION',
+          tibetan: 'སྐུ་གསུང་ཐུགས་ཀྱི་དངོས་གྲུབ་སྩལ་དུ་གསོལ།།',
+          phonetics: 'ku sung tuk kyi ngö drup tsal du söl',
+          translation: 'and bestow the powers of body, speech and mind.'
+        },
+        {
+          id: 'ng-1-6',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་དང།',
+          translation: 'Thinking like that, say:'
+        },
+        {
+          id: 'ng-1-7',
+          type: 'RECITATION',
+          tibetan: 'དུས་གསུམ་སངས་རྒྱས་ཐམས་ཅད་ཀྱི་ངོ་བོ་བླ་མ་རིན་པོ་ཆེ་མཁྱེན།།',
+          phonetics: 'du sum sang gye tam che kyi ngo wo la ma rin po che kyen',
+          translation: 'Precious lama, essence of all past, present and future buddhas, think of me!'
+        },
+        {
+          id: 'ng-1-8',
+          type: 'RECITATION',
+          tibetan: 'བདག་གི་རྒྱུད་སྨིན་ཅིང་གྲོལ་བར་བྱིན་གྱིས་བརླབ་དུ་གསོལ།།',
+          phonetics: 'dak gi gyü min chin drol war jin gyi lap tu söl',
+          translation: 'Grant the blessing of ripening and liberating my being.'
+        },
+        {
+          id: 'ng-1-9',
+          type: 'RECITATION',
+          tibetan: 'ཟབ་ལམ་གྱི་རྟོགས་པ་ཁྱད་པར་ཅན་རྒྱུད་ལ་སྐྱེ་བར་བྱིན་གྱིས་བརླབ་ཏུ་གསོལ།།',
+          phonetics: 'zab lam gyi tok pa kye par chen gyü la kye war jin gyi lap tu söl',
+          translation: 'Bless me so that the exceptional realization of the profound path will be born in me.'
+        },
+        {
+          id: 'ng-1-10',
+          type: 'RECITATION',
+          tibetan: 'ཚེ་འདི་ཉིད་ལ་འོད་གསལ་རྫོགས་པ་ཆེན་པོའི་ལམ་མཆོག་མཐར་ཕྱིན་པར་བྱིན་གྱིས་བརླབ་ཏུ་གསོལ།།',
+          phonetics: 'tse di nyi la ö sal dzok pa chen pöy lam chok tar chin par jin gyi lap tu söl',
+          translation: 'Bless me to complete the profound path of Clear Light Great Perfection in this very lifetime.'
+        },
+        {
+          id: 'ng-1-11',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་གསོལ་བ་བཏབ་མཐར། བླ་མ་འོད་དུ་ཞུ་ནས་རང་ལ་ཐིམ་པར་བསམ་ཞིང་རང་བབས་སུ་ཀློད་དེ་འཇོག་གོ །',
+          translation: 'After the prayer, Guru dissolves into light and absorbs into you. Rest naturally at ease.'
+        },
+        {
+          id: 'ng-1-12',
+          type: 'INSTRUCTION',
+          tibetan: '།གཉིས་པ་སྐབས་དོན་སྔོན་འགྲོ་དངོས་ལ། ཐུན་མོང་དང། ཁྱད་པར་གཉིས་ཀྱི། དང་པོ་ཐུན་མོང་བློ་ལྡོག་རྣམ་པ་བཞིས་རྒྱུད་སྦྱོང་བ་ནི།',
+          translation: 'Secondly, in the particular, pertinent preliminary, there are two parts: the common and the special. The common is the cultivation of one\'s being through The Four Thoughts that Turn the Mind.'
+        }
+      ]
+    },
+    {
+      id: 'ng-2',
+      title: 'The Four Thoughts that Turn the Mind',
+      blocks: [
+        {
+          id: 'ng-2-1',
+          type: 'RECITATION',
+          tibetan: 'དལ་འབྱོར་འདི་ནི་ཤིན་ཏུ་རྙེད་པར་དཀའ།།',
+          phonetics: 'dal jor di ni shin tu nye par ka',
+          translation: 'This well endowed birth is so difficult to find.'
+        },
+        {
+          id: 'ng-2-2',
+          type: 'RECITATION',
+          tibetan: 'སྐྱེས་བུས་དོན་སྒྲུབ་ཐོབ་པར་གྱུར་པ་ལ།།',
+          phonetics: 'kye bü dön drup top par gyur pa la',
+          translation: 'Once a person has obtained a meaningful life,'
+        },
+        {
+          id: 'ng-2-3',
+          type: 'RECITATION',
+          tibetan: 'གལ་ཏེ་འདི་ལ་ཕན་པ་མ་བསྒྲུབ་ན།།',
+          phonetics: 'gal te di la pen pa ma drup na',
+          translation: 'if its purpose is not accomplished now,'
+        },
+        {
+          id: 'ng-2-4',
+          type: 'RECITATION',
+          tibetan: 'ཕྱིས་འདི་ཡང་དག་འབྱོར་པར་ག་ལ་འགྱུར།།',
+          phonetics: 'chi di yang dak jor war ga la gyur',
+          translation: 'how will this perfect opportunity ever come again?'
+        },
+        {
+          id: 'ng-2-5',
+          type: 'RECITATION',
+          tibetan: 'སྲིད་གསུམ་མི་རྟག་སྟོན་ཀའི་སྤྲིན་དང་འདྲ།།',
+          phonetics: 'si sum mi tak tön kay trin dung dra',
+          translation: 'The three existences are impermanent, like autumn clouds.'
+        },
+        {
+          id: 'ng-2-6',
+          type: 'RECITATION',
+          tibetan: 'འགྲོ་བའི་སྐྱེ་འཆི་གར་ལ་བལྟ་དང་མཚུངས།།',
+          phonetics: 'dro way kye chi gar la ta dang tsung',
+          translation: 'The births and deaths of beings are like the visions of a dance.'
+        },
+        {
+          id: 'ng-2-7',
+          type: 'RECITATION',
+          tibetan: 'སྐྱེས་བུའི་ཚེ་འགྲོ་ནམ་མཁའི་གློག་འདྲ་སྟེ།།',
+          phonetics: 'kye buy tse dro nam kay lok dra te',
+          translation: 'A person\'s life span is like lightning in the sky,'
+        },
+        {
+          id: 'ng-2-8',
+          type: 'RECITATION',
+          tibetan: 'རི་གཟར་འབབ་ཆུ་བཞིན་དུ་མྱུར་མགྱོགས་འགྲོ།།',
+          phonetics: 'ri zar bap chu shin du nyur gyok dro',
+          translation: 'passing as quickly as a steep mountain waterfall.'
+        },
+        {
+          id: 'ng-2-9',
+          type: 'RECITATION',
+          tibetan: 'དུས་ཀྱིས་བསྙེན་ནས་རྒྱལ་པོ་འགྲོ་གྱུར་ན།།',
+          phonetics: 'du kyi nyen ne gyal po dro gyur na',
+          translation: 'When the time has come, even for a king,'
+        },
+        {
+          id: 'ng-2-10',
+          type: 'RECITATION',
+          tibetan: 'ལོངས་སྤྱོད་མཛའ་དང་གཉེན་བཤེས་རྗེས་མི་འབྲང༌།།',
+          phonetics: 'long chö dza dang nyen she je mi drang',
+          translation: 'possessions, relatives and friends cannot follow.'
+        },
+        {
+          id: 'ng-2-11',
+          type: 'RECITATION',
+          tibetan: 'སྐྱེས་བུ་དག་ནི་གར་གནས་གར་འགྲོ་ཡང༌།།',
+          phonetics: 'kye bu dak ni gar ne gar dro yang',
+          translation: 'But for all people, wherever they are and wherever they go,'
+        },
+        {
+          id: 'ng-2-12',
+          type: 'RECITATION',
+          tibetan: 'ལས་ནི་གྲིབ་མ་བཞིན་དུ་རྗེས་སུ་འབྲང༌།།',
+          phonetics: 'le ni drip ma shin du je su drang',
+          translation: 'karma follows behind like a shadow.'
+        },
+        {
+          id: 'ng-2-13',
+          type: 'RECITATION',
+          tibetan: 'སྲེད་སྲིད་མ་རིག་དབང་གིས་སྐྱེ་བོ་རྣམས།།',
+          phonetics: 'se si ma rik wang gi kye wo nam',
+          translation: 'Beings under the power of ignorant attached existence --'
+        },
+        {
+          id: 'ng-2-14',
+          type: 'RECITATION',
+          tibetan: 'མི་དང་ལྷ་དང་ངན་སོང་རྣམ་གསུམ་པོ།།',
+          phonetics: 'mi dang lha dang ngen song nam sum po',
+          translation: 'humans, gods and the three lower realms --'
+        },
+        {
+          id: 'ng-2-15',
+          type: 'RECITATION',
+          tibetan: 'འགྲོ་བ་ལྔ་པོ་དག་ཏུ་མི་མཁས་འཁོར།།',
+          phonetics: 'dro wa nga po dak tu mi ke kor',
+          translation: 'cycle unwittingly through these five states'
+        },
+        {
+          id: 'ng-2-16',
+          type: 'RECITATION',
+          tibetan: 'དཔེར་ན་རྫ་མཁན་འཁོར་ལོ་འཁོར་བ་བཞིན།།',
+          phonetics: 'per na dza khen khor lo khor wa shin',
+          translation: 'like the spinning of a potter\'s wheel.'
+        },
+        {
+          id: 'ng-2-17',
+          type: 'RECITATION',
+          tibetan: 'སྲིད་གསུམ་རྒ་དང་ནད་ཀྱི་སྡུག་བསྔལ་འབར།།',
+          phonetics: 'si sum ga dang ne kyi duk ngel bar',
+          translation: 'The three existences burn with the pain of old age and sickness.'
+        },
+        {
+          id: 'ng-2-18',
+          type: 'RECITATION',
+          tibetan: 'འདི་ན་འཆི་མེད་རབ་འབར་མགོན་མེད་དེ།།',
+          phonetics: 'di na chi me rab bar gön me de',
+          translation: 'Here, in this endless, excruciating, helpless state,'
+        },
+        {
+          id: 'ng-2-19',
+          type: 'RECITATION',
+          tibetan: 'སྲིད་ལས་བྱུང་ལ་འགྲོ་བ་རྟག་ཏུ་རྨོངས།།',
+          phonetics: 'si le jung la dro wa tak tu mong',
+          translation: 'they remain ignorant of the way out of existence,'
+        },
+        {
+          id: 'ng-2-20',
+          type: 'RECITATION',
+          tibetan: 'བུམ་པར་ཆུད་པའི་བུང་བ་འཁོར་བ་བཞིན།།',
+          phonetics: 'bum par chü pay bung wa khor wa shin',
+          translation: 'like bees circling around inside of a bottle.'
+        },
+        {
+          id: 'ng-2-21',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་པ་རྣམས་ངག་དུ་བརྗོད་པའམ་མ་བརྗོད་ཀྱང་རུང་སྟེ་དོན་ཡིད་ལ་བསམ་པས་སྣ་དྲངས་ནས།',
+          translation: 'Whether or not these thoughts are read out loud, contemplate their meaning so that they become the inspiration.'
+        },
+        {
+          id: 'ng-2-22',
+          type: 'RECITATION',
+          tibetan: 'མཁའ་ཁྱབ་འགྲོ་ཀུན་བདག་གི་ཕ་མ་སྟེ།།',
+          phonetics: 'kha khyab dro kun dak gi pa ma te',
+          translation: 'All beings throughout space, my mothers and fathers,'
+        },
+        {
+          id: 'ng-2-23',
+          type: 'RECITATION',
+          tibetan: 'བདེ་བ་འདོད་ཀྱང་སྡུག་བསྔལ་འབའ་ཞིག་སྒྲུབ།།',
+          phonetics: 'de wa dö kyang duk ngel ba shik drup',
+          translation: 'desire happiness but achieve only suffering.'
+        },
+        {
+          id: 'ng-2-24',
+          type: 'RECITATION',
+          tibetan: 'ཐར་མེད་འཁོར་བར་འཁྱམས་པ་སྙིང་རེ་རྗེ།།',
+          phonetics: 'tar me khor war khyam pa nying re je',
+          translation: 'How pitiful they are, wandering without escape in samsara.'
+        },
+        {
+          id: 'ng-2-25',
+          type: 'RECITATION',
+          tibetan: 'འདི་རྣམས་བདེ་ལྡན་སྡུག་བསྔལ་བྲལ་བ་དང།།',
+          phonetics: 'di nam de den duk ngel dral wa dang',
+          translation: 'In order for them to have happiness, freedom from suffering,'
+        },
+        {
+          id: 'ng-2-26',
+          type: 'RECITATION',
+          tibetan: 'འཕགས་པའི་བདེ་ཐོབ་བཏང་སྙོམས་ཆེར་འགོད་ཕྱིར།།',
+          phonetics: 'pak pay de top tang nyom cher gö chir',
+          translation: 'obtain the ultimate bliss and be established in great equanimity,'
+        },
+        {
+          id: 'ng-2-27',
+          type: 'RECITATION',
+          tibetan: 'ཟབ་ལམ་ཉམས་ལེན་མཐའ་རུ་དབྱུང་བར་བགྱི།།',
+          phonetics: 'zab lam nyam len ta ru yung war gyi',
+          translation: 'I will practice the profound path to its completion.'
+        },
+        {
+          id: 'ng-2-28',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་ཚད་མེད་བཞི་ལ་བློ་སྦྱངས་པས་འོག་གི་ཉམས་ལེན་སོ་སོའི་དོན་རྣལ་མ་རྒྱུད་ལ་སྐྱེ་བའི་གཞི་འདིང་ངོ༌། །',
+          translation: 'Training the mind with these "four immeasurables" establishes the basis for the meaning of the individual practices below to arise naturally in one\'s stream of being.'
+        }
+      ]
+    },
+    {
+      id: 'ng-3',
+      title: '2.1 Refuge',
+      blocks: [
+        {
+          id: 'ng-3-1',
+          type: 'INSTRUCTION',
+          tibetan: 'གཉིས་པ་ཁྱད་པར་གྱི་སྔོན་འགྲོ་ལ་ལྔ་ལས། དང་པོ་ལམ་གྱི་འཇུག་སྒོ་སྐྱབས་སུ་འགྲོ་བ་ནི། ཐོག་མར་སྐྱབས་ཡུལ་གསལ་གདབ་པ་ལ།',
+          translation: 'Secondly, of the five parts in the special preliminary, the first is the way to enter the path of going for refuge. First of all, clearly imagine the objects of refuge:'
+        },
+        {
+          id: 'ng-3-2',
+          type: 'RECITATION',
+          tibetan: 'རང་ཉིད་གནས་པའི་ས་ཕྱོགས་འདི་དག་ཀུན།།',
+          phonetics: 'rang nyi ne pe sa chok di dak kun',
+          translation: 'This place where I am, the entire area.'
+        },
+        {
+          id: 'ng-3-3',
+          type: 'RECITATION',
+          tibetan: 'དག་པའི་ཞིང་ཁམས་མཚན་ཉིད་ཡོངས་རྫོགས་དབུས།།',
+          phonetics: 'dak pay shing kham tsen nyi yong dzok ü',
+          translation: 'is the pure land with all its perfect characteristics.'
+        },
+        {
+          id: 'ng-3-4',
+          type: 'RECITATION',
+          tibetan: 'དཔག་བསམ་སྡོང་པོ་ཡལ་ག་ལྔ་ལྡན་པ།།',
+          phonetics: 'pak sam dong po yel ka nga den pa',
+          translation: 'In the center of it is a wish-fulfilling tree with a trunk and five branches.'
+        },
+        {
+          id: 'ng-3-5',
+          type: 'RECITATION',
+          tibetan: 'ལོ་འདབ་མེ་ཏོག་འབྲས་བུ་ཕུན་ཚོགས་པས།།',
+          phonetics: 'lo dap me tok dre bu pun tsok pay',
+          translation: 'Its profuse foliage, flowers and fruit'
+        },
+        {
+          id: 'ng-3-6',
+          type: 'RECITATION',
+          tibetan: 'ནམ་མཁའ་གང་བར་རབ་ཏུ་གཏམས་པ་ཡིས།།',
+          phonetics: 'nam kha gang war rab tu tam pa yi',
+          translation: 'completely fill the whole sky.'
+        },
+        {
+          id: 'ng-3-7',
+          type: 'RECITATION',
+          tibetan: 'དབུས་ཀྱི་ཡལ་གར་རིན་ཆེན་སེང་གེའི་ཁྲི།།',
+          phonetics: 'ü kyi yel kar rin chen seng gey tri',
+          translation: 'On the central branch is a jeweled lion throne'
+        },
+        {
+          id: 'ng-3-8',
+          type: 'RECITATION',
+          tibetan: 'སྣ་ཚོགས་པདྨ་ཉི་ཟླའི་གདན་སྟེང་དུ།།',
+          phonetics: 'na tsok pe ma nyi day den teng du',
+          translation: 'with a multicolored lotus, sun and moon seat.'
+        },
+        {
+          id: 'ng-3-9',
+          type: 'RECITATION',
+          tibetan: 'བཀའ་དྲིན་མཚུངས་མེད་རྩ་བའི་བླ་མ་ཉིད།།',
+          phonetics: 'ka drin tsung me tsa way la ma nyi',
+          translation: 'Upon that is the incomparably kind root lama,'
+        },
+        {
+          id: 'ng-3-10',
+          type: 'RECITATION',
+          tibetan: 'གང་འདུལ་མོས་ངོར་ཅིར་ཡང་འཆར་བའི་ཚུལ།།',
+          phonetics: 'gang dul mö ngor chir yang char way tsul',
+          translation: 'appearing in whatever way suits disciples.'
+        },
+        {
+          id: 'ng-3-11',
+          type: 'RECITATION',
+          tibetan: 'དབུ་གཙུག་ཡས་རིམ་ཀུན་ཏུ་བཟང་པོའི་བར།།',
+          phonetics: 'u tsuk ye rim kun tu zang poy bar',
+          translation: 'Above his head are all the lineage lamas,'
+        },
+        {
+          id: 'ng-3-12',
+          type: 'RECITATION',
+          tibetan: 'བརྒྱུད་པའི་བླ་མ་མ་ལུས་ཐོ་བརྩེགས་བཞུགས།།',
+          phonetics: 'gyu pay la ma ma lu to tsek shuk',
+          translation: 'one above the other, up to Samantabhadra.'
+        },
+        {
+          id: 'ng-3-13',
+          type: 'RECITATION',
+          tibetan: 'གཡས་ཀྱི་ཡལ་གར་ཐུབ་པའི་དབང་པོ་ལ།།',
+          phonetics: 'ye kyi yel kar tup pay wang po la',
+          translation: 'On the right branch, the Mighty Adept, Buddha,'
+        },
+        {
+          id: 'ng-3-14',
+          type: 'RECITATION',
+          tibetan: 'ཕྱོགས་བཅུའི་བདེ་གཤེགས་སངས་རྒྱས་ཚོགས་ཀྱིས་བསྐོར།།',
+          phonetics: 'chok chuy de shek sang gye tsok kyi kor',
+          translation: 'is surrounded by an ocean of tathagata buddhas of the three times.'
+        },
+        {
+          id: 'ng-3-15',
+          type: 'RECITATION',
+          tibetan: 'རྒྱབ་ཀྱི་ཡལ་གར་དམ་ཆོས་དཀོན་མཆོག་ནི།།',
+          phonetics: 'gyap kyi yel ka dam chö kön chok ni',
+          translation: 'On the rear branch is the rare and excellent holy Dharma'
+        },
+        {
+          id: 'ng-3-16',
+          type: 'RECITATION',
+          tibetan: 'གསུང་རབ་གླེགས་བམ་བརྩེགས་པའི་རྣམ་པ་ཅན།།',
+          phonetics: 'sung rab lek bam tsek pay nam pa chen',
+          translation: 'in the form of stacks of volumes of the canon.'
+        },
+        {
+          id: 'ng-3-17',
+          type: 'RECITATION',
+          tibetan: 'གཡོན་གྱི་ཡལ་གར་ཉེ་བའི་སྲས་བརྒྱད་ལ།།',
+          phonetics: 'yön gyi yel kar nye way se gye la',
+          translation: 'On the left branch are the eight close sons,'
+        },
+        {
+          id: 'ng-3-18',
+          type: 'RECITATION',
+          tibetan: 'བྱང་སེམས་ཉན་རང་འཕགས་པའི་ཚོགས་ཀྱིས་བསྐོར།།',
+          phonetics: 'jang sem nyen rang pak pay tsok kyi kor',
+          translation: 'surrounded by the noble assembly of bodhisattvas, sravakas and pratyekabuddhas.'
+        },
+        {
+          id: 'ng-3-19',
+          type: 'RECITATION',
+          tibetan: 'མདུན་གྱི་ཡལ་གར་ཞི་ཁྲོ་རབ་འབྱམས་ལ།།',
+          phonetics: 'dun gyi yel kar shi tro rab jam la',
+          translation: 'On the branch in front is the multitude of peaceful and wrathful ones,'
+        },
+        {
+          id: 'ng-3-20',
+          type: 'RECITATION',
+          tibetan: 'རྒྱུད་སྡེ་བཞི་དྲུག་ཡི་དམ་ལྷ་ཚོགས་དང༌།།',
+          phonetics: 'gyü de shi druk yi dam lha tsok dang',
+          translation: 'surrounded by the yidam deities of the four and six tantras,'
+        },
+        {
+          id: 'ng-3-21',
+          type: 'RECITATION',
+          tibetan: 'མཐའ་བསྐོར་མཁའ་འགྲོ་ཆོས་སྐྱོང་ཚོགས་ཀྱིས་བསྐོར།།',
+          phonetics: 'ta kor khan dro cho kyong tsok kyi kor',
+          translation: 'with the dakinis and dharma protectors all around.'
+        },
+        {
+          id: 'ng-3-22',
+          type: 'RECITATION',
+          tibetan: 'ཀུན་ཀྱང་མཚན་དཔེའི་གཟི་བྱིན་འོད་སྟོང་འབར།།',
+          phonetics: 'kun kyang tsen pey zi jin ö tong bar',
+          translation: 'All of them are blazing like a thousand lights with the brilliance of their marks and characteristics.'
+        },
+        {
+          id: 'ng-3-23',
+          type: 'RECITATION',
+          tibetan: 'མཐོང་ཐོས་དྲན་རེག་སྒྲོལ་བའི་ཐུགས་རྗེ་ཅན།།',
+          phonetics: 'tong tö dren rek drol way tuk je chen',
+          translation: 'They possess the compassion, which liberates through seeing, hearing, remembering and touching.'
+        },
+        {
+          id: 'ng-3-24',
+          type: 'RECITATION',
+          tibetan: 'བདག་སོགས་འགྲོ་ལ་བུ་གཅིག་མ་བཞིན་དུ།།',
+          phonetics: 'dak sok dro la bu chik ma shin du',
+          translation: 'They regard me and all beings with joy and loving kindness as a mother does an only child.'
+        },
+        {
+          id: 'ng-3-25',
+          type: 'RECITATION',
+          tibetan: 'དགྱེས་ཤིང་བརྩེ་བས་དགོངས་ཏེ་བཞུགས་པར་གྱུར།།',
+          phonetics: 'gye shing tse way gong te shuk par gyur',
+          translation: ''
+        },
+        {
+          id: 'ng-3-26',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་སྐྱབས་ཡུལ་གསལ་བཏབ་ནས། དེ་དག་གི་ཡོན་ཏན་དང་ཐུགས་རྗེ་དྲན་པའི་མོས་གུས་གདུང་ཤུགས་དྲག་པོས།',
+          translation: 'Having clearly visualized these objects of refuge, pray with the intense, heartfelt devotion that comes from contemplating their qualities and compassion:'
+        },
+        {
+          id: 'ng-3-27',
+          type: 'RECITATION',
+          tibetan: 'ན་མོ་༔ སྣང་བ་མ་བཀོད་དབྱིངས་ཀྱི་ནང༔',
+          phonetics: 'namo nang wa ma kö ying kyi nang',
+          translation: 'Namo! Within basic space without the array of appearances,',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-3-28',
+          type: 'RECITATION',
+          tibetan: 'རིག་པ་ཡེ་ཤེས་སྐུ་གསུམ་རྫོགས༔',
+          phonetics: 'rik pa ye she ku sum dzok',
+          translation: 'The three kayas are perfect in intrinsic awareness wisdom.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-3-29',
+          type: 'RECITATION',
+          tibetan: 'གཞོན་ནུ་དབྱིངས་ཀྱི་བུམ་སྐུ་ལ༔',
+          phonetics: 'shön nu ying kyi bum ku la',
+          translation: 'In the youthful vase body of basic space',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-3-30',
+          type: 'RECITATION',
+          tibetan: 'བདག་འཛིན་བྲལ་བར་སྐྱབས་སུ་མཆི༔',
+          phonetics: 'dak dzin dral war kyab su chi',
+          translation: 'I go for refuge without ego clinging.',
+          variant: 'repeated'
+        }
+      ]
+    },
+    {
+      id: 'ng-4',
+      title: '2.2 Engendering the Spirit of Awakening',
+      blocks: [
+        {
+          id: 'ng-4-1',
+          type: 'INSTRUCTION',
+          tibetan: 'གཉིས་པ་སེམས་བསྐྱེད་པ་ནི།',
+          translation: 'With the intention to train in the bodhisattva\'s activity because of the desire to attain enlightenment for the sake of others, recite the following:'
+        },
+        {
+          id: 'ng-4-2',
+          type: 'RECITATION',
+          tibetan: 'སྣང་བ་བཀོད་པ་ཆེན་པོའི་དབྱིངས༔',
+          phonetics: 'nang wa kö pa chen poy ying',
+          translation: 'In basic space with the great array of appearances,',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-4-3',
+          type: 'RECITATION',
+          tibetan: 'ཡེ་ཤེས་འོད་ལྔ་རྫོགས་པའི་སྐུ༔',
+          phonetics: 'ye she ö nga dzok pay ku',
+          translation: 'the body of the five wisdom lights perfected,',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-4-4',
+          type: 'RECITATION',
+          tibetan: 'ཐིག་ལེ་རྣམ་དག་རྫོགས་ལྡན་ལ༔',
+          phonetics: 'tig le nam dak dzok den la',
+          translation: 'the completely pure and perfect sphere,',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-4-5',
+          type: 'RECITATION',
+          tibetan: 'རང་གྲོལ་ཆེན་པོར་སེམས་བསྐྱེད་དོ༔',
+          phonetics: 'rang drol chen por sem kye do',
+          translation: 'Within this state of great self-liberation, I generate bodhichitta.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-4-6',
+          type: 'RECITATION',
+          tibetan: 'སྐྱབས་ཡུལ་རྣམས་ལས་འོད་ཟེར་དཔག་ཡས་བྱུང༌།།',
+          phonetics: 'kyab yul nam la ö zer pak ye jung',
+          translation: 'Boundless light arises from the objects of refuge'
+        },
+        {
+          id: 'ng-4-7',
+          type: 'RECITATION',
+          tibetan: 'སེམས་ཅན་མ་ལུས་དག་པའི་ཞིང་དུ་དྲངས།།',
+          phonetics: 'sem chen ma lu dak pay shing du drang',
+          translation: 'and draws all beings without exception to the pureland.'
+        },
+        {
+          id: 'ng-4-8',
+          type: 'RECITATION',
+          tibetan: 'སྐྱབས་ཡུལ་ཐམས་ཅད་བླ་མའི་སྐུ་ལ་འདུས།།',
+          phonetics: 'kyab yul tam che la may ku la dü',
+          translation: 'All the objects of refuge are gathered into the lama\'s body.'
+        },
+        {
+          id: 'ng-4-9',
+          type: 'RECITATION',
+          tibetan: 'བླ་མ་འོད་ཞུ་རང་ཐིམ་གཉིས་མེད་གྱུར།།',
+          phonetics: 'la ma ö shu rang tim nyi me gyur',
+          translation: 'The lama dissolves into light and melts into me, becoming united.'
+        }
+      ]
+    },
+    {
+      id: 'ng-5',
+      title: '2.3 The Purification of Obscurations (Vajrasattva)',
+      blocks: [
+        {
+          id: 'ng-5-1',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་སྭ་བྷཱ་ཝ་ཤུདྡྷ༔སརྦ་དྷརྨ་སྭ་བྷཱ་ཝ་ཤུདྡྷ྅ཧཾ།',
+          phonetics: 'om svabhawa shuddha sarwa dharma svabhawa shuddho ham',
+          translation: '(Mantra of emptiness)'
+        },
+        {
+          id: 'ng-5-2',
+          type: 'RECITATION',
+          tibetan: 'མ་དག་སྣང་བ་མི་དམིགས་སྟོང་པར་སྦྱངས།།',
+          phonetics: 'ma dak nang wa mi mik tong par jang',
+          translation: 'Impure appearances disappear and are purified in emptiness.'
+        },
+        {
+          id: 'ng-5-3',
+          type: 'RECITATION',
+          tibetan: 'སྟོང་པའི་ངང་ལས་པད་དཀར་ཟླ་བའི་སྟེང༌།',
+          phonetics: 'tong pay ngang le pe kar da way teng',
+          translation: 'From within emptiness, upon a white lotus and a moon seat.'
+        },
+        {
+          id: 'ng-5-4',
+          type: 'RECITATION',
+          tibetan: 'རང་སེམས་ཧཱུྃ་ཡིག་དཀར་གསལ་ཡོངས་གྱུར་པ།།',
+          phonetics: 'rang sem hung yik kar sal yong gyur pa',
+          translation: 'one\'s own mind as the clear white letter HUNG'
+        },
+        {
+          id: 'ng-5-5',
+          type: 'RECITATION',
+          tibetan: 'རྡོ་རྗེ་སེམས་དཔའ་དྲི་མེད་སྟོན་ཟླའི་མདངས།།',
+          phonetics: 'dor je sem pa dri me tön day dang',
+          translation: 'completely transforms into Vajrasattva, the complexion of the immaculate autumn moon.'
+        },
+        {
+          id: 'ng-5-6',
+          type: 'RECITATION',
+          tibetan: 'ཞི་འཛུམ་མཚན་དཔེའི་རབ་མཛེས་རྡོ་དྲིལ་འཛིན།།',
+          phonetics: 'shi dzum tsen pey rab dze dor dril dzin',
+          translation: 'He is smiling peacefully, resplendent in the marks and characteristics, holding bell and dorje,'
+        },
+        {
+          id: 'ng-5-7',
+          type: 'RECITATION',
+          tibetan: 'ལོངས་སྤྱོད་ཆས་རྫོགས་ཞབས་ཟུང་སེམས་སྐྱིལ་བཞུགས༎',
+          phonetics: 'long cho che dzok shap zung sem kyil shuk',
+          translation: 'with all aspects of sambhogakaya, sitting with legs in the hero\'s posture.'
+        },
+        {
+          id: 'ng-5-8',
+          type: 'RECITATION',
+          tibetan: 'ཐུགས་དབུས་པད་ཟླར་རྡོ་རྗེའི་ལྟེ་བར་ཧཱུཾ།།',
+          phonetics: 'tuk ü pe dar dor jey te war hung',
+          translation: 'HUNG is in the middle of a vajra on a lotus and moon in his heart.'
+        },
+        {
+          id: 'ng-5-9',
+          type: 'RECITATION',
+          tibetan: 'ཡན་ལག་བཞི་ལ་སྙིང་པོ་འབྲུ་དྲུག་དང༌།།',
+          phonetics: 'yen lak shi la nying po dru druk dang',
+          translation: 'the six syllables of the heart mantra are in the four directions,'
+        },
+        {
+          id: 'ng-5-10',
+          type: 'RECITATION',
+          tibetan: 'དེ་མཐར་ཡིག་བརྒྱའི་ཕྲེང་བས་བསྐོར་བ་ལས།།',
+          phonetics: 'de tar yik gyay treng wai kor wa le',
+          translation: 'and the garland of a hundred syllables circles around it.'
+        },
+        {
+          id: 'ng-5-11',
+          type: 'RECITATION',
+          tibetan: 'བདུད་རྩིའི་རྒྱུན་བབས་སྡིག་སྒྲིབ་བག་ཆགས་དང༌།།',
+          phonetics: 'düd tsiy gyun bap dik drip bak chak dang',
+          translation: 'From this flows a cascade of elixir, expelling and purifying'
+        },
+        {
+          id: 'ng-5-12',
+          type: 'RECITATION',
+          tibetan: 'སྡུག་བསྔལ་ནད་གདོན་མ་ལུས་ཕྱིར་སྦྱངས་ཏེ།།',
+          phonetics: 'duk ngen ne dön ma lü chir jang te',
+          translation: 'all sins, obscurations, habits, sorrows, sickness and spirits.'
+        },
+        {
+          id: 'ng-5-13',
+          type: 'RECITATION',
+          tibetan: 'རང་ལུས་ཤེལ་གོང་ལྟར་དག་དེའི་འོད་ཟེར།།',
+          phonetics: 'rang lu shel gong tar dak dey ö zer',
+          translation: 'One\'s body is left as pure as a crystal, and its light'
+        },
+        {
+          id: 'ng-5-14',
+          type: 'RECITATION',
+          tibetan: 'འགྲོ་ཀུན་ལ་ཕོག་སྡིག་སྒྲིབ་རྒྱུ་བཅས་སྦྱངས།།',
+          phonetics: 'dro kün la pok dik drip gyu che jang',
+          translation: 'strikes all beings, purifying obscurations along with their causes.'
+        },
+        {
+          id: 'ng-5-15',
+          type: 'RECITATION',
+          tibetan: 'སྣང་གྲགས་ལྷ་དང་སྔགས་ཀྱི་རོལ་པར་གྱུར།།',
+          phonetics: 'nang drak lha dang ngak kyi rol par gyur',
+          translation: 'Appearance and sound become the play of deity and mantra.'
+        },
+        {
+          id: 'ng-5-16',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་དམིགས་ལ།',
+          translation: 'Thus, with the visualization:'
+        },
+        {
+          id: 'ng-5-17',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་བཛྲ་ས་ཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་ས་ཏྭ་ཏེ་ནོ་པ། ཏིཥྛ་དྲྀ་ཌྷ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡ་ཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙི་ཏྟཾ་ཤྲི་ཡཾ། ཀུརུཧཱུྃཧཧཧཧཧོ། བྷགཝཱན། སརྦ་ཏ་ཐཱ་ག་ཏ་བཛྲ་མཱ་མེ་མུཉྩ་བཛཱི་བྷ་ཝ་མཧཱ་ས་མ་ཡ་ས་ཏྭ་ཨཱཿ',
+          phonetics: 'om vajra sattva samaya manu palaya vajra sattva teno pa tikta dridho me bhawa suto khayo mebhawa supo khayo mebhawa anu rakto mebhawa sarwa siddhi me prayatsa sarwa karma sutsa me tsitam shriyamkuru hung ha ha ha ha ho bhagawan sarwa tathagata vajra mamemuntsa vajri bhawa maha samaya sattva ah',
+          translation: '(The Hundred Syllable Mantra)',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-5-18',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་བཛྲ་ས་ཏྭ་ཨཱཿ',
+          phonetics: 'om vajra sattva ah',
+          translation: '(The Heart Mantra)',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-5-19',
+          type: 'RECITATION',
+          tibetan: 'ལྷ་སྔགས་སྣང་ཆའི་དངོས་ཀུན་རང་ལ་ཐིམ།།',
+          phonetics: 'lha ngak nang chay ngö kun lwong la tim',
+          translation: 'The appearing aspects of deity and mantra absorb into me.'
+        },
+        {
+          id: 'ng-5-20',
+          type: 'RECITATION',
+          tibetan: 'རང་ཉིད་རྡོར་སེམས་མེ་ལོང་གཟུགས་བརྙན་ལྟར།།',
+          phonetics: 'rang nyi dor sem me long zuk nyen tar',
+          translation: 'I am Vajrasattva, appearing like a reflection in a mirror,'
+        },
+        {
+          id: 'ng-5-21',
+          type: 'RECITATION',
+          tibetan: 'གསལ་ལ་རྙོག་མེད་རང་བབས་གདོད་མའི་གཤིས།།',
+          phonetics: 'sal la nyok me rang bap dö may shi',
+          translation: 'with unsullied clarity, the unaltered original nature.'
+        },
+        {
+          id: 'ng-5-22',
+          type: 'RECITATION',
+          tibetan: 'རིག་སྟོང་རྡོར་སེམས་དགོངས་ཀློང་ཡངས་པར་བརྡལ།།',
+          phonetics: 'rik tong dor sem gong long yang par dal',
+          translation: 'Awareness-emptiness, the vast expanse of Vajrasattva\'s enlightened intention, is all-present.'
+        }
+      ]
+    },
+    {
+      id: 'ng-6',
+      title: '2.4 Gathering of Accumulations (Mandala Offering)',
+      blocks: [
+        {
+          id: 'ng-6-1',
+          type: 'RECITATION',
+          tibetan: 'ན་མོ་༔ གདོད་མའི་ཞིང་ཁམས་རྣམ་པར་དག་པ་རུ༔',
+          phonetics: 'namo: dö may shing kham nam par dak pa ru',
+          translation: 'NAMO! In the original, immaculate realm'
+        },
+        {
+          id: 'ng-6-2',
+          type: 'RECITATION',
+          tibetan: 'ཡེ་ཤེས་རིག་པ་འོད་ལྔའི་ཚོམ་བུ་བཀོད༔',
+          phonetics: 'ye she rik pa ö ngay tsom bu kö',
+          translation: 'the heaps of the five lights of wisdom awareness are arrayed.'
+        },
+        {
+          id: 'ng-6-3',
+          type: 'RECITATION',
+          tibetan: 'གཞི་མེད་སྤྲོས་བྲལ་ཀུན་བཟང་ཡབ་ཡུམ་ལ༔',
+          phonetics: 'shi me trö dral kun zang yab yum la',
+          translation: 'To the baseless, unembellished Samantabhadra, masculine and feminine,'
+        },
+        {
+          id: 'ng-6-4',
+          type: 'RECITATION',
+          tibetan: 'གའུ་མཁ་སྦྱོར་དབྱིངས་ཀྱི་མནྜལ་འབུལ༔',
+          phonetics: 'gau kha jor ying kyi mandal bul',
+          translation: 'I offer the mandala of basic space in the joined gau.'
+        },
+        {
+          id: 'ng-6-5',
+          type: 'HEADER',
+          translation: 'For the Sambhogakaya'
+        },
+        {
+          id: 'ng-6-6',
+          type: 'RECITATION',
+          tibetan: 'དབྱིངས་ཀྱི་དཀྱིལ་འཁོར་རྣམ་པར་དག་པ་རུ༔',
+          phonetics: 'ying kyi kyil khor nam par dak pa rus',
+          translation: 'In the utterly pure mandala of basic space'
+        },
+        {
+          id: 'ng-6-7',
+          type: 'RECITATION',
+          tibetan: 'ཐིག་ལེ་རང་གསལ་འོད་ཀྱི་ཚོམ་བུ་བཀོད༔',
+          phonetics: 'tig le rang sal ö kyi tsom bu kö',
+          translation: 'the heaps of light of the self-luminous sphere are arrayed.'
+        },
+        {
+          id: 'ng-6-8',
+          type: 'RECITATION',
+          tibetan: 'བླ་མ་ལོངས་སྤྱོད་རྫོགས་པའི་སྐུ་རྣམ་ལ༔',
+          phonetics: 'la ma long chö dzok pay ku nam la',
+          translation: 'To all sambhogakaya lamas'
+        },
+        {
+          id: 'ng-6-9',
+          type: 'RECITATION',
+          tibetan: 'སྣང་བ་བཀོད་པ་ཆེན་པོའི་མནྜལ་འབུལ༔',
+          phonetics: 'nang wa kö pa chen poy mandal bul',
+          translation: 'I offer the mandala of the great array of appearances.'
+        },
+        {
+          id: 'ng-6-10',
+          type: 'HEADER',
+          translation: 'For the Nirmanakaya'
+        },
+        {
+          id: 'ng-6-11',
+          type: 'RECITATION',
+          tibetan: 'སྟོང་གསུམ་མི་མཇེད་འཇིག་རྟེན་ཞིང་ཁམས་སུ༔',
+          phonetics: 'tong sum mi je jik ten shing kham su',
+          translation: 'In the realm of dauntless worlds of the three thousand-fold universe'
+        },
+        {
+          id: 'ng-6-12',
+          type: 'RECITATION',
+          tibetan: 'བྱེ་བ་ཕྲག་བརྒྱ་འཛམ་གླིང་ཚོམ་བུར་བཀོད༔',
+          phonetics: 'je wa trak gya dzam ling tsom bur kö',
+          translation: 'the heaps of a billion Earths are arrayed,'
+        },
+        {
+          id: 'ng-6-13',
+          type: 'RECITATION',
+          tibetan: 'འབྱུང་བཞི་རང་སྣང་ལྕགས་རི་མུ་ཁྱུད་བཅས༔',
+          phonetics: 'jung shi xang nang chak ri mu khyu che',
+          translation: 'with iron mountain peripheries, the innate appearance of the four elements.'
+        },
+        {
+          id: 'ng-6-14',
+          type: 'RECITATION',
+          tibetan: 'རིག་སྣང་དག་པ་སྤྲུལ་པའི་སྐུ་ལ་འབུལ༔',
+          phonetics: 'rik nang dak pa trul pay ku la bul',
+          translation: 'I offer them to the nirmanakaya, pure appearance of awareness.'
+        },
+        {
+          id: 'ng-6-15',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་བྱ་མ་སྤྲུལ་སྐར་འཕུལ་ནས། སླར་ཡང་ཚོམ་བུ་གསོ་བཞིན་དུ།',
+          translation: 'After offering that to the nirmanakaya lama, replenish the heaps.'
+        },
+        {
+          id: 'ng-6-16',
+          type: 'RECITATION',
+          tibetan: 'ཆོས་སྐུའི་མནྜལ་སྟོང་ཉིད་སྙིང་རྗེ་འབུལ༔',
+          phonetics: 'chö kuy mandal tong nyi nying je bul',
+          translation: 'I offer the dharmakaya mandala of emptiness and compassion.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-17',
+          type: 'RECITATION',
+          tibetan: 'ལོངས་སྐུའི་མནྜལ་མ་འགགས་རང་གསལ་འབུལ༔',
+          phonetics: 'long kuy mandal ma gak rang sal bul',
+          translation: 'I offer the sambhogakaya mandala of unimpeded, innate luminosity.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-18',
+          type: 'RECITATION',
+          tibetan: 'སྤྲུལ་སྐུའི་མནྜལ་སྣ་ཚོགས་ཡིད་འོང་འབུལ༔',
+          phonetics: 'trul kuy mandal na tsok yi ong bul',
+          translation: 'I offer the nirmanakaya mandala of various pleasing things.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-19',
+          type: 'RECITATION',
+          tibetan: 'སྟོང་གསུམ་འདིའམ་སྟོང་གསུམ་གཞན་དག་ན༔',
+          phonetics: 'tong sum di am tong sum shen dak na',
+          translation: 'In this or in other universes,',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-20',
+          type: 'RECITATION',
+          tibetan: 'ལྷ་རྫས་མཆོག་གི་མནྜལ་བཀོད་པ་རྣམས་༔',
+          phonetics: 'lha dze chok gi mandal kö pa nam',
+          translation: 'all the mandala displays of excellent divine articles',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-21',
+          type: 'RECITATION',
+          tibetan: 'སྐྱབས་གནས་གུ་རུ་ཡི་དམ་ལྷ་ལ་འབུལ༔',
+          phonetics: 'kyab ne gu ru yi dam lha la bul',
+          translation: 'I offer to the source of refuge, the guru and yidam deities.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-22',
+          type: 'RECITATION',
+          tibetan: 'ཐུགས་རྗེས་འགྲོ་བའི་དོན་དུ་བཞེས་སུ་གསོལ༔',
+          phonetics: 'tuk jei dro way dön du she su söl',
+          translation: 'Accept it with compassion for the sake of beings.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-23',
+          type: 'RECITATION',
+          tibetan: 'བཞེས་ནས་བྱིན་གྱིས་བརླབ་པར་མཛད་དུ་གསོལ༔',
+          phonetics: 'she ne jin gyi lap par dze du söl',
+          translation: 'Having accepted it, please grant your blessing.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-6-24',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་སྐ་གསུམ་གྱི་ཞིང་ཁམས་གྲངས་ཅི་ནས་སུ་འབུལ་བ་ཀུན་རྫོབ་རྒྱུའི་ཚོགས་བསགས་དང། མཐར་ཚོགས་ཞིང་མཆོད་རྫས་དང་མི་དམིགས་པའི་ངང་ལ་འཇོག་པ་དོན་དམ་འབྲས་བུའི་ཚོགས་བསགས་སོ།།',
+          translation: 'This offering of as many as possible realms of the three kayas is the relative causal accumulation. Afterwards, the field of accumulation together with articles of offering dissolve into light, and in the form of a letter HUNG are gathered into myself.'
+        },
+        {
+          id: 'ng-6-25',
+          type: 'INSTRUCTION',
+          translation: 'If you cannot accumulate the Three Kayas Mandala Offering, then use the Short Mandala Offering:'
+        },
+        {
+          id: 'ng-6-26',
+          type: 'RECITATION',
+          tibetan: 'ས་གཞི་སྤོས་ཀྱིས་བྱུག་ཤིང་མེ་ཏོག་བཀྲམ།།',
+          phonetics: 'sa zhi pö kyi jug shing me tog tram',
+          translation: 'The ground anointed with perfumed water and strewn with flowers'
+        },
+        {
+          id: 'ng-6-27',
+          type: 'RECITATION',
+          tibetan: 'རི་རབ་གླིང་བཞི་ཉི་ཟླས་བརྒྱན་པ་འདི།།',
+          phonetics: 'ri rab ling zhi nyi de gyen pa di',
+          translation: 'Mount Meru, the four continents, the sun, the moon,'
+        },
+        {
+          id: 'ng-6-28',
+          type: 'RECITATION',
+          tibetan: 'སངས་རྒྱས་ཞིང་དུ་དམིགས་ཏེ་འཕུལ་བ་ཡིས།།',
+          phonetics: 'sang gye zhing du mig te pül wa yi',
+          translation: 'are offered as a Buddha realm.'
+        },
+        {
+          id: 'ng-6-29',
+          type: 'RECITATION',
+          tibetan: 'འགྲོ་ཀུན་རྣམ་དག་ཞིང་ལ་སྤྱོད་པར་ཤོག།',
+          phonetics: 'dro kün nam dag zhing la chö par shog',
+          translation: 'May all beings attain the Pure Land through this offering!'
+        },
+        {
+          id: 'ng-6-30',
+          type: 'RECITATION',
+          tibetan: 'ཨི་དམ་གུ་རུ་རཏྣ་མནྜལ་ཀཾ་ནིརྱ་ཏ་ཡཱ་མི།',
+          phonetics: 'idam guru ratna mandala kamnirya tayami',
+          translation: 'I send forth this jeweled mandala to you, precious guru!'
+        }
+      ]
+    },
+    {
+      id: 'ng-7',
+      title: '2.5 Guru Yoga',
+      blocks: [
+        {
+          id: 'ng-7-1',
+          type: 'INSTRUCTION',
+          tibetan: 'ལྔ་པ་བླ་མའི་རྣལ་འབྱོར་ནི། ཟབ་ལམ་གྱི་རྟེན་འབྲེལ་མོས་གུས་ཀྱི་གནད་ལ་བརྟེན་ནས་བསྒྲིགས་དགོས་པས་ན་ཡིད་མཁྱེད་ཤེས་ཀྱི་དད་པ་གཏིང་ཚུགས་པའི་སྒོ་ནས།',
+          translation: 'Since it is necessary to prepare oneself by relying on the crucial point of devotion, which is the effective connection in this profound path of Vajrayana, develop the firm conviction of belief in the lama\'s awareness of your mind.'
+        },
+        {
+          id: 'ng-7-2',
+          type: 'RECITATION',
+          tibetan: 'རང་མདུན་ནམ་མཁའ་འོད་ལྔ་འཁྲུགས་པའི་ཀློང༌།།',
+          phonetics: 'rang dun nam kha ö nga thruk pay long',
+          translation: 'The sky before me is an expanse of dazzling five-colored lights.'
+        },
+        {
+          id: 'ng-7-3',
+          type: 'RECITATION',
+          tibetan: 'སེང་ཁྲི་པདྨ་ཉི་ཟླའི་གདན་སྟེང་དུ།།',
+          phonetics: 'seng tri pe ma ni day den teng du',
+          translation: 'Upon a lotus, sun and moon seat on a lion throne.'
+        },
+        {
+          id: 'ng-7-4',
+          type: 'RECITATION',
+          tibetan: 'མཁྱབ་བདག་དྲིན་ཅན་རྩ་བའི་བླ་མ་ཉིད།།',
+          phonetics: 'khyab dak drin chen tsa way la ma nyi',
+          translation: 'sits the sovereign lord, the kind root lama himself,'
+        },
+        {
+          id: 'ng-7-5',
+          type: 'RECITATION',
+          tibetan: 'མངོན་སུམ་བཞིན་དུ་བཞུགས་པའི་སྤྱི་བོ་ནས།།',
+          phonetics: 'ngön sum shin du shuk pay chi wo ne',
+          translation: 'appearing to be truly present.'
+        },
+        {
+          id: 'ng-7-6',
+          type: 'RECITATION',
+          tibetan: 'ཡས་རིམ་བརྒྱུད་པའི་བླ་མ་ཐོ་བརྩེགས་བཞུགས།།',
+          phonetics: 'ye rim gyü pay la ma to tsek shuk',
+          translation: 'Above his head are the lamas, yidams,'
+        },
+        {
+          id: 'ng-7-7',
+          type: 'RECITATION',
+          tibetan: 'མཐའ་བསྐོར་བླ་མ་ཡི་དམ་ཞི་དང་ཁྲོ་།།',
+          phonetics: 'ta kor la ma yi dam shi dang tro',
+          translation: 'peaceful and wrathful ones,'
+        },
+        {
+          id: 'ng-7-8',
+          type: 'RECITATION',
+          tibetan: 'སངས་རྒྱས་བྱང་སེམས་དཔའ་བོ་མཁའ་འགྲོ་དང༌།།',
+          phonetics: 'sang gye jang sem pa wo khan dro dang',
+          translation: 'buddhas, bodhisattvas, dakas and dakinis,'
+        },
+        {
+          id: 'ng-7-9',
+          type: 'RECITATION',
+          tibetan: 'ཆོས་སྐྱོང་ཚོགས་ཀྱི་སྤྲིན་ཕུང་གཏིབ་བཞིན་བསྐོར།།',
+          phonetics: 'chö kyong tsok kyi trin pung tip shin kor',
+          translation: 'and dharma protectors, all clustered around like thick clouds.'
+        },
+        {
+          id: 'ng-7-10',
+          type: 'RECITATION',
+          tibetan: 'ཀུན་ཀྱང་སྐུ་མཆོག་མཚན་དཔེའི་གཟི་མདངས་འབར།།',
+          phonetics: 'kun kyang ku chok tsen pey zi dang bar',
+          translation: 'All of them blaze with the radiance of the marks and characteristics of sublime form.'
+        },
+        {
+          id: 'ng-7-11',
+          type: 'RECITATION',
+          tibetan: 'གསུང་དབྱངས་ཟབ་གསང་ཆོས་ཀྱི་སྒྲ་ཆེན་སྒྲོག།',
+          phonetics: 'sung yang zab sang chö kyi dra chen drok',
+          translation: 'Their melodious speech resounds with the great sound of the profound secret dharma.'
+        },
+        {
+          id: 'ng-7-12',
+          type: 'RECITATION',
+          tibetan: 'ཐུགས་ནི་བདེ་ཆེན་ཡེ་ཤེས་སྙིང་པོ་ཅན།།',
+          phonetics: 'tuk ni de chen ye she nying po chen',
+          translation: 'Their minds possess the essence of the wisdom of great bliss.'
+        },
+        {
+          id: 'ng-7-13',
+          type: 'RECITATION',
+          tibetan: 'ཐོགས་མེད་ཐུགས་རྗེ་ཡོན་ཏན་འཕྲིན་ལས་ཀྱིས།།',
+          phonetics: 'tok me tuk je yön ten trin le kyi',
+          translation: 'With the activities and qualities of uninhibited compassion,'
+        },
+        {
+          id: 'ng-7-14',
+          type: 'RECITATION',
+          tibetan: 'བདག་རྒྱུད་བྱིན་གྱིས་རློབས་པའི་མགོན་དམ་པར།།',
+          phonetics: 'dak gyü jin gyi lop pay gön dam par',
+          translation: 'the holy master who blesses my mind stream'
+        },
+        {
+          id: 'ng-7-15',
+          type: 'RECITATION',
+          tibetan: 'བརྩེ་བས་དགོངས་བཞིན་དགྱེས་པས་བཞུགས་པར་གྱུར།།',
+          phonetics: 'tse wai gong shin gye pai shuk par gyur',
+          translation: 'dwells joyfully thinking of me with loving kindness.'
+        },
+        {
+          id: 'ng-7-16',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་ཨཱཿཧཱུྃ། རིག་སྟོང་ཟུང་འཇུག་ཀུན་ཏུ་བཟང་ཡབ་ཡུམ་།།',
+          phonetics: 'om ah hung rik tong zung juk kun tu zang yab yum',
+          translation: 'OM AH HUNG Samantabhadra, masculine and feminine, the union of awareness and emptiness,'
+        },
+        {
+          id: 'ng-7-17',
+          type: 'RECITATION',
+          tibetan: 'བདེ་ལྡན་ལོངས་སྤྱོད་རྫོགས་སྐུ་རིགས་ལྔའི་ལྷ།།',
+          phonetics: 'de den long cho dzok ku rik ngay lha',
+          translation: 'blissful sambhogakaya deities of the five families,'
+        },
+        {
+          id: 'ng-7-18',
+          type: 'RECITATION',
+          tibetan: 'མཆོག་གི་སྤྲུལ་སྐུ་དགའ་རབ་རྡོ་རྗེ་ལ།།',
+          phonetics: 'chok gi trul ku ga rab dor je la',
+          translation: 'and excellent nirmanakaya, Garab Dorje,'
+        },
+        {
+          id: 'ng-7-19',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-20',
+          type: 'RECITATION',
+          tibetan: 'རྒྱལ་ཀུན་ངོ་བོ་ཨོ་རྒྱན་ཐོད་ཕྲེང་རྩལ།།',
+          phonetics: 'gyal kun ngo wo or gyen tö treng tsal',
+          translation: 'The essence of all victorious ones, Orgyen Tötrengtsal,'
+        },
+        {
+          id: 'ng-7-21',
+          type: 'RECITATION',
+          tibetan: 'མཁའ་སྤྱོད་ཌཱ་ཀི་མཁར་ཆེན་བཟའ་མཚོ་རྒྱལ།།',
+          phonetics: 'kha chö da ki khar chen za tso gyal',
+          translation: 'Dakini of Kachö, Tsogyal, queen of the great court,'
+        },
+        {
+          id: 'ng-7-22',
+          type: 'RECITATION',
+          tibetan: 'གདམས་པའི་བཀའ་བབས་ལྷ་ལྕམ་པདྨ་གསལ།།',
+          phonetics: 'dam pay ka bap lha cham pe ma sal',
+          translation: 'and Lady Pema Sal, who received the legacy of instructions,'
+        },
+        {
+          id: 'ng-7-23',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-24',
+          type: 'RECITATION',
+          tibetan: 'ཟབ་གཏེར་མངའ་བདག་ཨོ་རྒྱན་པདྨ་གླིང༌།།',
+          phonetics: 'zab ter nga dak or gyen pe ma ling',
+          translation: 'Master of the profound treasures, Orgyen Pema Ling,'
+        },
+        {
+          id: 'ng-7-25',
+          type: 'RECITATION',
+          tibetan: 'སྐལ་ལྡན་སྔགས་འཆང་ཆོས་རྗེ་རྣམ་པ་གཉིས།།',
+          phonetics: 'kal den nyan chang cho je nam pa nyi',
+          translation: 'the two dharma lords, fortunate tantrikas,'
+        },
+        {
+          id: 'ng-7-26',
+          type: 'RECITATION',
+          tibetan: 'སྤྲུལ་པའི་སྐུ་མཆོག་བསྟན་འཛིན་གྲགས་པ་ལ།།',
+          phonetics: 'trul pay ku chok ten dzin drak pa la',
+          translation: 'and the excellent nirmanakaya, Tenzin Drakpa,'
+        },
+        {
+          id: 'ng-7-27',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-28',
+          type: 'RECITATION',
+          tibetan: 'རྒྱལ་བའི་སྲས་མཆོག་པདྨ་འཕྲིན་ལས་རྩལ།།',
+          phonetics: 'gyal way se chok pe ma trin le tsal',
+          translation: 'Pema Trinlay, supreme son of the victorious ones,'
+        },
+        {
+          id: 'ng-7-29',
+          type: 'RECITATION',
+          tibetan: 'ཤེས་བྱ་ཀུན་མཁྱེན་ཚུལ་ཁྲིམས་རྡོ་རྗེའི་ཞབས།།',
+          phonetics: 'she ja kun khyen tsul trim dor jey shap',
+          translation: 'Tsultrim Dorje, who knows all things.'
+        },
+        {
+          id: 'ng-7-30',
+          type: 'RECITATION',
+          tibetan: 'གྲུབ་མཆོག་བསྟན་འཛིན་འགྱུར་མེད་རྡོ་རྗེ་ལ།།',
+          phonetics: 'drup chok ten dzin gyur me dor je la',
+          translation: 'and the highly accomplished Tenzin Gyurme Dorje,'
+        },
+        {
+          id: 'ng-7-31',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-32',
+          type: 'RECITATION',
+          tibetan: 'མཚུངས་མེད་བསྟན་འཛིན་ལེགས་པའི་དོན་གྲུབ་ཞབས།།',
+          phonetics: 'tsung me ten dzin lek pay dön drup shap',
+          translation: 'Unequalled Tenzin Lekpai Döndrup,'
+        },
+        {
+          id: 'ng-7-33',
+          type: 'RECITATION',
+          tibetan: 'མཁྱབ་བདག་ངག་དབང་ཀུན་བཟང་རྡོ་རྗེ་འཛིན།།',
+          phonetics: 'khyab dak ngak wang kun zang dor je dzin',
+          translation: 'sovereign Ngawang Kunzang Dorje,'
+        },
+        {
+          id: 'ng-7-34',
+          type: 'RECITATION',
+          tibetan: 'ཀུན་བཟང་འགྱུས་མེད་མཆོག་གྲུབ་དཔལ་འབར་ལ།།',
+          phonetics: 'kun zang gyur me chok drup pal bar la',
+          translation: 'and Kunzang Gyurme Chokdrup Palbar,'
+        },
+        {
+          id: 'ng-7-35',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-36',
+          type: 'RECITATION',
+          tibetan: 'པདྨ་བསྟན་འཛིན་གྲུབ་མཆོག་རྡོ་རྗེའི་སྡེ།།',
+          phonetics: 'pe ma ten dzin drup chok dor jey de',
+          translation: 'Pema Tenzin Drupchok Dorje,'
+        },
+        {
+          id: 'ng-7-37',
+          type: 'RECITATION',
+          tibetan: 'རྒྱལ་དབང་འགྱུར་མེད་པདྨ་མཁྱབ་བདག་རྗེ།།',
+          phonetics: 'gyal wang gyur me pe ma khyab dak je',
+          translation: 'Lord Gyalwang Gyurme Pema Khyabdak,'
+        },
+        {
+          id: 'ng-7-38',
+          type: 'RECITATION',
+          tibetan: 'བསྟན་འཛིན་སྲིད་ཞི་རྣམ་པར་རྒྱལ་བ་ལ།།',
+          phonetics: 'ten dzin si shi nam par gyal wa la',
+          translation: 'and Tenzin Siszhi Nampar Gyalwa,'
+        },
+        {
+          id: 'ng-7-39',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-40',
+          type: 'RECITATION',
+          tibetan: 'མི་འགྱུར་ལྷུན་གྲུབ་བདེ་ཆེན་རྡོ་རྗེ་རྩལ།།',
+          phonetics: 'mi gyur lhun drup de chen dor je tsal',
+          translation: 'Mingyur Lhundrup Dechen Dorje,'
+        },
+        {
+          id: 'ng-7-41',
+          type: 'RECITATION',
+          tibetan: 'མཚུངས་མེད་ཀུན་བཟང་རིག་འཛིན་རྡོ་རྗེའི་ཞབས།།',
+          phonetics: 'tsung me kun zang rik dzin dor jey shap',
+          translation: 'peerless Kunzang Rikdzin Dorje,'
+        },
+        {
+          id: 'ng-7-42',
+          type: 'RECITATION',
+          tibetan: 'རྣམ་འདྲེན་ཀུན་བཟང་བསྟན་པའི་ཉི་མ་ལ།།',
+          phonetics: 'nam dren kun zang ten pay nyi ma la',
+          translation: 'and the guide Kunzang Tempai Nyima,'
+        },
+        {
+          id: 'ng-7-43',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-44',
+          type: 'RECITATION',
+          tibetan: 'རྒྱལ་སྲས་འཇིགས་མེད་ཚེ་དབང་ནོར་བུའི་དཔལ།།',
+          phonetics: 'gyal se jik me tse wang nor buy pal',
+          translation: 'Glorious Jigme Tsewang Norbu, son of the victorious ones,'
+        },
+        {
+          id: 'ng-7-45',
+          type: 'RECITATION',
+          tibetan: 'རྡོ་རྗེ་འཛིན་དབང་དགེ་འདུན་རྒྱ་མཚོའི་དཔལ།།',
+          phonetics: 'dor je dzin wang gen dun gya tsoy pal',
+          translation: 'the mighty vajra holder, Gendun Gyamtso,'
+        },
+        {
+          id: 'ng-7-46',
+          type: 'RECITATION',
+          tibetan: 'རིགས་ཀུན་མཁྱབ་བདག་རྩ་བའི་བླ་མ་ལ།།',
+          phonetics: 'rik kun khyab dak tsa way la ma la',
+          translation: 'and my root lama, sovereign over all the families,'
+        },
+        {
+          id: 'ng-7-47',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-48',
+          type: 'RECITATION',
+          tibetan: 'ཀུན་བཟང་ཐུགས་བཅུད་དགོངས་པ་ཀུན་འདུས་དང༌།།',
+          phonetics: 'kun zang tuk chü gong pa kun dü dang',
+          translation: 'The union of Samantabhadra\'s intentions, quintessence of his mind,'
+        },
+        {
+          id: 'ng-7-49',
+          type: 'RECITATION',
+          tibetan: 'ཡི་དམ་རྒྱལ་བ་ཞི་དང་ཁྲོ་བོའི་ཚོགས་།།',
+          phonetics: 'yi dam gyal wa shi dang tro woy tsok',
+          translation: 'assembly of victorious yidams, peaceful and wrathful ones,'
+        },
+        {
+          id: 'ng-7-50',
+          type: 'RECITATION',
+          tibetan: 'མ་དང་མཁའ་འགྲོ་ཆོས་སྐྱོང་གཏེར་བདག་ལ།།',
+          phonetics: 'ma dang kha dro cho kyong ter dak la',
+          translation: 'mamos, dakinis, dharma protectors, and treasure lords,'
+        },
+        {
+          id: 'ng-7-51',
+          type: 'RECITATION',
+          tibetan: 'གསོལ་འདེབས་རྗེས་བཟུང་བདག་རྒྱུད་སྨིན་གྲོལ་གསོལ།།',
+          phonetics: 'söl dep je zung dak gyü min drol söl',
+          translation: 'I pray to you to accept me, ripen and liberate my being.'
+        },
+        {
+          id: 'ng-7-52',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་བླ་མ་བརྒྱུད་པའི་གསོལ་འདེབས་སྔོན་དུ་འགྲོ་བས། གཙོ་བོར།',
+          translation: 'Having first done this lineage prayer, then do the main part:'
+        },
+        {
+          id: 'ng-7-53',
+          type: 'RECITATION',
+          tibetan: 'ཨོཾ་ཨཱཿཧཱུྃ༔ བླ་མ་འཇའ་དང་འོད་དུ་འཁྱིལ་ལི་ལི༔',
+          phonetics: 'om ah hung la ma ja dang ö du khyil li li',
+          translation: 'OM AH HUNG The lama is wreathed in lights and rainbows,',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-54',
+          type: 'RECITATION',
+          tibetan: 'སྐུ་དང་ཐིག་ལེར་ཤིགས་སེ་ཤིག༔',
+          phonetics: 'ku dang tig ler shik se shik',
+          translation: 'trembling shimmering forms and spheres.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-55',
+          type: 'RECITATION',
+          tibetan: 'ལུས་ངག་ཡིད་གསུམ་གུས་ཕྱག་འཚལ༔',
+          phonetics: 'lu ngak yid sum gü chak tsal',
+          translation: 'I bow in devotion with body, speech and mind.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-56',
+          type: 'RECITATION',
+          tibetan: 'རྡོ་རྗེའི་སྐུ་ལ་གསོལ་བ་འདེབས༔',
+          phonetics: 'dor jey ku la söl wa dep',
+          translation: 'I supplicate the vajra form.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-57',
+          type: 'RECITATION',
+          tibetan: 'ལུས་ལ་བདེ་བར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'lu la de war jin gyi lop',
+          translation: 'Bless my body with bliss.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-58',
+          type: 'RECITATION',
+          tibetan: 'རྡོ་རྗེའི་གསུང་ལ་གསོལ་བ་འདེབས༔',
+          phonetics: 'dor jey sung la söl wa dep',
+          translation: 'I supplicate the vajra speech.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-59',
+          type: 'RECITATION',
+          tibetan: 'ངག་ལ་ནུས་པར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'ngak la nü par jin gyi lop',
+          translation: 'Bless my speech with power.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-60',
+          type: 'RECITATION',
+          tibetan: 'རྡོ་རྗེའི་ཐུགས་ལ་གསོལ་བ་འདེབས༔',
+          phonetics: 'dor jey tuk la söl wa dep',
+          translation: 'I supplicate the vajra mind.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-61',
+          type: 'RECITATION',
+          tibetan: 'སེམས་ལ་རྟོགས་པར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'sem la tok par jin gyi lop',
+          translation: 'Bless my mind with realization.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-62',
+          type: 'RECITATION',
+          tibetan: 'གནས་ལུགས་རྟོགས་པར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'ne luk tok par jin gyi lop',
+          translation: 'Bless me to realize the true nature.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-63',
+          type: 'RECITATION',
+          tibetan: 'མཐོང་རྐྱེན་རྒྱས་པར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'tong kyen gye par jin gyi lop',
+          translation: 'Bless me with the increase of visions.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-64',
+          type: 'RECITATION',
+          tibetan: 'སྒྲོན་བཞི་ལོངས་པར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'drön shi long par jin gyi lop',
+          translation: 'Bless me to experience the four lamps.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-65',
+          type: 'RECITATION',
+          tibetan: 'སྣང་བཞི་འཆར་བར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'nang shi char war jin gyi lop',
+          translation: 'Bless me so that the four visions will arise.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-66',
+          type: 'RECITATION',
+          tibetan: 'འོད་གསལ་འབྱོངས་པར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'ö sal jong war jin gyi lop',
+          translation: 'Bless me to develop the clear light.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-67',
+          type: 'RECITATION',
+          tibetan: 'ཟད་སར་འཁྱོལ་བར་བྱིན་གྱིས་རློབས༔',
+          phonetics: 'ze sar khyol war jin gyi lop',
+          translation: 'Bless me so all the visions subside into dharmata.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-68',
+          type: 'RECITATION',
+          tibetan: 'མཆོག་དང་ཐུན་མོང་དངོས་གྲུབ་སྩོལ༔',
+          phonetics: 'chok dang tun mong ngö drup tsol',
+          translation: 'Bestow the common and supreme siddhis.',
+          variant: 'repeated'
+        },
+        {
+          id: 'ng-7-69',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་བརྒྱ་སྟོང་སོགས་གྲངས་ཅི་ནུས་ཀྱིས་གསོལ་བ་བཏབ་པས།',
+          translation: 'Pray in this way as many times as possible, such as a hundred, a thousand, and so on.'
+        },
+        {
+          id: 'ng-7-71',
+          type: 'RECITATION',
+          tibetan: 'ཀུན་བཟང་ནས་བཟུང་བརྒྱུད་པའི་བླ་མ་རྣམས་།།',
+          phonetics: 'kun zang ne zung gyü pay la ma nam',
+          translation: 'Starting with Samantabhadra, all the lamas in turn'
+        },
+        {
+          id: 'ng-7-72',
+          type: 'RECITATION',
+          tibetan: 'ཡས་རིམ་འོད་ཞུ་བླ་མའི་སྐུ་ལ་ཐིམ་།།',
+          phonetics: 'ye rim ö zhu la may ku la tim',
+          translation: 'dissolve into light and finally absorb into the lama\'s body.'
+        },
+        {
+          id: 'ng-7-73',
+          type: 'RECITATION',
+          tibetan: 'དེ་དག་ཀུན་གྱི་མཁྱེན་བརྩེ་ནུས་པའི་སྟོབས།།',
+          phonetics: 'de dak kun gyi khyen tse nü pay top',
+          translation: 'All of their wisdom, love, and strength of capabilities'
+        },
+        {
+          id: 'ng-7-74',
+          type: 'RECITATION',
+          tibetan: 'གཅིག་བསྡུས་བདག་ཉིད་ཆེན་པོར་བཞུགས་པ་ཡི།།',
+          phonetics: 'chik dü dak nyi chen por shuk pa yi',
+          translation: 'are present in the one great embodiment dwelling there,'
+        },
+        {
+          id: 'ng-7-75',
+          type: 'RECITATION',
+          tibetan: 'གནས་གསུམ་རྡོ་རྗེའི་འབྲུ་གསུམ་གྱིས་མཚན་གྱུར།།',
+          phonetics: 'ne sum dor jey dru sum gyi tsen gyur',
+          translation: 'with his three vajras marked by the three letters.'
+        }
+      ]
+    },
+    {
+      id: 'ng-8',
+      title: 'Receiving the Four Empowerments',
+      blocks: [
+        {
+          id: 'ng-8-1',
+          type: 'INSTRUCTION',
+          tibetan: 'ཞེས་མོས་ལ་སླར་ཡང་གསོལ་བ་བཏབ་པས།',
+          translation: 'Imagining that, again pray.'
+        },
+        {
+          id: 'ng-8-2',
+          type: 'RECITATION',
+          tibetan: 'བླ་མའི་དཔྲལ་བའི་ཨོཾ་ལས་འོད་ཟེར་དཀར་པོ་འཕྲོས།',
+          phonetics: 'la may tral way om le ö zer kar po trö',
+          translation: 'White light shines from the OM in the lama\'s forehead,'
+        },
+        {
+          id: 'ng-8-3',
+          type: 'RECITATION',
+          tibetan: 'རང་གི་དཔྲལ་བར་ཐིམ་།',
+          phonetics: 'rang gi tral war tim',
+          translation: 'is absorbed into my own forehead'
+        },
+        {
+          id: 'ng-8-4',
+          type: 'RECITATION',
+          tibetan: 'ལུས་ཀྱི་སྒྲིབ་པ་སྦྱངས་།',
+          phonetics: 'lu kyid drip pa jang',
+          translation: 'and purifies the obscurations of my body.'
+        },
+        {
+          id: 'ng-8-5',
+          type: 'RECITATION',
+          tibetan: 'སྐུའི་བྱིན་རླབས་ལུས་ལ་ཞུགས།',
+          phonetics: 'kuy jin lap lu la shuk',
+          translation: 'The blessing of the Body enters my body.'
+        },
+        {
+          id: 'ng-8-6',
+          type: 'RECITATION',
+          tibetan: 'སངས་རྒྱས་ཐམས་ཅད་ཀྱི་སྐུ་དང་རང་ལུས་དབྱེར་མེད་སྣང་སྟོང་གི་ངང་དུ་གྱུར།',
+          phonetics: 'sang gye tam ce kyi ku dang rang lu yer me nang tong gi ngang du gyur',
+          translation: 'The Body of all buddhas and my body become inseparable within appearance-emptiness.'
+        },
+        {
+          id: 'ng-8-7',
+          type: 'RECITATION',
+          tibetan: 'མགྲིན་པའི་ཨཱཿལས་འོད་ཟེར་དམར་པོ་འཕྲོས།',
+          phonetics: 'drin pay ah le ö zer mar po trö',
+          translation: 'Red light shines from the AH in the lama\'s throat,'
+        },
+        {
+          id: 'ng-8-8',
+          type: 'RECITATION',
+          tibetan: 'རང་གྱི་མགྲིན་པར་ཐིམ་།',
+          phonetics: 'rang gi drin par tim',
+          translation: 'is absorbed into my own throat'
+        },
+        {
+          id: 'ng-8-9',
+          type: 'RECITATION',
+          tibetan: 'ངག་གི་སྒྲིབ་པ་སྦྱངས་།',
+          phonetics: 'ngak gi drip pa jang',
+          translation: 'and purifies the obscurations of my speech.'
+        },
+        {
+          id: 'ng-8-10',
+          type: 'RECITATION',
+          tibetan: 'གསུང་གི་བྱིན་རླབས་ངག་ལ་ཞུགས།',
+          phonetics: 'sung gi jin lap ngak la shuk',
+          translation: 'The blessing of the Speech enters my speech.'
+        },
+        {
+          id: 'ng-8-11',
+          type: 'RECITATION',
+          tibetan: 'སངས་རྒྱས་ཐམས་ཅད་ཀྱི་གསུང་དང་རང་གི་ངག་དབྱེར་མེད་སྒྲགས་སྟོང་གི་ངང་དུ་གྱུར།',
+          phonetics: 'sang gye tam che kyi sun dang rang gi ngak yer me draK tong gi ngang du gyur',
+          translation: 'The Speech of all buddhas and my speech become inseparable within sound-emptiness.'
+        },
+        {
+          id: 'ng-8-12',
+          type: 'RECITATION',
+          tibetan: 'ཐུགས་ཀའི་ཧཱུྃ་ལས་འོད་ཟེར་སྔོན་པོ་འཕྲོས།',
+          phonetics: 'tuk kay hung le ö zer ngön po trö',
+          translation: 'Blue light shines from the HUNG in the lama\'s heart,'
+        },
+        {
+          id: 'ng-8-13',
+          type: 'RECITATION',
+          tibetan: 'རང་གི་སྙིང་གར་ཐིམ་།',
+          phonetics: 'rang gi nying gar tim',
+          translation: 'is absorbed into my own heart'
+        },
+        {
+          id: 'ng-8-14',
+          type: 'RECITATION',
+          tibetan: 'ཡིད་ཀྱི་སྒྲིབ་པ་སྦྱངས་།',
+          phonetics: 'yid kyi drip pa jang',
+          translation: 'and purifies the obscurations of my mind.'
+        },
+        {
+          id: 'ng-8-15',
+          type: 'RECITATION',
+          tibetan: 'ཐུགས་ཀྱི་བྱིན་རླབས་ཡིད་ལ་ཞུགས།',
+          phonetics: 'tuk kyi jin lap yid la shuk',
+          translation: 'The blessing of the Mind enters my mind.'
+        },
+        {
+          id: 'ng-8-16',
+          type: 'RECITATION',
+          tibetan: 'སངས་རྒྱས་ཐམས་ཅད་ཀྱི་ཐུགས་དང་རང་གི་ཡིད་དབྱེར་མེད་བདེ་སྟོང་གི་ངང་དུ་གྱུར།',
+          phonetics: 'sang gye tam che kyi tuk dang rang gi yid yer me de tong gi ngang du gyur',
+          translation: 'The Mind of all buddhas and my mind become inseparable within bliss-emptiness.'
+        },
+        {
+          id: 'ng-8-17',
+          type: 'RECITATION',
+          tibetan: 'སླར་ཡང་བླ་མའི་གནས་གསུམ་གྱི་ཡི་གེ་གསུམ་ལས་འོད་ཟེར་དཀར་དམར་མཐིང་གསུམ་འཕྲོས།',
+          phonetics: 'lar yang la may ne sum gyi yi ge sum le ö zer kar mar ting sum trö',
+          translation: 'Again, white, red, and blue light shines from the three letters in the lama\'s three places,'
+        },
+        {
+          id: 'ng-8-18',
+          type: 'RECITATION',
+          tibetan: 'རང་གི་གནས་གསུམ་དུ་ཐིམ་།',
+          phonetics: 'rang gi ne sum du tim',
+          translation: 'is absorbed into my own three places'
+        },
+        {
+          id: 'ng-8-19',
+          type: 'RECITATION',
+          tibetan: 'སྒོ་གསུམ་གྱི་སྒྲིབ་པ་སྦྱངས་།',
+          phonetics: 'go sum gyi drip pa jang',
+          translation: 'and purifies the obscurations of my three faculties.'
+        },
+        {
+          id: 'ng-8-20',
+          type: 'RECITATION',
+          tibetan: 'རྡོ་རྗེ་གསུམ་གྱི་བྱིན་རླབས་སྒོ་གསུམ་ལ་ཞུགས།',
+          phonetics: 'dor je sum gyi jin lap go sum la shuk',
+          translation: 'The blessing of the three vajras enters my three faculties.'
+        },
+        {
+          id: 'ng-8-21',
+          type: 'RECITATION',
+          tibetan: 'སངས་རྒྱས་ཐམས་ཅད་ཀྱི་སྐུ་གསུང་ཐུགས་དང་རང་གི་ལུས་ངག་ཡིད་གསུམ་དབྱེར་མེད་གྱུར་པར་བསམ་ལ་མ་བཅོས་རང་བབས་སུ་ཀློད་དེ་ཅི་གནས་སུ་མཉམ་པར་བཞག དེ་ལས་ལྡང་བ་ན་རང་དང་བླ་མ་དབྱེར་མེད་སྣང་སྒྲགས་རིག་གསུམ་བླ་མའི་སྐུ་གསུང་ཐུགས་ཀྱི་རོལ་པར་ཤེས་པའི་ངང་ནས།',
+          phonetics: 'sang gye tam che kyi ku sung tuk dang rang gi lu ngak yid sum yer me du gyur',
+          translation: 'The Body, Speech, and Mind of all buddhas and my body, speech, and mind become inseparable. Rest in relaxed, natural, uncontrived equipoise for however long it lasts. When you emerge from that, your mind and the lama\'s are inseparable. With the understanding that appearance, sound, and awareness are the play of the lama\'s Body, Speech, and Mind, recite:'
+        }
+      ]
+    },
+    {
+      id: 'ng-9',
+      title: 'Dedication',
+      blocks: [
+        {
+          id: 'ng-9-1',
+          type: 'RECITATION',
+          tibetan: 'རང་བཞིན་དག་པའི་དགེ་བ་འདིས༔',
+          phonetics: 'rang shin dak pay ge wa di',
+          translation: 'By this virtue which is pure by nature'
+        },
+        {
+          id: 'ng-9-2',
+          type: 'RECITATION',
+          tibetan: 'འཁོར་བ་ངན་སོང་དོང་སྤྲུགས་ནས༔',
+          phonetics: 'khor wa ngen song dong truk ne',
+          translation: 'May the depths of the lower realms of samsara be stirred,'
+        },
+        {
+          id: 'ng-9-3',
+          type: 'RECITATION',
+          tibetan: 'སྲིད་པར་མིང་ཙམ་མེད་པ་དང༔',
+          phonetics: 'si par ming tsam me pa dang',
+          translation: 'may they be emptied so not even their names remain,'
+        },
+        {
+          id: 'ng-9-4',
+          type: 'RECITATION',
+          tibetan: 'དོན་གཉིས་ལྷུན་གྱིས་གྲུབ་པར་ཤོག།',
+          phonetics: 'dön nyi lhun gyi drup par shok',
+          translation: 'and may the two benefits be spontaneously accomplished.'
+        }
+      ]
+    }
+  ]
+};
+
+// ══════════════════════════════════════════════════════
+// THEME
+// ══════════════════════════════════════════════════════
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.isDark ? 'dark' : 'light');
+  document.getElementById('iconSun').style.display = state.isDark ? 'none' : 'block';
+  document.getElementById('iconMoon').style.display = state.isDark ? 'block' : 'none';
+}
+
+function toggleTheme() {
+  state.isDark = !state.isDark;
+  applyTheme();
+  saveState();
+}
+
+// ══════════════════════════════════════════════════════
+// LANGUAGE TOGGLES
+// ══════════════════════════════════════════════════════
+
+function applyLangs() {
+  document.getElementById('btnTib').classList.toggle('active', state.showTibetan);
+  document.getElementById('btnPho').classList.toggle('active', state.showPhonetics);
+  document.getElementById('btnEng').classList.toggle('active', state.showTranslation);
+  // Re-render content
+  renderContent();
+}
+
+function toggleLang(which) {
+  if (which === 'tibetan') state.showTibetan = !state.showTibetan;
+  if (which === 'phonetics') state.showPhonetics = !state.showPhonetics;
+  if (which === 'translation') state.showTranslation = !state.showTranslation;
+  applyLangs();
+  saveState();
+}
+
+// ══════════════════════════════════════════════════════
+// FONT SIZE
+// ══════════════════════════════════════════════════════
+
+function changeFontSize(delta) {
+  state.fontSize = Math.max(12, Math.min(40, state.fontSize + delta * 2));
+  renderContent();
+  saveState();
+}
+
+// ══════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════
+
+function switchTab(tab) {
+  // Close index if open
+  document.getElementById('indexPanel').classList.remove('open');
+
+  state.activeTab = tab;
+  saveState();
+
+  // Update tab button styles
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  // Deactivate INDEX tab button
+  document.querySelector('.tab-btn[data-tab="INDEX"]').classList.remove('active');
+
+  renderContent();
+  renderIndex();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Stop any scrolling
+  stopAutoScroll();
+  stopTiltScroll();
+}
+
+// ══════════════════════════════════════════════════════
+// INDEX
+// ══════════════════════════════════════════════════════
+
+function toggleIndex() {
+  const panel = document.getElementById('indexPanel');
+  const btn = document.querySelector('.tab-btn[data-tab="INDEX"]');
+  panel.classList.toggle('open');
+  btn.classList.toggle('active', panel.classList.contains('open'));
+}
+
+function renderIndex() {
+  const sections = TABS_DATA[state.activeTab] || [];
+  const container = document.getElementById('indexList');
+
+  container.innerHTML =
+    '<div class="index-heading">' + state.activeTab + ' — Sections</div>' +
+    sections.map((sec, i) =>
+      '<button class="index-item" onclick="jumpToSection(' + i + ')">' + sec.title + '</button>'
+    ).join('');
+}
+
+function jumpToSection(idx) {
+  const el = document.getElementById('section-' + idx);
+  if (el) {
+    const offset = 100; // header + tab height
+    window.scrollTo({ top: el.offsetTop - offset, behavior: 'smooth' });
+  }
+  document.getElementById('indexPanel').classList.remove('open');
+  document.querySelector('.tab-btn[data-tab="INDEX"]').classList.remove('active');
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER CONTENT
+// ══════════════════════════════════════════════════════
+
+function renderContent() {
+  const sections = TABS_DATA[state.activeTab] || [];
+  const area = document.getElementById('contentArea');
+  const fs = state.fontSize;
+
+  const tibSz = (fs * 1.5) + 'px';
+  const phoSz = (fs * 0.9) + 'px';
+  const engSz = fs + 'px';
+  const instrTibSz = (fs * 1.2) + 'px';
+
+  let html = '';
+
+  sections.forEach((sec, si) => {
+    html += '<div class="section-block" id="section-' + si + '">';
+    html += '<div class="section-heading">' + esc(sec.title) + '</div>';
+
+    sec.blocks.forEach(b => {
+      html += renderBlock(b, { tibSz, phoSz, engSz, instrTibSz });
+    });
+
+    html += '</div>';
+  });
+
+  area.innerHTML = html;
+}
+
+function renderBlock(b, sz) {
+  const showT = state.showTibetan;
+  const showP = state.showPhonetics;
+  const showE = state.showTranslation;
+  const isRepeated = b.variant === 'repeated';
+
+  if (b.type === 'TITLE') {
+    let h = '<div class="block block-title">';
+    if (showT && b.tibetan) h += '<div class="tib" style="font-size:' + sz.tibSz + '">' + esc(b.tibetan) + '</div>';
+    if (showP && b.phonetics) h += '<div class="pho">' + esc(b.phonetics) + '</div>';
+    if (showE && b.translation) h += '<div class="eng" style="font-size:' + sz.engSz + '">' + esc(b.translation) + '</div>';
+    h += '<div class="divider-line"></div></div>';
+    return h;
+  }
+
+  if (b.type === 'NAVIGATION') {
+    return '<div class="block block-nav"><button class="nav-btn" onclick="switchTab(\'' + esc(b.targetTab) + '\')">' +
+      esc(b.translation) +
+      ' <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>' +
+      '</button></div>';
+  }
+
+  if (b.type === 'HEADER') {
+    return '<div class="block"><div class="block-header-text" style="font-size:' + sz.engSz + '">' + esc(b.translation) + '</div></div>';
+  }
+
+  if (b.type === 'INSTRUCTION') {
+    let h = '<div class="block block-instruction">';
+    if (showT && b.tibetan) h += '<div class="tib" style="font-size:' + sz.instrTibSz + '">' + esc(b.tibetan) + '</div>';
+    if (showE && b.translation) h += '<div class="eng" style="font-size:' + sz.engSz + '">' + esc(b.translation) + '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  // RECITATION (default)
+  let cls = 'block block-recitation' + (isRepeated ? ' block-repeated' : '');
+  let h = '<div class="' + cls + '">';
+  if (showT && b.tibetan) h += '<div class="tib" style="font-size:' + sz.tibSz + '">' + esc(b.tibetan) + '</div>';
+  if (showP && b.phonetics) h += '<div class="pho" style="font-size:' + sz.phoSz + '">' + esc(b.phonetics) + '</div>';
+  if (showE && b.translation) h += '<div class="eng" style="font-size:' + sz.engSz + '">' + esc(b.translation) + '</div>';
+  h += '</div>';
+  return h;
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ══════════════════════════════════════════════════════
+// AUTO-SCROLL (rAF + time-delta engine)
+// ══════════════════════════════════════════════════════
+
+let isAutoScrolling = false;
+let autoScrollRaf = null;
+let lastScrollTime = 0;
+let scrollAccumulator = 0;
+
+function toggleAutoScroll() {
+  if (isTiltScrolling) stopTiltScroll();
+  isAutoScrolling ? stopAutoScroll() : startAutoScroll();
+}
+
+function startAutoScroll() {
+  isAutoScrolling = true;
+  lastScrollTime = 0;
+  scrollAccumulator = 0;
+  updatePlayIcon();
+  autoScrollLoop(performance.now());
+}
+
+function stopAutoScroll() {
+  isAutoScrolling = false;
+  if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
+  autoScrollRaf = null;
+  updatePlayIcon();
+}
+
+function autoScrollLoop(ts) {
+  if (!isAutoScrolling) return;
+  if (!lastScrollTime) lastScrollTime = ts;
+
+  const dt = ts - lastScrollTime;
+  lastScrollTime = ts;
+
+  // Accumulate fractional pixels
+  scrollAccumulator += (state.scrollSpeed * 0.015 + 0.005) * dt;
+
+  if (scrollAccumulator >= 0.5) {
+    window.scrollBy({ top: scrollAccumulator, behavior: 'auto' });
+    scrollAccumulator = 0;
+  }
+
+  // Stop at bottom
+  if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 2) {
+    stopAutoScroll();
+    return;
+  }
+
+  autoScrollRaf = requestAnimationFrame(autoScrollLoop);
+}
+
+function changeSpeed(delta) {
+  state.scrollSpeed = Math.max(1, Math.min(10, state.scrollSpeed + delta));
+  saveState();
+}
+
+function updatePlayIcon() {
+  document.getElementById('iconPlay').style.display = isAutoScrolling ? 'none' : 'block';
+  document.getElementById('iconPause').style.display = isAutoScrolling ? 'block' : 'none';
+  document.getElementById('btnPlay').classList.toggle('active', isAutoScrolling);
+}
+
+// ══════════════════════════════════════════════════════
+// TILT-TO-SCROLL
+// ══════════════════════════════════════════════════════
+
+let isTiltScrolling = false;
+let tiltPermissionGranted = false;
+let tiltReferenceBeta = null;
+let tiltRafId = null;
+let tiltSpeed = 0;
+
+async function toggleTiltScroll() {
+  if (isAutoScrolling) stopAutoScroll();
+
+  if (isTiltScrolling) {
+    stopTiltScroll();
+    return;
+  }
+
+  // Request iOS permission if needed
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const perm = await DeviceOrientationEvent.requestPermission();
+      if (perm === 'granted') {
+        tiltPermissionGranted = true;
+      } else {
+        alert('Motion permission denied. Enable it in Settings → Safari.');
+        return;
+      }
+    } catch (e) {
+      alert('Could not request motion permission.');
+      return;
+    }
+  } else {
+    tiltPermissionGranted = true;
+  }
+
+  startTiltScroll();
+}
+
+function startTiltScroll() {
+  isTiltScrolling = true;
+  tiltReferenceBeta = null;
+  tiltSpeed = 0;
+  window.addEventListener('deviceorientation', handleTilt);
+  tiltLoop();
+  document.getElementById('btnTilt').classList.add('active');
+}
+
+function stopTiltScroll() {
+  isTiltScrolling = false;
+  window.removeEventListener('deviceorientation', handleTilt);
+  if (tiltRafId) cancelAnimationFrame(tiltRafId);
+  tiltRafId = null;
+  document.getElementById('btnTilt').classList.remove('active');
+}
+
+function handleTilt(e) {
+  if (e.beta === null) return;
+  if (tiltReferenceBeta === null) tiltReferenceBeta = e.beta;
+
+  const tilt = e.beta - tiltReferenceBeta;
+  // Non-linear: small tilts = slow, large tilts = fast
+  tiltSpeed = Math.pow(Math.abs(tilt) / 8, 2) * Math.sign(tilt) * (state.scrollSpeed * 0.5);
+}
+
+function tiltLoop() {
+  if (!isTiltScrolling) return;
+  if (Math.abs(tiltSpeed) > 0.1) {
+    window.scrollBy({ top: tiltSpeed, behavior: 'auto' });
+  }
+  tiltRafId = requestAnimationFrame(tiltLoop);
+}
+
+// ══════════════════════════════════════════════════════
+// FULLSCREEN
+// ══════════════════════════════════════════════════════
+
+let isFullScreen = false;
+
+function toggleFullScreen() {
+  isFullScreen = !isFullScreen;
+  document.body.classList.toggle('fullscreen', isFullScreen);
+
+  if (isFullScreen && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else if (!isFullScreen && document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+// Sync if user exits fullscreen via Escape
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && isFullScreen) {
+    isFullScreen = false;
+    document.body.classList.remove('fullscreen');
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// SCROLL-TO-TOP BUTTON
+// ══════════════════════════════════════════════════════
+
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 300);
+});
+
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+// ══════════════════════════════════════════════════════
+// PREVENT COPY / RIGHT-CLICK (matches existing apps)
+// ══════════════════════════════════════════════════════
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => e.preventDefault());
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+
+(function init() {
+  applyTheme();
+
+  // Respect system dark mode if no saved preference
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      state.isDark = true;
+      applyTheme();
+    }
+  }
+
+  // Set active tab buttons
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === state.activeTab);
+  });
+
+  renderContent();
+  renderIndex();
+})();
+
+</script>
+
+</body>
+</html>
