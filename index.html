@@ -88,10 +88,14 @@
     /* ══════════════════════════════════════════
        HEADER
        ══════════════════════════════════════════ */
-    .app-header {
+    .sticky-stack {
       position: sticky;
       top: 0;
       z-index: 50;
+      background: var(--bg);
+    }
+
+    .app-header {
       background: var(--bg);
       border-bottom: 1px solid var(--border);
       transition: background 0.3s, border 0.3s;
@@ -169,9 +173,6 @@
        TABS
        ══════════════════════════════════════════ */
     .tab-bar {
-      position: sticky;
-      top: 40px;
-      z-index: 40;
       background: var(--bg-secondary);
       border-bottom: 1px solid var(--border);
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -202,7 +203,9 @@
       transition: color 0.2s, background 0.2s;
     }
 
-    .tab-btn:hover { color: var(--text); background: var(--accent-10); }
+    @media (hover: hover) {
+      .tab-btn:hover { color: var(--text); background: var(--accent-10); }
+    }
 
     .tab-btn.active {
       color: var(--accent);
@@ -228,20 +231,44 @@
     .tab-btn.active .tab-icon { opacity: 1; }
 
     /* ══════════════════════════════════════════
-       INDEX PANEL (slide-down)
+       INDEX PANEL (overlay)
        ══════════════════════════════════════════ */
+    .index-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
+      background: rgba(0,0,0,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .index-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     .index-panel {
-      max-height: 0;
-      overflow: hidden;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: var(--stack-h, 80px);
+      z-index: 60;
+      max-height: min(60vh, calc(100vh - var(--stack-h, 80px) - 4rem));
+      overflow-y: auto;
       background: var(--bg-secondary);
-      border-bottom: 1px solid transparent;
-      transition: max-height 0.35s ease, border 0.3s;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      transform: translateY(-12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.25s ease;
     }
 
     .index-panel.open {
-      max-height: 60vh;
-      overflow-y: auto;
-      border-bottom-color: var(--border);
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
 
     .index-inner {
@@ -485,7 +512,11 @@
       transition: background 0.15s, color 0.15s;
     }
 
-    .bar-btn:hover { background: var(--accent-10); color: var(--text); }
+    @media (hover: hover) {
+      .bar-btn:hover { background: var(--accent-10); color: var(--text); }
+    }
+    .bar-btn:focus { outline: none; }
+    .bar-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
     .bar-btn.active {
       background: var(--accent-10);
@@ -539,13 +570,11 @@
     /* ══════════════════════════════════════════
        FULLSCREEN overrides
        ══════════════════════════════════════════ */
-    body.fullscreen .app-header,
-    body.fullscreen .tab-bar,
-    body.fullscreen .index-panel { display: none; }
+    body.fullscreen .sticky-stack,
+    body.fullscreen .index-panel,
+    body.fullscreen .index-backdrop { display: none; }
 
     body.fullscreen .content-area { padding-top: 1rem; }
-
-    body.fullscreen .tab-bar + .index-panel + .content-area { padding-top: 1rem; }
 
     /* ══════════════════════════════════════════
        ANIMATIONS
@@ -592,6 +621,7 @@
 
 <body>
 
+  <div class="sticky-stack" id="stickyStack">
   <header class="app-header" id="appHeader">
     <div class="header-inner">
       <span class="header-title">KGK Ngöndro</span>
@@ -624,7 +654,9 @@
       </button>
     </div>
   </nav>
+  </div>
 
+  <div class="index-backdrop" id="indexBackdrop" onclick="toggleIndex()"></div>
   <div class="index-panel" id="indexPanel">
     <div class="index-inner" id="indexList">
       </div>
@@ -2911,7 +2943,7 @@ function changeFontSize(delta) {
 
 function switchTab(tab) {
   // Close index if open
-  document.getElementById('indexPanel').classList.remove('open');
+  closeIndex();
 
   state.activeTab = tab;
   saveState();
@@ -2938,9 +2970,18 @@ function switchTab(tab) {
 
 function toggleIndex() {
   const panel = document.getElementById('indexPanel');
+  const backdrop = document.getElementById('indexBackdrop');
   const btn = document.querySelector('.tab-btn[data-tab="INDEX"]');
-  panel.classList.toggle('open');
-  btn.classList.toggle('active', panel.classList.contains('open'));
+  const willOpen = !panel.classList.contains('open');
+  panel.classList.toggle('open', willOpen);
+  backdrop.classList.toggle('open', willOpen);
+  btn.classList.toggle('active', willOpen);
+}
+
+function closeIndex() {
+  document.getElementById('indexPanel').classList.remove('open');
+  document.getElementById('indexBackdrop').classList.remove('open');
+  document.querySelector('.tab-btn[data-tab="INDEX"]').classList.remove('active');
 }
 
 const INDEX_LINKS = [
@@ -2967,8 +3008,7 @@ function jumpToIndex(i) {
   const link = INDEX_LINKS[i];
   if (!link) return;
 
-  document.getElementById('indexPanel').classList.remove('open');
-  document.querySelector('.tab-btn[data-tab="INDEX"]').classList.remove('active');
+  closeIndex();
 
   const needsTabSwitch = state.activeTab !== link.tab;
 
@@ -3001,8 +3041,7 @@ function jumpToSection(idx) {
     const offset = 100;
     window.scrollTo({ top: el.offsetTop - offset, behavior: 'smooth' });
   }
-  document.getElementById('indexPanel').classList.remove('open');
-  document.querySelector('.tab-btn[data-tab="INDEX"]').classList.remove('active');
+  closeIndex();
 }
 
 // ══════════════════════════════════════════════════════
@@ -3093,6 +3132,11 @@ let autoScrollRaf = null;
 let lastScrollTime = 0;
 let scrollAccumulator = 0;
 
+// pixels per second at scrollSpeed = 1 .. 10
+function autoScrollPxPerSec() {
+  return 20 + state.scrollSpeed * 18; // ~38 .. 200 px/s
+}
+
 function toggleAutoScroll() {
   if (isTiltScrolling) stopTiltScroll();
   isAutoScrolling ? stopAutoScroll() : startAutoScroll();
@@ -3103,29 +3147,38 @@ function startAutoScroll() {
   lastScrollTime = 0;
   scrollAccumulator = 0;
   updatePlayIcon();
-  autoScrollLoop(performance.now());
+  autoScrollRaf = requestAnimationFrame(autoScrollLoop);
 }
 
 function stopAutoScroll() {
   isAutoScrolling = false;
   if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
   autoScrollRaf = null;
+  scrollAccumulator = 0;
+  lastScrollTime = 0;
   updatePlayIcon();
 }
 
 function autoScrollLoop(ts) {
   if (!isAutoScrolling) return;
-  if (!lastScrollTime) lastScrollTime = ts;
 
-  const dt = ts - lastScrollTime;
+  if (!lastScrollTime) {
+    lastScrollTime = ts;
+    autoScrollRaf = requestAnimationFrame(autoScrollLoop);
+    return;
+  }
+
+  let dt = ts - lastScrollTime;
   lastScrollTime = ts;
+  // Clamp dt to avoid giant jumps after tab was backgrounded
+  if (dt > 100) dt = 100;
 
-  // Accumulate fractional pixels
-  scrollAccumulator += (state.scrollSpeed * 0.015 + 0.005) * dt;
+  scrollAccumulator += autoScrollPxPerSec() * (dt / 1000);
 
-  if (scrollAccumulator >= 0.5) {
-    window.scrollBy({ top: scrollAccumulator, behavior: 'auto' });
-    scrollAccumulator = 0;
+  if (scrollAccumulator >= 1) {
+    const px = Math.floor(scrollAccumulator);
+    window.scrollBy(0, px);
+    scrollAccumulator -= px;
   }
 
   // Stop at bottom
@@ -3156,7 +3209,10 @@ let isTiltScrolling = false;
 let tiltPermissionGranted = false;
 let tiltReferenceBeta = null;
 let tiltRafId = null;
-let tiltSpeed = 0;
+let tiltSpeed = 0;          // pixels per second
+let tiltLastTs = 0;
+let tiltStartTime = 0;       // ignore tilts immediately after toggle on
+let tiltScrollAccum = 0;
 
 async function toggleTiltScroll() {
   if (isAutoScrolling) stopAutoScroll();
@@ -3192,9 +3248,14 @@ function startTiltScroll() {
   isTiltScrolling = true;
   tiltReferenceBeta = null;
   tiltSpeed = 0;
+  tiltLastTs = 0;
+  tiltScrollAccum = 0;
+  tiltStartTime = performance.now();
   window.addEventListener('deviceorientation', handleTilt);
-  tiltLoop();
+  tiltRafId = requestAnimationFrame(tiltLoop);
   document.getElementById('btnTilt').classList.add('active');
+  // Drop hover/focus visual remnant on touch devices
+  document.getElementById('btnTilt').blur();
 }
 
 function stopTiltScroll() {
@@ -3202,23 +3263,76 @@ function stopTiltScroll() {
   window.removeEventListener('deviceorientation', handleTilt);
   if (tiltRafId) cancelAnimationFrame(tiltRafId);
   tiltRafId = null;
-  document.getElementById('btnTilt').classList.remove('active');
+  tiltSpeed = 0;
+  tiltScrollAccum = 0;
+  tiltLastTs = 0;
+  tiltReferenceBeta = null;
+  const btn = document.getElementById('btnTilt');
+  btn.classList.remove('active');
+  btn.blur();
 }
+
+const TILT_DEADZONE_DEG = 3;
+const TILT_MAX_DEG = 30;
+const TILT_MAX_PX_PER_SEC = 1500;
+const TILT_WARMUP_MS = 350;
 
 function handleTilt(e) {
-  if (e.beta === null) return;
+  if (e.beta === null || e.beta === undefined) return;
+
+  // Re-baseline a few hundred ms after enabling, so the act of tapping
+  // the button doesn't get interpreted as a tilt and jump the page.
+  if (performance.now() - tiltStartTime < TILT_WARMUP_MS) {
+    tiltReferenceBeta = e.beta;
+    tiltSpeed = 0;
+    return;
+  }
+
   if (tiltReferenceBeta === null) tiltReferenceBeta = e.beta;
 
-  const tilt = e.beta - tiltReferenceBeta;
-  // Inverted, more sensitive: tilt forward (toward you) = scroll down
-  tiltSpeed = -Math.pow(Math.abs(tilt) / 4, 2) * Math.sign(tilt) * (state.scrollSpeed * 1.2);
+  let tilt = e.beta - tiltReferenceBeta;
+
+  // Dead zone so resting on the table doesn't drift
+  if (Math.abs(tilt) < TILT_DEADZONE_DEG) {
+    tiltSpeed = 0;
+    return;
+  }
+
+  const sign = Math.sign(tilt);
+  const mag = Math.min(Math.abs(tilt) - TILT_DEADZONE_DEG, TILT_MAX_DEG);
+  const norm = mag / TILT_MAX_DEG; // 0..1
+  // Quadratic curve: small tilts gentle, larger tilts ramp up.
+  const curve = norm * norm;
+
+  // Inverted: tilt toward you (positive beta change) -> scroll down.
+  tiltSpeed = -sign * curve * TILT_MAX_PX_PER_SEC * (0.4 + state.scrollSpeed * 0.06);
 }
 
-function tiltLoop() {
-  if (!isTiltScrolling) return;
-  if (Math.abs(tiltSpeed) > 0.1) {
-    window.scrollBy({ top: tiltSpeed, behavior: 'auto' });
+function tiltLoop(ts) {
+  if (!isTiltScrolling) {
+    tiltRafId = null;
+    return;
   }
+
+  if (!tiltLastTs) {
+    tiltLastTs = ts || performance.now();
+    tiltRafId = requestAnimationFrame(tiltLoop);
+    return;
+  }
+
+  const now = ts || performance.now();
+  let dt = now - tiltLastTs;
+  tiltLastTs = now;
+  if (dt > 100) dt = 100;
+
+  tiltScrollAccum += tiltSpeed * (dt / 1000);
+
+  if (Math.abs(tiltScrollAccum) >= 1) {
+    const px = tiltScrollAccum > 0 ? Math.floor(tiltScrollAccum) : Math.ceil(tiltScrollAccum);
+    window.scrollBy(0, px);
+    tiltScrollAccum -= px;
+  }
+
   tiltRafId = requestAnimationFrame(tiltLoop);
 }
 
@@ -3275,6 +3389,16 @@ document.addEventListener('copy', e => e.preventDefault());
 // INIT
 // ══════════════════════════════════════════════════════
 
+function measureStackHeight() {
+  const stack = document.getElementById('stickyStack');
+  if (!stack) return;
+  const h = stack.getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--stack-h', h + 'px');
+}
+
+window.addEventListener('resize', measureStackHeight);
+window.addEventListener('orientationchange', measureStackHeight);
+
 (function init() {
   applyTheme();
 
@@ -3285,6 +3409,12 @@ document.addEventListener('copy', e => e.preventDefault());
 
   renderContent();
   renderIndex();
+  measureStackHeight();
+  // Re-measure after fonts/layout settle
+  requestAnimationFrame(() => requestAnimationFrame(measureStackHeight));
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(measureStackHeight);
+  }
 })();
 
 </script>
