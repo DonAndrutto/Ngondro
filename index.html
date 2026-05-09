@@ -3494,7 +3494,9 @@ function handleTilt(e) {
     targetTiltSpeed = 0;
   } else {
     const t = tilt - Math.sign(tilt) * deadzone;
-    targetTiltSpeed = Math.sign(t) * Math.pow(Math.abs(t) / 1.2, 1.5) * (state.scrollSpeed * 0.12);
+    const raw = Math.sign(t) * Math.pow(Math.abs(t) / 1.2, 1.5) * (state.scrollSpeed * 0.12);
+    const maxPxPerFrame = 3.5;
+    targetTiltSpeed = -Math.max(-maxPxPerFrame, Math.min(maxPxPerFrame, raw));
   }
 }
 
