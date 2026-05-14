@@ -565,86 +565,95 @@
       margin-bottom: var(--sp-2);
     }
 
-    /* Timer block */
+    /* Timer block — kept visually discrete: a thin inline row, not a card */
     .block-timer {
-      margin: var(--sp-7) auto;
-      max-width: 22rem;
-      padding: var(--sp-5) var(--sp-5);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--elev-2);
+      margin: var(--sp-5) auto;
+      max-width: 18rem;
+      padding: var(--sp-2) var(--sp-3);
+      background: transparent;
+      border: none;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: none;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: var(--sp-3);
+      opacity: 0.75;
+      transition: opacity var(--dur-2);
     }
+    .block-timer:hover { opacity: 1; }
+    .block-timer.is-running { opacity: 1; }
     .block-timer.is-finished {
+      opacity: 1;
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent), var(--elev-2);
     }
-    .block-timer .timer-label {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: var(--ls-caps);
-      color: var(--text-muted);
-    }
+    .block-timer .timer-label { display: none; }
     .block-timer .timer-display {
       font-family: 'Inter', sans-serif;
       font-variant-numeric: tabular-nums;
-      font-weight: 300;
-      font-size: 2.6rem;
-      color: var(--text);
-      line-height: 1.1;
-      letter-spacing: 0.02em;
+      font-weight: 400;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1;
+      letter-spacing: 0.04em;
     }
-    .block-timer.is-finished .timer-display {
-      color: var(--accent);
-    }
-    .block-timer .timer-sub {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.7rem;
-      color: var(--text-light);
-      letter-spacing: 0.02em;
-    }
+    .block-timer.is-running .timer-display { color: var(--text); }
+    .block-timer.is-finished .timer-display { color: var(--accent); }
+    .block-timer .timer-sub { display: none; }
     .block-timer .timer-controls {
       display: flex;
-      gap: var(--sp-3);
-      margin-top: var(--sp-2);
+      gap: var(--sp-1);
+      margin: 0;
     }
     .timer-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.4rem;
-      min-width: 5.5rem;
-      padding: var(--sp-2) var(--sp-4);
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      min-width: 0;
       font-family: 'Inter', sans-serif;
+      font-size: 0;
+      background: transparent;
+      color: var(--text-light);
+      border: none;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background var(--dur-2),
+                  color var(--dur-2),
+                  transform var(--dur-1);
+    }
+    .timer-btn svg { width: 13px; height: 13px; }
+    .timer-btn:hover { background: var(--accent-10); color: var(--accent); }
+    .timer-btn:active { transform: scale(var(--press-scale)); }
+    .timer-btn:focus { outline: none; }
+    .timer-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+    .timer-btn[disabled] { opacity: 0.4; cursor: default; }
+    .timer-btn[disabled]:hover { background: transparent; color: var(--text-light); }
+
+    /* Dialog action buttons keep a labeled style */
+    .timer-dialog .timer-btn {
+      width: auto;
+      height: auto;
+      padding: var(--sp-2) var(--sp-4);
+      min-width: 5.5rem;
       font-size: 0.78rem;
       font-weight: 500;
       letter-spacing: 0.04em;
       background: var(--bg-secondary);
       color: var(--text);
       border: 1px solid var(--border);
-      border-radius: var(--radius-pill);
-      cursor: pointer;
-      transition: background var(--dur-2),
-                  color var(--dur-2),
-                  border-color var(--dur-2),
-                  transform var(--dur-1);
     }
-    .timer-btn:hover { background: var(--accent-10); color: var(--accent); border-color: var(--accent); }
-    .timer-btn:active { transform: scale(var(--press-scale)); }
-    .timer-btn:focus { outline: none; }
-    .timer-btn:focus-visible { outline: none; box-shadow: var(--ring); }
-    .timer-btn.is-primary {
+    .timer-dialog .timer-btn:hover { background: var(--accent-10); color: var(--accent); border-color: var(--accent); }
+    .timer-dialog .timer-btn.is-primary {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent);
     }
-    .timer-btn.is-primary:hover { background: var(--accent); color: #fff; opacity: 0.92; }
+    .timer-dialog .timer-btn.is-primary:hover { background: var(--accent); color: #fff; opacity: 0.92; }
 
     /* Timer settings dialog */
     .timer-dialog-backdrop {
@@ -3928,34 +3937,30 @@ function formatHMS(sec) {
   return pad(m) + ':' + pad(s);
 }
 
+const TIMER_ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
+const TIMER_ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
+const TIMER_ICON_DONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 12 10 18 20 6"/></svg>';
+const TIMER_ICON_RESET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+
 function renderTimerBlock(b) {
   const key = b.timerKey;
   const isRunning = timerRuntime.activeKey === key;
   const { seconds, finished } = timerDisplayFor(key);
   const mode = state.timer.mode;
 
-  let sub;
-  if (mode === 'stopwatch') {
-    sub = 'Stopwatch';
-  } else {
-    const total = timerTotalSeconds();
-    const usedBefore = spentBefore(key);
-    const available = Math.max(0, total - usedBefore);
-    sub = 'Remaining of ' + formatHMS(total) + ' total · ' + formatHMS(available) + ' available';
-  }
-
   const finishedCls = (finished && mode === 'countdown') ? ' is-finished' : '';
-  const playLabel = isRunning ? 'Pause' : (finished && mode === 'countdown' ? 'Done' : 'Start');
-  const playDisabled = (finished && mode === 'countdown' && !isRunning) ? 'disabled' : '';
+  const runningCls = isRunning ? ' is-running' : '';
+  let playIcon, playTitle, playDisabled = '';
+  if (isRunning) { playIcon = TIMER_ICON_PAUSE; playTitle = 'Pause'; }
+  else if (finished && mode === 'countdown') { playIcon = TIMER_ICON_DONE; playTitle = 'Done'; playDisabled = 'disabled'; }
+  else { playIcon = TIMER_ICON_PLAY; playTitle = 'Start'; }
 
   return '' +
-    '<div class="block block-timer' + finishedCls + '" id="timer-block-' + key + '" data-timer-key="' + key + '">' +
-      '<div class="timer-label">' + esc(b.label || 'Timer') + '</div>' +
+    '<div class="block block-timer' + finishedCls + runningCls + '" id="timer-block-' + key + '" data-timer-key="' + key + '">' +
       '<div class="timer-display" id="timer-display-' + key + '">' + formatHMS(seconds) + '</div>' +
-      '<div class="timer-sub" id="timer-sub-' + key + '">' + esc(sub) + '</div>' +
       '<div class="timer-controls">' +
-        '<button type="button" class="timer-btn is-primary" id="timer-play-' + key + '" ' + playDisabled + ' onclick="toggleTimer(' + key + ')">' + playLabel + '</button>' +
-        '<button type="button" class="timer-btn" onclick="resetTimer(' + key + ')">Reset</button>' +
+        '<button type="button" class="timer-btn" id="timer-play-' + key + '" ' + playDisabled + ' title="' + playTitle + '" aria-label="' + playTitle + '" onclick="toggleTimer(' + key + ')">' + playIcon + '</button>' +
+        '<button type="button" class="timer-btn" title="Reset" aria-label="Reset" onclick="resetTimer(' + key + ')">' + TIMER_ICON_RESET + '</button>' +
       '</div>' +
     '</div>';
 }
@@ -3973,8 +3978,6 @@ function stopTimerTicker() {
 }
 
 function tickTimers() {
-  // Only the active key needs live updates, but refresh all displays so
-  // remaining/available stay consistent after a finish.
   const mode = state.timer.mode;
   for (let k = 0; k < TIMER_COUNT; k++) {
     const display = document.getElementById('timer-display-' + k);
@@ -3984,16 +3987,7 @@ function tickTimers() {
     const block = document.getElementById('timer-block-' + k);
     if (block) {
       block.classList.toggle('is-finished', finished && mode === 'countdown');
-    }
-    const sub = document.getElementById('timer-sub-' + k);
-    if (sub) {
-      if (mode === 'stopwatch') {
-        sub.textContent = 'Stopwatch';
-      } else {
-        const total = timerTotalSeconds();
-        const available = Math.max(0, total - spentBefore(k));
-        sub.textContent = 'Remaining of ' + formatHMS(total) + ' total · ' + formatHMS(available) + ' available';
-      }
+      block.classList.toggle('is-running', timerRuntime.activeKey === k);
     }
     // Auto-stop on countdown completion
     if (mode === 'countdown' && finished && timerRuntime.activeKey === k && !timerRuntime.finished[k]) {
@@ -4011,13 +4005,19 @@ function renderTimerControls(key) {
   const isRunning = timerRuntime.activeKey === key;
   const { finished } = timerDisplayFor(key);
   if (isRunning) {
-    btn.textContent = 'Pause';
+    btn.innerHTML = TIMER_ICON_PAUSE;
+    btn.title = 'Pause';
+    btn.setAttribute('aria-label', 'Pause');
     btn.removeAttribute('disabled');
   } else if (finished && state.timer.mode === 'countdown') {
-    btn.textContent = 'Done';
+    btn.innerHTML = TIMER_ICON_DONE;
+    btn.title = 'Done';
+    btn.setAttribute('aria-label', 'Done');
     btn.setAttribute('disabled', 'disabled');
   } else {
-    btn.textContent = 'Start';
+    btn.innerHTML = TIMER_ICON_PLAY;
+    btn.title = 'Start';
+    btn.setAttribute('aria-label', 'Start');
     btn.removeAttribute('disabled');
   }
 }
