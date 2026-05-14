@@ -518,6 +518,30 @@
       font-feature-settings: "ccmp", "rclt";
     }
 
+    /* Empowerment seed syllables — OM (white), AH (red), HUNG (blue).
+       Sized up slightly above surrounding Tibetan. */
+    .syl {
+      font-size: 1.35em;
+      line-height: inherit;
+      padding: 0 0.05em;
+      font-weight: 600;
+    }
+    .syl-om {
+      color: #FFFFFF;
+      -webkit-text-stroke: 1px #44403c;
+      text-stroke: 1px #44403c;
+      paint-order: stroke fill;
+    }
+    [data-theme="dark"] .syl-om {
+      color: #FFFFFF;
+      -webkit-text-stroke: 0;
+      text-stroke: 0;
+    }
+    .syl-ah   { color: #C62828; }
+    [data-theme="dark"] .syl-ah { color: #FF6F6F; }
+    .syl-hung { color: #1E5FBF; }
+    [data-theme="dark"] .syl-hung { color: #6FA8FF; }
+
     /* Navigation button */
     .block-nav {
       margin: var(--sp-6) auto;
@@ -1105,6 +1129,7 @@
         <input type="checkbox" id="timerSoundChk" />
         <span>Play chime at end</span>
       </label>
+      <button type="button" class="timer-btn" onclick="testChime()" style="align-self:flex-start;">Test chime</button>
     </div>
     <div class="dlg-actions">
       <button type="button" class="timer-btn" onclick="resetAllTimers()">Reset all</button>
@@ -3100,6 +3125,7 @@ const TABS_DATA = {
           id: 'ng-8-2',
           type: 'RECITATION',
           tibetan: 'བླ་མའི་དཔྲལ་བའི་ཨོཾ་ལས་འོད་ཟེར་དཀར་པོ་འཕྲོས།',
+          tibetanHtml: 'བླ་མའི་དཔྲལ་བའི་<span class="syl syl-om">ཨོཾ</span>་ལས་འོད་ཟེར་དཀར་པོ་འཕྲོས།',
           phonetics: 'la may tral way om le ö zer kar po trö',
           translation: 'White light shines from the OM in the lama\'s forehead,'
         },
@@ -3135,6 +3161,7 @@ const TABS_DATA = {
           id: 'ng-8-7',
           type: 'RECITATION',
           tibetan: 'མགྲིན་པའི་ཨཱཿལས་འོད་ཟེར་དམར་པོ་འཕྲོས།',
+          tibetanHtml: 'མགྲིན་པའི་<span class="syl syl-ah">ཨཱཿ</span>ལས་འོད་ཟེར་དམར་པོ་འཕྲོས།',
           phonetics: 'drin pay ah le ö zer mar po trö',
           translation: 'Red light shines from the AH in the lama\'s throat,'
         },
@@ -3170,6 +3197,7 @@ const TABS_DATA = {
           id: 'ng-8-12',
           type: 'RECITATION',
           tibetan: 'ཐུགས་ཀའི་ཧཱུྃ་ལས་འོད་ཟེར་སྔོན་པོ་འཕྲོས།',
+          tibetanHtml: 'ཐུགས་ཀའི་<span class="syl syl-hung">ཧཱུྃ</span>་ལས་འོད་ཟེར་སྔོན་པོ་འཕྲོས།',
           phonetics: 'tuk kay hung le ö zer ngön po trö',
           translation: 'Blue light shines from the HUNG in the lama\'s heart,'
         },
@@ -3555,7 +3583,10 @@ function renderBlock(b, sz) {
   // RECITATION (default)
   let cls = 'block block-recitation' + (isRepeated ? ' block-repeated' : '');
   let h = '<div class="' + cls + '">';
-  if (showT && b.tibetan) h += '<div class="tib" style="font-size:' + sz.tibSz + '">' + esc(b.tibetan) + '</div>';
+  if (showT && b.tibetan) {
+    const tibContent = b.tibetanHtml ? b.tibetanHtml : esc(b.tibetan);
+    h += '<div class="tib" style="font-size:' + sz.tibSz + '">' + tibContent + '</div>';
+  }
   if (showP && b.phonetics) h += '<div class="pho" style="font-size:' + sz.phoSz + '">' + esc(b.phonetics) + '</div>';
   if (showE && b.translation) h += '<div class="eng" style="font-size:' + sz.engSz + '">' + esc(b.translation) + '</div>';
   h += '</div>';
@@ -3910,7 +3941,8 @@ function spentBefore(key) {
 function liveElapsed(key) {
   const stored = state.timer.spent[key] || 0;
   if (timerRuntime.activeKey === key) {
-    return stored + (performance.now() - timerRuntime.runStartedAt) / 1000;
+    // Wall-clock based so background time still counts.
+    return stored + (Date.now() - timerRuntime.runStartedAt) / 1000;
   }
   return stored;
 }
@@ -3993,6 +4025,7 @@ function tickTimers() {
     if (mode === 'countdown' && finished && timerRuntime.activeKey === k && !timerRuntime.finished[k]) {
       pauseActiveTimer();
       timerRuntime.finished[k] = true;
+      releaseWakeLock();
       if (state.timer.soundEnabled) playChime();
       renderTimerControls(k);
     }
@@ -4023,8 +4056,11 @@ function renderTimerControls(key) {
 }
 
 function toggleTimer(key) {
+  // Any user gesture is a chance to unlock audio.
+  primeAudio();
   if (timerRuntime.activeKey === key) {
     pauseActiveTimer();
+    releaseWakeLock();
   } else {
     // Pause any other running timer first (banking its elapsed)
     if (timerRuntime.activeKey !== -1) pauseActiveTimer();
@@ -4034,10 +4070,9 @@ function toggleTimer(key) {
       if (finished) return;
     }
     timerRuntime.activeKey = key;
-    timerRuntime.runStartedAt = performance.now();
+    timerRuntime.runStartedAt = Date.now();
     startTimerTicker();
-    // Allow audio resume on user gesture
-    primeAudio();
+    requestWakeLock();
   }
   for (let k = 0; k < TIMER_COUNT; k++) renderTimerControls(k);
   tickTimers();
@@ -4047,7 +4082,7 @@ function toggleTimer(key) {
 function pauseActiveTimer() {
   const k = timerRuntime.activeKey;
   if (k === -1) return;
-  const delta = (performance.now() - timerRuntime.runStartedAt) / 1000;
+  const delta = (Date.now() - timerRuntime.runStartedAt) / 1000;
   state.timer.spent[k] = (state.timer.spent[k] || 0) + delta;
   timerRuntime.activeKey = -1;
   timerRuntime.runStartedAt = 0;
@@ -4060,6 +4095,7 @@ function resetTimer(key) {
     timerRuntime.activeKey = -1;
     timerRuntime.runStartedAt = 0;
     stopTimerTicker();
+    releaseWakeLock();
   }
   state.timer.spent[key] = 0;
   timerRuntime.finished[key] = false;
@@ -4073,6 +4109,7 @@ function resetAllTimers() {
     timerRuntime.activeKey = -1;
     timerRuntime.runStartedAt = 0;
     stopTimerTicker();
+    releaseWakeLock();
   }
   state.timer.spent = [0, 0, 0, 0];
   timerRuntime.finished = [false, false, false, false];
@@ -4125,45 +4162,117 @@ function syncTimerModeUI() {
 // — Audio chime —
 
 let audioCtx = null;
+let audioUnlocked = false;
+
 function primeAudio() {
   try {
     if (!audioCtx) {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (Ctx) audioCtx = new Ctx();
     }
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if (!audioCtx) return;
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+    // Play a near-silent tick to fully unlock on iOS Safari.
+    if (!audioUnlocked) {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      g.gain.value = 0.0001;
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.02);
+      audioUnlocked = true;
+    }
   } catch {}
 }
 
 function playChime() {
   try {
-    primeAudio();
+    if (!audioCtx) primeAudio();
     if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    // Three soft bell tones
-    [0, 0.55, 1.1].forEach((offset, i) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(660 + i * 80, now + offset);
-      gain.gain.setValueAtTime(0.0001, now + offset);
-      gain.gain.exponentialRampToValueAtTime(0.35, now + offset + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 1.6);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now + offset);
-      osc.stop(now + offset + 1.7);
-    });
+    const start = () => {
+      const now = audioCtx.currentTime;
+      // Three bell tones (descending pentatonic-ish), each with quick attack and long decay.
+      [
+        { f: 880, t: 0.00 },
+        { f: 740, t: 0.55 },
+        { f: 587, t: 1.10 }
+      ].forEach(({ f, t }) => {
+        // Main tone
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now + t);
+        gain.gain.setValueAtTime(0, now + t);
+        gain.gain.linearRampToValueAtTime(0.5, now + t + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0005, now + t + 2.2);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now + t);
+        osc.stop(now + t + 2.3);
+        // Partial for a richer bell timbre
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(f * 2.01, now + t);
+        gain2.gain.setValueAtTime(0, now + t);
+        gain2.gain.linearRampToValueAtTime(0.18, now + t + 0.012);
+        gain2.gain.exponentialRampToValueAtTime(0.0005, now + t + 1.6);
+        osc2.connect(gain2); gain2.connect(audioCtx.destination);
+        osc2.start(now + t);
+        osc2.stop(now + t + 1.7);
+      });
+    };
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume().then(start).catch(start);
+    } else {
+      start();
+    }
   } catch {}
 }
 
-// Pause any active timer when leaving the tab (so background time doesn't burn it)
+// — Wake lock (best-effort; not all browsers/HTTP origins support it) —
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if (!('wakeLock' in navigator)) return;
+    if (wakeLock) return;
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => { wakeLock = null; });
+  } catch { wakeLock = null; }
+}
+function releaseWakeLock() {
+  try { if (wakeLock) wakeLock.release(); } catch {}
+  wakeLock = null;
+}
+
+// When the tab returns to the foreground, catch the display up to wall-clock
+// time and reacquire the wake lock (browsers drop it on hide).
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && timerRuntime.activeKey !== -1) {
-    pauseActiveTimer();
-    for (let k = 0; k < TIMER_COUNT; k++) renderTimerControls(k);
+  if (!document.hidden) {
+    if (timerRuntime.activeKey !== -1) requestWakeLock();
+    tickTimers();
   }
 });
+
+// Unlock audio on the very first user interaction anywhere on the page,
+// so the chime can fire later (even from a setInterval callback).
+function unlockOnFirstGesture() {
+  primeAudio();
+  if (audioUnlocked) {
+    window.removeEventListener('pointerdown', unlockOnFirstGesture, true);
+    window.removeEventListener('touchstart', unlockOnFirstGesture, true);
+    window.removeEventListener('keydown', unlockOnFirstGesture, true);
+  }
+}
+window.addEventListener('pointerdown', unlockOnFirstGesture, true);
+window.addEventListener('touchstart', unlockOnFirstGesture, true);
+window.addEventListener('keydown', unlockOnFirstGesture, true);
+
+function testChime() {
+  primeAudio();
+  playChime();
+}
 
 (function init() {
   applyTheme();
