@@ -565,6 +565,197 @@
       margin-bottom: var(--sp-2);
     }
 
+    /* Timer block */
+    .block-timer {
+      margin: var(--sp-7) auto;
+      max-width: 22rem;
+      padding: var(--sp-5) var(--sp-5);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+    .block-timer.is-finished {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), var(--elev-2);
+    }
+    .block-timer .timer-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--ls-caps);
+      color: var(--text-muted);
+    }
+    .block-timer .timer-display {
+      font-family: 'Inter', sans-serif;
+      font-variant-numeric: tabular-nums;
+      font-weight: 300;
+      font-size: 2.6rem;
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+    }
+    .block-timer.is-finished .timer-display {
+      color: var(--accent);
+    }
+    .block-timer .timer-sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: var(--text-light);
+      letter-spacing: 0.02em;
+    }
+    .block-timer .timer-controls {
+      display: flex;
+      gap: var(--sp-3);
+      margin-top: var(--sp-2);
+    }
+    .timer-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      min-width: 5.5rem;
+      padding: var(--sp-2) var(--sp-4);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      background: var(--bg-secondary);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background var(--dur-2),
+                  color var(--dur-2),
+                  border-color var(--dur-2),
+                  transform var(--dur-1);
+    }
+    .timer-btn:hover { background: var(--accent-10); color: var(--accent); border-color: var(--accent); }
+    .timer-btn:active { transform: scale(var(--press-scale)); }
+    .timer-btn:focus { outline: none; }
+    .timer-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+    .timer-btn.is-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .timer-btn.is-primary:hover { background: var(--accent); color: #fff; opacity: 0.92; }
+
+    /* Timer settings dialog */
+    .timer-dialog-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur-3) var(--ease-out);
+    }
+    .timer-dialog-backdrop.open { opacity: 1; pointer-events: auto; }
+    .timer-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.96);
+      z-index: 201;
+      width: min(92vw, 22rem);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      padding: var(--sp-6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur-3) var(--ease-out),
+                  transform var(--dur-3) var(--ease-spring);
+    }
+    .timer-dialog.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .timer-dialog .dlg-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: var(--ls-caps);
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--sp-4);
+      text-align: center;
+    }
+    .timer-dialog .dlg-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-4);
+    }
+    .timer-dialog .dlg-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .timer-dialog .seg {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 3px;
+      background: var(--bg-secondary);
+    }
+    .timer-dialog .seg button {
+      flex: 1;
+      padding: var(--sp-2) var(--sp-3);
+      border: none;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--dur-2), color var(--dur-2);
+    }
+    .timer-dialog .seg button.active {
+      background: var(--card);
+      color: var(--accent);
+      box-shadow: var(--elev-1);
+    }
+    .timer-dialog input[type="number"] {
+      width: 100%;
+      padding: var(--sp-2) var(--sp-3);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      color: var(--text);
+    }
+    .timer-dialog input[type="number"]:focus { outline: none; border-color: var(--accent); }
+    .timer-dialog .dlg-check {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .timer-dialog .dlg-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--sp-2);
+      margin-top: var(--sp-4);
+    }
+
     /* ══════════════════════════════════════════
        BOTTOM BAR
        ══════════════════════════════════════════ */
@@ -862,6 +1053,9 @@
         <button class="bar-btn" id="btnTilt" onclick="toggleTiltScroll()" title="Tilt scroll">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         </button>
+        <button class="bar-btn" id="btnTimerCfg" onclick="openTimerDialog()" title="Timer settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 14 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+        </button>
         <button class="bar-btn" id="btnTheme" onclick="toggleTheme()" title="Toggle theme">
           <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -880,6 +1074,34 @@
     </div>
   </div>
 
+  <div class="timer-dialog-backdrop" id="timerDialogBackdrop" onclick="closeTimerDialog()"></div>
+  <div class="timer-dialog" id="timerDialog" role="dialog" aria-modal="true" aria-labelledby="timerDialogTitle">
+    <div class="dlg-title" id="timerDialogTitle">Timer settings</div>
+    <div class="dlg-row">
+      <div class="dlg-label">Mode</div>
+      <div class="seg" id="timerModeSeg">
+        <button type="button" data-mode="countdown" onclick="setTimerMode('countdown')">Countdown</button>
+        <button type="button" data-mode="stopwatch" onclick="setTimerMode('stopwatch')">Stopwatch</button>
+      </div>
+    </div>
+    <div class="dlg-row" id="timerTotalRow">
+      <div class="dlg-label">Total time (minutes)</div>
+      <input type="number" id="timerTotalInput" min="1" max="240" step="1" />
+      <div style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--text-light);">
+        Time spent in earlier sections is subtracted from later ones.
+      </div>
+    </div>
+    <div class="dlg-row">
+      <label class="dlg-check">
+        <input type="checkbox" id="timerSoundChk" />
+        <span>Play chime at end</span>
+      </label>
+    </div>
+    <div class="dlg-actions">
+      <button type="button" class="timer-btn" onclick="resetAllTimers()">Reset all</button>
+      <button type="button" class="timer-btn is-primary" onclick="closeTimerDialog()">Done</button>
+    </div>
+  </div>
 
 <script>
 // ══════════════════════════════════════════════════════
@@ -898,14 +1120,29 @@ function defaultState() {
     showPhonetics: true,
     showTranslation: true,
     activeTab: 'YOGA',
-    scrollSpeed: 2
+    scrollSpeed: 2,
+    timer: {
+      mode: 'countdown',
+      totalMinutes: 15,
+      soundEnabled: true,
+      // accumulated elapsed seconds per timer slot (0..3)
+      spent: [0, 0, 0, 0]
+    }
   };
 }
 
 function loadState() {
   try {
     const s = localStorage.getItem(STORAGE_KEY);
-    return s ? { ...defaultState(), ...JSON.parse(s) } : defaultState();
+    const d = defaultState();
+    if (!s) return d;
+    const parsed = JSON.parse(s);
+    const merged = { ...d, ...parsed };
+    merged.timer = { ...d.timer, ...(parsed.timer || {}) };
+    if (!Array.isArray(merged.timer.spent) || merged.timer.spent.length !== 4) {
+      merged.timer.spent = [0, 0, 0, 0];
+    }
+    return merged;
   } catch { return defaultState(); }
 }
 
@@ -1905,6 +2142,12 @@ const TABS_DATA = {
           tibetan: 'བླ་མ་འོད་ཞུ་རང་ཐིམ་གཉིས་མེད་གྱུར།།',
           phonetics: 'la ma ö shu rang tim nyi me gyur',
           translation: 'The lama dissolves into light and melts into me, becoming united.'
+        },
+        {
+          id: 'ng-4-timer',
+          type: 'TIMER',
+          timerKey: 0,
+          label: 'Bodhichitta — rest in equipoise'
         }
       ]
     },
@@ -2066,6 +2309,12 @@ const TABS_DATA = {
           tibetan: 'རིག་སྟོང་རྡོར་སེམས་དགོངས་ཀློང་ཡངས་པར་བརྡལ།།',
           phonetics: 'rik tong dor sem gong long yang par dal',
           translation: 'Awareness-emptiness, the vast expanse of Vajrasattva\'s enlightened intention, is all-present.'
+        },
+        {
+          id: 'ng-5-timer',
+          type: 'TIMER',
+          timerKey: 1,
+          label: 'Vajrasattva — rest in equipoise'
         }
       ]
     },
@@ -2282,6 +2531,12 @@ const TABS_DATA = {
           tibetan: 'ཨི་དམ་གུ་རུ་རཏྣ་མནྜལ་ཀཾ་ནིརྱ་ཏ་ཡཱ་མི།',
           phonetics: 'idam guru ratna mandala kamnirya tayami',
           translation: 'I send forth this jeweled mandala to you, precious guru!'
+        },
+        {
+          id: 'ng-6-timer',
+          type: 'TIMER',
+          timerKey: 2,
+          label: 'Mandala — rest in equipoise'
         }
       ]
     },
@@ -2971,6 +3226,12 @@ const TABS_DATA = {
           tibetan: 'སངས་རྒྱས་ཐམས་ཅད་ཀྱི་སྐུ་གསུང་ཐུགས་དང་རང་གི་ལུས་ངག་ཡིད་གསུམ་དབྱེར་མེད་གྱུར་པར་བསམ་ལ་མ་བཅོས་རང་བབས་སུ་ཀློད་དེ་ཅི་གནས་སུ་མཉམ་པར་བཞག དེ་ལས་ལྡང་བ་ན་རང་དང་བླ་མ་དབྱེར་མེད་སྣང་སྒྲགས་རིག་གསུམ་བླ་མའི་སྐུ་གསུང་ཐུགས་ཀྱི་རོལ་པར་ཤེས་པའི་ངང་ནས།',
           phonetics: 'sang gye tam che kyi ku sung tuk dang rang gi lu ngak yid sum yer me du gyur',
           translation: 'The Body, Speech, and Mind of all buddhas and my body, speech, and mind become inseparable. Rest in relaxed, natural, uncontrived equipoise for however long it lasts. When you emerge from that, your mind and the lama\'s are inseparable. With the understanding that appearance, sound, and awareness are the play of the lama\'s Body, Speech, and Mind, recite:'
+        },
+        {
+          id: 'ng-8-timer',
+          type: 'TIMER',
+          timerKey: 3,
+          label: 'Guru Yoga — rest in equipoise'
         }
       ]
     },
@@ -3276,6 +3537,10 @@ function renderBlock(b, sz) {
     if (showE && b.translation) h += '<div class="eng" style="font-size:' + sz.engSz + '">' + esc(b.translation) + '</div>';
     h += '</div>';
     return h;
+  }
+
+  if (b.type === 'TIMER') {
+    return renderTimerBlock(b);
   }
 
   // RECITATION (default)
@@ -3603,6 +3868,302 @@ window.addEventListener('resize', measureStackHeight);
 window.addEventListener('resize', updateTabIndicator);
 window.addEventListener('orientationchange', measureStackHeight);
 window.addEventListener('orientationchange', updateTabIndicator);
+
+// ══════════════════════════════════════════════════════
+// MEDITATION TIMERS
+// ══════════════════════════════════════════════════════
+
+const TIMER_COUNT = 4;
+// runtime (non-persisted) per slot
+const timerRuntime = {
+  // slot index of currently running timer (-1 if none)
+  activeKey: -1,
+  // performance.now() when current run started
+  runStartedAt: 0,
+  // ticker interval id
+  intervalId: null,
+  // which slots have finished (sound played) — cleared on reset
+  finished: [false, false, false, false]
+};
+
+function timerTotalSeconds() {
+  return Math.max(1, Math.round((state.timer.totalMinutes || 0) * 60));
+}
+
+// Time already spent in slots before the given one.
+function spentBefore(key) {
+  let s = 0;
+  for (let i = 0; i < key; i++) s += state.timer.spent[i] || 0;
+  return s;
+}
+
+// Current live elapsed in a slot (including any running portion).
+function liveElapsed(key) {
+  const stored = state.timer.spent[key] || 0;
+  if (timerRuntime.activeKey === key) {
+    return stored + (performance.now() - timerRuntime.runStartedAt) / 1000;
+  }
+  return stored;
+}
+
+function timerDisplayFor(key) {
+  const mode = state.timer.mode;
+  if (mode === 'stopwatch') {
+    return { seconds: liveElapsed(key), finished: false };
+  }
+  // countdown
+  const total = timerTotalSeconds();
+  const used = spentBefore(key) + liveElapsed(key);
+  const remaining = total - used;
+  return { seconds: Math.max(0, remaining), finished: remaining <= 0 };
+}
+
+function formatHMS(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  const pad = n => (n < 10 ? '0' + n : '' + n);
+  if (h > 0) return h + ':' + pad(m) + ':' + pad(s);
+  return pad(m) + ':' + pad(s);
+}
+
+function renderTimerBlock(b) {
+  const key = b.timerKey;
+  const isRunning = timerRuntime.activeKey === key;
+  const { seconds, finished } = timerDisplayFor(key);
+  const mode = state.timer.mode;
+
+  let sub;
+  if (mode === 'stopwatch') {
+    sub = 'Stopwatch';
+  } else {
+    const total = timerTotalSeconds();
+    const usedBefore = spentBefore(key);
+    const available = Math.max(0, total - usedBefore);
+    sub = 'Remaining of ' + formatHMS(total) + ' total · ' + formatHMS(available) + ' available';
+  }
+
+  const finishedCls = (finished && mode === 'countdown') ? ' is-finished' : '';
+  const playLabel = isRunning ? 'Pause' : (finished && mode === 'countdown' ? 'Done' : 'Start');
+  const playDisabled = (finished && mode === 'countdown' && !isRunning) ? 'disabled' : '';
+
+  return '' +
+    '<div class="block block-timer' + finishedCls + '" id="timer-block-' + key + '" data-timer-key="' + key + '">' +
+      '<div class="timer-label">' + esc(b.label || 'Timer') + '</div>' +
+      '<div class="timer-display" id="timer-display-' + key + '">' + formatHMS(seconds) + '</div>' +
+      '<div class="timer-sub" id="timer-sub-' + key + '">' + esc(sub) + '</div>' +
+      '<div class="timer-controls">' +
+        '<button type="button" class="timer-btn is-primary" id="timer-play-' + key + '" ' + playDisabled + ' onclick="toggleTimer(' + key + ')">' + playLabel + '</button>' +
+        '<button type="button" class="timer-btn" onclick="resetTimer(' + key + ')">Reset</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function startTimerTicker() {
+  if (timerRuntime.intervalId) return;
+  timerRuntime.intervalId = setInterval(tickTimers, 250);
+}
+
+function stopTimerTicker() {
+  if (timerRuntime.intervalId) {
+    clearInterval(timerRuntime.intervalId);
+    timerRuntime.intervalId = null;
+  }
+}
+
+function tickTimers() {
+  // Only the active key needs live updates, but refresh all displays so
+  // remaining/available stay consistent after a finish.
+  const mode = state.timer.mode;
+  for (let k = 0; k < TIMER_COUNT; k++) {
+    const display = document.getElementById('timer-display-' + k);
+    if (!display) continue;
+    const { seconds, finished } = timerDisplayFor(k);
+    display.textContent = formatHMS(seconds);
+    const block = document.getElementById('timer-block-' + k);
+    if (block) {
+      block.classList.toggle('is-finished', finished && mode === 'countdown');
+    }
+    const sub = document.getElementById('timer-sub-' + k);
+    if (sub) {
+      if (mode === 'stopwatch') {
+        sub.textContent = 'Stopwatch';
+      } else {
+        const total = timerTotalSeconds();
+        const available = Math.max(0, total - spentBefore(k));
+        sub.textContent = 'Remaining of ' + formatHMS(total) + ' total · ' + formatHMS(available) + ' available';
+      }
+    }
+    // Auto-stop on countdown completion
+    if (mode === 'countdown' && finished && timerRuntime.activeKey === k && !timerRuntime.finished[k]) {
+      pauseActiveTimer();
+      timerRuntime.finished[k] = true;
+      if (state.timer.soundEnabled) playChime();
+      renderTimerControls(k);
+    }
+  }
+}
+
+function renderTimerControls(key) {
+  const btn = document.getElementById('timer-play-' + key);
+  if (!btn) return;
+  const isRunning = timerRuntime.activeKey === key;
+  const { finished } = timerDisplayFor(key);
+  if (isRunning) {
+    btn.textContent = 'Pause';
+    btn.removeAttribute('disabled');
+  } else if (finished && state.timer.mode === 'countdown') {
+    btn.textContent = 'Done';
+    btn.setAttribute('disabled', 'disabled');
+  } else {
+    btn.textContent = 'Start';
+    btn.removeAttribute('disabled');
+  }
+}
+
+function toggleTimer(key) {
+  if (timerRuntime.activeKey === key) {
+    pauseActiveTimer();
+  } else {
+    // Pause any other running timer first (banking its elapsed)
+    if (timerRuntime.activeKey !== -1) pauseActiveTimer();
+    // If countdown and already finished, do nothing
+    if (state.timer.mode === 'countdown') {
+      const { finished } = timerDisplayFor(key);
+      if (finished) return;
+    }
+    timerRuntime.activeKey = key;
+    timerRuntime.runStartedAt = performance.now();
+    startTimerTicker();
+    // Allow audio resume on user gesture
+    primeAudio();
+  }
+  for (let k = 0; k < TIMER_COUNT; k++) renderTimerControls(k);
+  tickTimers();
+  saveState();
+}
+
+function pauseActiveTimer() {
+  const k = timerRuntime.activeKey;
+  if (k === -1) return;
+  const delta = (performance.now() - timerRuntime.runStartedAt) / 1000;
+  state.timer.spent[k] = (state.timer.spent[k] || 0) + delta;
+  timerRuntime.activeKey = -1;
+  timerRuntime.runStartedAt = 0;
+  stopTimerTicker();
+  saveState();
+}
+
+function resetTimer(key) {
+  if (timerRuntime.activeKey === key) {
+    timerRuntime.activeKey = -1;
+    timerRuntime.runStartedAt = 0;
+    stopTimerTicker();
+  }
+  state.timer.spent[key] = 0;
+  timerRuntime.finished[key] = false;
+  saveState();
+  tickTimers();
+  renderTimerControls(key);
+}
+
+function resetAllTimers() {
+  if (timerRuntime.activeKey !== -1) {
+    timerRuntime.activeKey = -1;
+    timerRuntime.runStartedAt = 0;
+    stopTimerTicker();
+  }
+  state.timer.spent = [0, 0, 0, 0];
+  timerRuntime.finished = [false, false, false, false];
+  saveState();
+  for (let k = 0; k < TIMER_COUNT; k++) renderTimerControls(k);
+  tickTimers();
+}
+
+// — Settings dialog —
+
+function openTimerDialog() {
+  const bd = document.getElementById('timerDialogBackdrop');
+  const dlg = document.getElementById('timerDialog');
+  document.getElementById('timerTotalInput').value = state.timer.totalMinutes;
+  document.getElementById('timerSoundChk').checked = !!state.timer.soundEnabled;
+  syncTimerModeUI();
+  bd.classList.add('open');
+  dlg.classList.add('open');
+}
+
+function closeTimerDialog() {
+  document.getElementById('timerDialogBackdrop').classList.remove('open');
+  document.getElementById('timerDialog').classList.remove('open');
+  // Persist any in-dialog input changes
+  const v = parseFloat(document.getElementById('timerTotalInput').value);
+  if (!isNaN(v) && v > 0) state.timer.totalMinutes = Math.min(240, Math.max(1, v));
+  state.timer.soundEnabled = document.getElementById('timerSoundChk').checked;
+  saveState();
+  tickTimers();
+}
+
+function setTimerMode(mode) {
+  state.timer.mode = mode;
+  syncTimerModeUI();
+  saveState();
+  tickTimers();
+  for (let k = 0; k < TIMER_COUNT; k++) renderTimerControls(k);
+}
+
+function syncTimerModeUI() {
+  const seg = document.getElementById('timerModeSeg');
+  if (!seg) return;
+  seg.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === state.timer.mode);
+  });
+  document.getElementById('timerTotalRow').style.display =
+    state.timer.mode === 'countdown' ? '' : 'none';
+}
+
+// — Audio chime —
+
+let audioCtx = null;
+function primeAudio() {
+  try {
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx) audioCtx = new Ctx();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  } catch {}
+}
+
+function playChime() {
+  try {
+    primeAudio();
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    // Three soft bell tones
+    [0, 0.55, 1.1].forEach((offset, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(660 + i * 80, now + offset);
+      gain.gain.setValueAtTime(0.0001, now + offset);
+      gain.gain.exponentialRampToValueAtTime(0.35, now + offset + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 1.6);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 1.7);
+    });
+  } catch {}
+}
+
+// Pause any active timer when leaving the tab (so background time doesn't burn it)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && timerRuntime.activeKey !== -1) {
+    pauseActiveTimer();
+    for (let k = 0; k < TIMER_COUNT; k++) renderTimerControls(k);
+  }
+});
 
 (function init() {
   applyTheme();
