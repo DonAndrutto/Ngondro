@@ -38,6 +38,11 @@
       --recitation-repeated-tib: #5D4037;
       --instruction: #78716c;
       --phonetics: #44403c;
+      /* Repeated-passage ("refrain") panel */
+      --refrain-bg: rgba(139,0,0,0.035);
+      --refrain-border: color-mix(in srgb, var(--accent) 16%, var(--border));
+      --refrain-glow: rgba(139,0,0,0.16);
+      --refrain-label: var(--accent);
 
       /* Spacing scale (4px base) */
       --sp-1: 0.25rem;
@@ -102,6 +107,10 @@
       --recitation-repeated-tib: #E0CFC2;
       --instruction: #a8a29e;
       --phonetics: #ece8e2;
+      --refrain-bg: rgba(255,153,51,0.06);
+      --refrain-border: color-mix(in srgb, var(--accent) 24%, var(--border));
+      --refrain-glow: rgba(255,153,51,0.22);
+      --refrain-label: var(--accent);
 
       --elev-1: 0 1px 2px rgba(0,0,0,0.40);
       --elev-2: 0 2px 8px rgba(0,0,0,0.40), 0 1px 2px rgba(0,0,0,0.30);
@@ -483,9 +492,98 @@
       margin: 0 auto;
     }
 
-    /* Repeated variant */
-    .block-repeated .tib { color: var(--recitation-repeated-tib); }
-    .block-repeated .pho { font-weight: 700; }
+    /* ── Repeated passages ("refrain" panels) ──────────────
+       The core formulas that are recited repeatedly (refuge,
+       bodhichitta, vajrasattva, three-kaya mandala, guru yoga)
+       are grouped into a softly framed panel and marked with a
+       delicate caption, so the repetition reads clearly without
+       being loud. The lines themselves stay identical to normal
+       recitation. */
+    .refrain-group {
+      position: relative;
+      max-width: 40rem;
+      margin: var(--sp-6) auto var(--sp-7);
+      padding: var(--sp-3) var(--sp-5) var(--sp-5);
+      background: var(--refrain-bg);
+      border: 1px solid var(--refrain-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-1), var(--inset-hi);
+      transition: box-shadow var(--dur-3) var(--ease-out),
+                  border-color var(--dur-3) var(--ease-out);
+    }
+    .refrain-group .block:last-child { margin-bottom: 0; }
+
+    .refrain-marker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-3);
+      margin: 0 auto var(--sp-4);
+      color: var(--refrain-label);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .refrain-marker::before,
+    .refrain-marker::after {
+      content: "";
+      height: 1px;
+      width: 2.5rem;
+      background: linear-gradient(to right,
+        transparent,
+        color-mix(in srgb, var(--accent) 38%, transparent));
+    }
+    .refrain-marker::after { transform: scaleX(-1); }
+
+    .refrain-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--ls-caps-sm);
+      white-space: nowrap;
+      opacity: 0.92;
+    }
+    .refrain-icon { width: 13px; height: 13px; flex: none; opacity: 0.9; }
+
+    /* Gentle pulse when auto-scroll pauses on arrival */
+    @media (prefers-reduced-motion: no-preference) {
+      .refrain-group.refrain-active { animation: refrainPulse 2.8s var(--ease-out); }
+      .refrain-group.refrain-active .refrain-icon { animation: refrainSpin 1.4s var(--ease-out); }
+    }
+    @keyframes refrainPulse {
+      0%   { box-shadow: var(--elev-1), var(--inset-hi); border-color: var(--refrain-border); }
+      30%  { box-shadow: 0 0 0 2px var(--refrain-glow), var(--elev-2); border-color: var(--accent); }
+      100% { box-shadow: var(--elev-1), var(--inset-hi); border-color: var(--refrain-border); }
+    }
+    @keyframes refrainSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* ── Illustrative images (refuge tree, vajrasattva, guru) ── */
+    .block-image { margin: var(--sp-7) auto var(--sp-6); text-align: center; }
+    .block-image figure { margin: 0 auto; max-width: 30rem; }
+    .block-image img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      border: 1px solid var(--border);
+      background: var(--card);
+    }
+    .block-image figcaption {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.66rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: var(--ls-caps-sm);
+      color: var(--text-muted);
+      margin-top: var(--sp-3);
+    }
 
     /* Instruction */
     .block-instruction {
@@ -2049,6 +2147,13 @@ const TABS_DATA = {
           translation: 'Having clearly visualized these objects of refuge, pray with the intense, heartfelt devotion that comes from contemplating their qualities and compassion:'
         },
         {
+          id: 'ng-3-img-refuge-tree',
+          type: 'IMAGE',
+          src: 'https://raw.githubusercontent.com/DonAndrutto/Media/fb4334123099733c182b1a99b404b4b1cbfc5a41/Refuge%20Tree.jpg',
+          alt: 'The refuge tree, with the root lama and the assembly of refuge',
+          caption: 'The Refuge Tree'
+        },
+        {
           id: 'ng-3-27',
           type: 'RECITATION',
           tibetan: 'ན་མོ་༔ སྣང་བ་མ་བཀོད་དབྱིངས་ཀྱི་ནང༔',
@@ -2274,6 +2379,13 @@ const TABS_DATA = {
           type: 'INSTRUCTION',
           tibetan: 'ཞེས་དམིགས་ལ།',
           translation: 'Thus, with the visualization:'
+        },
+        {
+          id: 'ng-5-img-vajrasattva',
+          type: 'IMAGE',
+          src: 'https://raw.githubusercontent.com/DonAndrutto/Media/fb4334123099733c182b1a99b404b4b1cbfc5a41/Vajrasattva.jpg',
+          alt: 'Vajrasattva, white as the autumn moon, holding bell and vajra',
+          caption: 'Vajrasattva'
         },
         {
           id: 'ng-5-17',
@@ -2916,6 +3028,13 @@ const TABS_DATA = {
           translation: 'Having first done this lineage prayer, then do the main part:'
         },
         {
+          id: 'ng-7-img-guru-yoga',
+          type: 'IMAGE',
+          src: 'https://raw.githubusercontent.com/DonAndrutto/Media/fb4334123099733c182b1a99b404b4b1cbfc5a41/Guru%20Yoga.jpg',
+          alt: 'The root lama upon a lion throne, surrounded by the lineage',
+          caption: 'The Guru'
+        },
+        {
           id: 'ng-7-53',
           type: 'RECITATION',
           tibetan: 'ཨོཾ་ཨཱཿཧཱུྃ༔ བླ་མ་འཇའ་དང་འོད་དུ་འཁྱིལ་ལི་ལི༔',
@@ -3488,6 +3607,13 @@ function jumpToSection(idx) {
 // RENDER CONTENT
 // ══════════════════════════════════════════════════════
 
+const REFRAIN_MARKER =
+  '<div class="refrain-marker"><span class="refrain-label">' +
+  '<svg class="refrain-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>' +
+  '<polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>' +
+  'Repeated</span></div>';
+
 function renderContent() {
   const sections = TABS_DATA[state.activeTab] || [];
   const area = document.getElementById('contentArea');
@@ -3504,9 +3630,25 @@ function renderContent() {
     html += '<div class="section-block" id="section-' + si + '">';
     html += '<div class="section-heading">' + esc(sec.title) + '</div>';
 
-    sec.blocks.forEach(b => {
-      html += renderBlock(b, { tibSz, phoSz, engSz, instrTibSz });
-    });
+    const sz = { tibSz, phoSz, engSz, instrTibSz };
+    let bi = 0, refrainN = 0;
+    while (bi < sec.blocks.length) {
+      const b = sec.blocks[bi];
+      if (b.variant === 'repeated') {
+        // Wrap a contiguous run of repeated lines in one refrain panel
+        let inner = '', bj = bi;
+        while (bj < sec.blocks.length && sec.blocks[bj].variant === 'repeated') {
+          inner += renderBlock(sec.blocks[bj], sz);
+          bj++;
+        }
+        html += '<div class="refrain-group" id="refrain-' + si + '-' + (refrainN++) +
+          '" title="This passage is recited repeatedly">' + REFRAIN_MARKER + inner + '</div>';
+        bi = bj;
+      } else {
+        html += renderBlock(b, sz);
+        bi++;
+      }
+    }
 
     html += '</div>';
   });
@@ -3550,6 +3692,14 @@ function renderBlock(b, sz) {
 
   if (b.type === 'TIMER') {
     return renderTimerBlock(b);
+  }
+
+  if (b.type === 'IMAGE') {
+    let h = '<div class="block block-image"><figure>';
+    h += '<img src="' + esc(b.src) + '" alt="' + esc(b.alt || '') + '" loading="lazy" decoding="async" />';
+    if (b.caption) h += '<figcaption>' + esc(b.caption) + '</figcaption>';
+    h += '</figure></div>';
+    return h;
   }
 
   // RECITATION (default)
@@ -3614,6 +3764,50 @@ let autoScrollRaf = null;
 let lastScrollTime = 0;
 let scrollAccumulator = 0;
 
+// ── Gentle pause on arriving at a repeated ("refrain") passage ──
+let refrainHoldUntil = 0;     // timestamp to hold (no scroll) until
+let refrainResumeStart = 0;   // timestamp the post-hold ease-in began
+const refrainVisited = new Set();
+const REFRAIN_HOLD_MS = 2600;   // length of the gentle pause
+const REFRAIN_RESUME_MS = 900;  // ease back up to full speed afterwards
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+// Pause once when a refrain panel reaches ~40% up the viewport.
+function scanRefrainArrival(ts) {
+  const groups = document.getElementsByClassName('refrain-group');
+  const vh = window.innerHeight;
+  const triggerY = vh * 0.40;
+  for (let i = 0; i < groups.length; i++) {
+    const g = groups[i];
+    const top = g.getBoundingClientRect().top;
+    if (top > vh) { refrainVisited.delete(g.id); continue; } // re-arm below view
+    if (refrainVisited.has(g.id)) continue;
+    if (top <= triggerY && top > triggerY - 220) {
+      refrainVisited.add(g.id);
+      refrainHoldUntil = ts + REFRAIN_HOLD_MS;
+      refrainResumeStart = refrainHoldUntil;
+      scrollAccumulator = 0;
+      g.classList.add('refrain-active');
+      setTimeout(() => g.classList.remove('refrain-active'),
+        REFRAIN_HOLD_MS + REFRAIN_RESUME_MS);
+      break;
+    }
+  }
+}
+
+// Speed factor 0..1: 0 while holding, eased ramp on resume, else 1.
+function refrainSpeedMultiplier(ts) {
+  if (ts >= refrainHoldUntil) scanRefrainArrival(ts);
+  if (ts < refrainHoldUntil) return 0;
+  if (refrainResumeStart) {
+    const t = (ts - refrainResumeStart) / REFRAIN_RESUME_MS;
+    if (t >= 1) { refrainResumeStart = 0; return 1; }
+    return easeOutCubic(t);
+  }
+  return 1;
+}
+
 // pixels per second at scrollSpeed = 1 .. 10
 function autoScrollPxPerSec() {
   return 20 + state.scrollSpeed * 18; // ~38 .. 200 px/s
@@ -3628,6 +3822,9 @@ function startAutoScroll() {
   isAutoScrolling = true;
   lastScrollTime = 0;
   scrollAccumulator = 0;
+  refrainHoldUntil = 0;
+  refrainResumeStart = 0;
+  refrainVisited.clear();
   updatePlayIcon();
   autoScrollRaf = requestAnimationFrame(autoScrollLoop);
 }
@@ -3664,7 +3861,7 @@ function autoScrollLoop(ts) {
   // Clamp dt to avoid giant jumps after tab was backgrounded
   if (dt > 100) dt = 100;
 
-  scrollAccumulator += autoScrollPxPerSec() * (dt / 1000);
+  scrollAccumulator += autoScrollPxPerSec() * refrainSpeedMultiplier(ts) * (dt / 1000);
 
   if (scrollAccumulator >= 1) {
     const px = Math.floor(scrollAccumulator);
