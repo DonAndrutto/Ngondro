@@ -1161,13 +1161,18 @@
     }
 
     /* ══════════════════════════════════════════
-       MANTRA GARLAND — fullscreen visualization
-       of the hundred syllables circling the HUNG
-       at the heart. Opened from the "Visualize"
-       button under the hundred-syllable mantra.
+       MANTRA GARLAND
+       A port of the Claude Design project
+       "Mantra Garland.dc.html" (garland.jsx +
+       animations-v2.jsx). The composition is a
+       fixed 1080×1920 stage scaled to fit; every
+       value inside it — geometry, colours, type
+       sizes, opacities — comes from garland.jsx
+       unchanged. Only the React scaffolding is
+       rewritten as plain DOM to match this app.
        ══════════════════════════════════════════ */
 
-    /* — Trigger button, sits inside the refrain panel — */
+    /* — Trigger button under the hundred-syllable mantra (app chrome) — */
     .block-visualize {
       display: flex;
       justify-content: center;
@@ -1203,405 +1208,37 @@
     .visualize-btn:focus { outline: none; }
     .visualize-btn:focus-visible { outline: none; box-shadow: var(--ring); }
 
-    /* — The overlay itself. A night field in either theme: the
-         syllables are luminous white, so the ground stays dark. — */
+    /* — Host surface. The design's page background. — */
     .garland-overlay {
-      --g-ink:    #05060b;
-      --g-white:  #f7f5f0;
-      --g-gold:   #ffc46b;
-      --g-blue:   #8fb0ff;
-      --g-dim:    rgba(247,245,240,0.42);
-
       position: fixed;
       inset: 0;
       z-index: 400;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background:
-        radial-gradient(circle at 50% 42%, #1a1f3a 0%, #0a0c17 46%, var(--g-ink) 100%);
-      color: var(--g-white);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 420ms var(--ease-out);
+      background: #0a0f1a;
+      overflow: hidden;
       overscroll-behavior: contain;
-      touch-action: none;
     }
     .garland-overlay[hidden] { display: none; }
-    .garland-overlay.open { opacity: 1; pointer-events: auto; }
 
-    /* Ambient particle field (nectar, dust) painted behind the rings */
-    .garland-fx {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    /* — Top bar — */
-    .garland-bar {
-      position: relative;
-      z-index: 3;
-      flex: none;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--sp-3);
-      padding: max(var(--sp-3), env(safe-area-inset-top)) var(--sp-4) var(--sp-2);
-    }
-    .garland-heading {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .garland-heading .g-tib {
-      font-family: 'Jomolhari', serif;
-      font-size: 0.95rem;
-      line-height: 2;
-      color: var(--g-gold);
-    }
-    .garland-heading .g-eng {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.62rem;
-      letter-spacing: var(--ls-caps-sm);
-      text-transform: uppercase;
-      color: var(--g-dim);
-    }
-    .g-bar-actions { display: flex; align-items: center; gap: var(--sp-1); }
-    .g-icon-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      padding: 0;
-      background: rgba(255,255,255,0.05);
-      color: var(--g-white);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: var(--radius-pill);
-      cursor: pointer;
-      transition: background var(--dur-2), color var(--dur-2),
-                  border-color var(--dur-2), transform var(--dur-1);
-    }
-    .g-icon-btn svg { width: 16px; height: 16px; }
-    .g-icon-btn:hover { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.22); }
-    .g-icon-btn:active { transform: scale(var(--press-scale)); }
-    .g-icon-btn.active { color: var(--g-gold); border-color: color-mix(in srgb, var(--g-gold) 45%, transparent); }
-    .g-icon-btn:focus { outline: none; }
-    .g-icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--g-ink), 0 0 0 4px var(--g-gold); }
-
-    /* — Stage: the square field the mandala is drawn in — */
-    .garland-field {
-      position: relative;
-      z-index: 2;
-      flex: 1 1 auto;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 0;
-    }
+    /* The 1080×1920 composition, scaled to fit the viewport. The design's
+       Stage does the same with transform: scale(); it subtracts a 44px
+       playback bar that only exists inside the design tool. */
     .garland-stage {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      opacity: 0;
-      transform: scale(0.9);
-      transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out);
-    }
-    .garland-overlay.open .garland-stage { opacity: 1; transform: scale(1); }
-
-    /* Radiance behind the heart */
-    .g-halo {
-      position: absolute;
-      left: 50%; top: 50%;
-      width: 74%; height: 74%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      background: radial-gradient(circle,
-        rgba(255,255,255,0.20) 0%,
-        rgba(180,205,255,0.10) 38%,
-        rgba(120,150,255,0.03) 62%,
-        transparent 72%);
-      animation: g-breathe 7s ease-in-out infinite;
-      pointer-events: none;
-    }
-    @keyframes g-breathe {
-      0%, 100% { transform: translate(-50%,-50%) scale(1);    opacity: 0.85; }
-      50%      { transform: translate(-50%,-50%) scale(1.07); opacity: 1; }
-    }
-
-    /* Lotus, moon disc and vajra */
-    .g-seat {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      pointer-events: none;
-    }
-    /* The petal lives in <defs>, so it carries its own paint — a descendant
-       selector on .g-lotus would never reach the cloned <use> content. */
-    .g-petal {
-      fill: rgba(255,196,107,0.10);
-      stroke: rgba(255,196,107,0.45);
-      stroke-width: 1.4;
-    }
-    .g-moon {
-      fill: rgba(226,236,255,0.14);
-      stroke: rgba(226,236,255,0.55);
-      stroke-width: 1.2;
-    }
-    .g-vajra-solid {
-      fill: rgba(247,245,240,0.16);
-      stroke: rgba(247,245,240,0.72);
-      stroke-width: 1.6;
-      stroke-linejoin: round;
-    }
-    .g-vajra-core {
-      fill: rgba(247,245,240,0.34);
-      stroke: rgba(247,245,240,0.80);
-      stroke-width: 1.4;
-      stroke-linejoin: round;
-    }
-    .g-vajra-prong {
-      fill: none;
-      stroke: rgba(247,245,240,0.66);
-      stroke-width: 2.6;
-      stroke-linecap: round;
-    }
-    .g-guide {
-      fill: none;
-      stroke: rgba(255,255,255,0.09);
-      stroke-width: 1;
-    }
-
-    /* — Syllable rings — */
-    .g-ring {
-      position: absolute;
-      inset: 0;
-      transform: rotate(var(--spin, 0deg));
-      will-change: transform;
-      pointer-events: none;
-    }
-    .g-syl {
       position: absolute;
       left: 50%;
       top: 50%;
-      transform: translate(-50%, -50%) rotate(var(--a)) translateY(calc(-1 * var(--r)));
-      font-family: 'Jomolhari', serif;
-      line-height: 1;
-      white-space: nowrap;
-    }
-    .g-syl-in {
-      display: inline-block;
-      color: var(--g-white);
-      text-shadow: 0 0 6px rgba(200,220,255,0.45);
-      transition: color 260ms var(--ease-out),
-                  text-shadow 260ms var(--ease-out),
-                  transform 260ms var(--ease-spring);
-    }
-    /* Upright mode: undo both the seat angle and the ring's live spin */
-    .g-ring.is-upright .g-syl-in {
-      transform: rotate(calc(-1 * (var(--a) + var(--spin, 0deg))));
-    }
-    .g-syl.is-lit .g-syl-in {
-      color: var(--g-gold);
-      text-shadow: 0 0 14px rgba(255,196,107,0.85), 0 0 30px rgba(255,196,107,0.35);
-    }
-    .g-ring:not(.is-upright) .g-syl.is-lit .g-syl-in { transform: scale(1.5); }
-    .g-ring.is-upright .g-syl.is-lit .g-syl-in {
-      transform: rotate(calc(-1 * (var(--a) + var(--spin, 0deg)))) scale(1.5);
+      width: 1080px;
+      height: 1920px;
+      transform-origin: center;
+      background: #0a0f1a;
+      overflow: hidden;
     }
 
-    .g-ring--heart .g-syl-in {
-      color: var(--g-blue);
-      text-shadow: 0 0 10px rgba(143,176,255,0.6);
-    }
-
-    /* — HUNG at the hub — */
-    .g-hub {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      font-family: 'Jomolhari', serif;
-      line-height: 1;
-      color: var(--g-white);
-      text-shadow: 0 0 12px rgba(255,255,255,0.7), 0 0 34px rgba(150,185,255,0.55);
-      animation: g-hub-pulse 7s ease-in-out infinite;
-      pointer-events: none;
-    }
-    @keyframes g-hub-pulse {
-      0%, 100% { text-shadow: 0 0 12px rgba(255,255,255,0.62), 0 0 30px rgba(150,185,255,0.42); }
-      50%      { text-shadow: 0 0 18px rgba(255,255,255,0.92), 0 0 52px rgba(150,185,255,0.72); }
-    }
-
-    /* — Readout under the stage — */
-    .garland-readout {
-      position: relative;
-      z-index: 3;
-      flex: none;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: var(--sp-2) var(--sp-4) var(--sp-1);
-      text-align: center;
-    }
-    .g-read-tib {
-      font-family: 'Jomolhari', serif;
-      font-size: 1.6rem;
-      line-height: 1.5;
-      color: var(--g-gold);
-      min-height: 2.4rem;
-    }
-    .g-read-pho {
-      font-family: 'EB Garamond', serif;
-      font-style: italic;
-      font-size: 0.95rem;
-      letter-spacing: 0.03em;
-      color: rgba(247,245,240,0.82);
-      min-height: 1.3rem;
-    }
-    .g-read-count {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.62rem;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: var(--ls-caps-sm);
-      text-transform: uppercase;
-      color: var(--g-dim);
-    }
-    .garland-overlay.no-pho .g-read-pho { visibility: hidden; }
-
-    /* — Transport + tweaks — */
-    .garland-controls {
-      position: relative;
-      z-index: 3;
-      flex: none;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--sp-2);
-      padding: var(--sp-2) var(--sp-4) max(var(--sp-4), env(safe-area-inset-bottom));
-    }
-
-    .garland-tweaks {
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      z-index: 4;
-      width: min(94vw, 26rem);
-      transform: translate(-50%, 100%);
-      background: rgba(12,15,28,0.92);
-      backdrop-filter: blur(14px) saturate(130%);
-      -webkit-backdrop-filter: blur(14px) saturate(130%);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-bottom: none;
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      padding: var(--sp-5) var(--sp-5) max(var(--sp-5), env(safe-area-inset-bottom));
-      box-shadow: 0 -12px 40px rgba(0,0,0,0.6);
-      opacity: 0;
-      pointer-events: none;
-      transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-3) var(--ease-out);
-    }
-    .garland-tweaks.open {
-      transform: translate(-50%, 0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .g-tweak-title {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.62rem;
-      letter-spacing: var(--ls-caps-sm);
-      text-transform: uppercase;
-      color: var(--g-dim);
-      margin-bottom: var(--sp-4);
-    }
-    .g-tweak-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--sp-4);
-      padding: var(--sp-2) 0;
-    }
-    .g-tweak-row + .g-tweak-row { border-top: 1px solid rgba(255,255,255,0.07); }
-    .g-tweak-label {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.78rem;
-      color: rgba(247,245,240,0.9);
-      flex: none;
-    }
-    .g-tweak-row input[type="range"] {
-      flex: 1 1 auto;
-      max-width: 11rem;
-      accent-color: var(--g-gold);
-      background: transparent;
-      cursor: pointer;
-    }
-    .g-seg {
-      display: inline-flex;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius-pill);
-      padding: 2px;
-      flex: none;
-    }
-    .g-seg button {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.03em;
-      padding: 5px var(--sp-3);
-      background: transparent;
-      color: rgba(247,245,240,0.72);
-      border: none;
-      border-radius: var(--radius-pill);
-      cursor: pointer;
-      transition: background var(--dur-2), color var(--dur-2);
-    }
-    .g-seg button.active { background: var(--g-gold); color: #1a1206; }
-    .g-seg button:focus { outline: none; }
-    .g-seg button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--g-ink), 0 0 0 4px var(--g-gold); }
-    .g-switch {
-      position: relative;
-      width: 40px;
-      height: 22px;
-      flex: none;
-      background: rgba(255,255,255,0.14);
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: var(--radius-pill);
-      cursor: pointer;
-      transition: background var(--dur-2);
-    }
-    .g-switch::after {
-      content: "";
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--g-white);
-      transition: transform var(--dur-2) var(--ease-out);
-    }
-    .g-switch.on { background: var(--g-gold); }
-    .g-switch.on::after { transform: translateX(18px); }
-    .g-switch:focus { outline: none; }
-    .g-switch:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--g-ink), 0 0 0 4px var(--g-gold); }
-
-    /* Short viewports: drop the readout's Tibetan line, it is on the ring */
-    @media (max-height: 560px) {
-      .g-read-tib { display: none; }
-      .garland-heading .g-tib { display: none; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .g-halo, .g-hub { animation: none; }
-      .garland-stage, .garland-overlay, .g-syl-in { transition-duration: 1ms; }
-    }
+    /* — Registers, verbatim from the project's <helmet> — */
+    input[type=range].om-reg { -webkit-appearance: none; appearance: none; width: 100%; height: 18px; background: transparent; margin: 0; cursor: pointer; }
+    input[type=range].om-reg::-webkit-slider-runnable-track { height: 2px; background: rgba(240,234,214,0.22); border-radius: 2px; }
+    input[type=range].om-reg::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #d4a55a; margin-top: -6px; border: none; }
+    input[type=range].om-reg::-moz-range-track { height: 2px; background: rgba(240,234,214,0.22); border-radius: 2px; }
+    input[type=range].om-reg::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #d4a55a; border: none; }
   </style>
 </head>
 
@@ -1884,133 +1521,50 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════
-       MANTRA GARLAND — "ཡིག་བརྒྱའི་ཕྲེང་བ", the hundred syllables
-       turning around the HUNG at the hub of the vajra, on lotus
-       and moon. Opened by the Visualize button in the Vajrasattva
-       section; everything inside is built and driven by the
-       GARLAND VISUALIZATION block at the end of the script.
+       MANTRA GARLAND — the "Mantra Garland.dc.html" project.
+       The stage holds the Rotation scene: background wash,
+       breathing pulse, grain, then the garland field. Every
+       element inside the field is positioned per frame by
+       the GARLAND VISUALIZATION block at the end of the
+       script, following garland.jsx exactly.
        ══════════════════════════════════════════════════════ -->
   <div class="garland-overlay" id="garlandOverlay" role="dialog" aria-modal="true"
-       aria-label="Mantra garland visualization" hidden>
+       aria-label="Mantra garland" hidden>
 
-    <canvas class="garland-fx" id="garlandFx" aria-hidden="true"></canvas>
+    <div class="garland-stage" id="garlandStage">
+      <!-- Rotation: the scene wrapper -->
+      <div id="omScene" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, #182136 0%, #0d1424 48%, #0a0f1a 78%)">
+        <div id="omPulse" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, rgba(235,228,205,0.045) 0%, rgba(235,228,205,0) 55%)"></div>
+        <div id="omGrain" style="position:absolute;inset:0;opacity:0.05;mix-blend-mode:overlay"></div>
 
-    <div class="garland-bar">
-      <div class="garland-heading">
-        <span class="g-tib">ཡིག་བརྒྱའི་ཕྲེང་བ</span>
-        <span class="g-eng">The garland of a hundred syllables</span>
-      </div>
-      <div class="g-bar-actions">
-        <button type="button" class="g-icon-btn" id="gBtnTweaks" onclick="toggleGarlandTweaks()"
-                aria-label="Visualization settings" title="Settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="8" r="2.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="2.5" fill="currentColor" stroke="none"/></svg>
-        </button>
-        <button type="button" class="g-icon-btn" id="gBtnClose" onclick="closeGarland()"
-                aria-label="Close visualization" title="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="garland-field" id="garlandField">
-      <div class="garland-stage" id="garlandStage">
-        <div class="g-halo" aria-hidden="true"></div>
-
-        <svg class="g-seat" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
-          <defs>
-            <!-- One half of a five-pronged vajra; mirrored for the other side.
-                 The centre prong runs straight out and the four outer prongs
-                 curve back in to meet just short of its tip. -->
-            <g id="gVajraHalf">
-              <ellipse class="g-vajra-solid" cx="-41" cy="0" rx="12" ry="15"/>
-              <ellipse class="g-vajra-solid" cx="-57" cy="0" rx="4" ry="10"/>
-              <path class="g-vajra-core" d="M-60,-4.5 L-92,-3 L-112,0 L-92,3 L-60,4.5 Z"/>
-              <path class="g-vajra-prong" d="M-60,-10 C-70,-24 -84,-29 -95,-24 C-102,-21 -106,-15 -106,-8"/>
-              <path class="g-vajra-prong" d="M-60,10 C-70,24 -84,29 -95,24 C-102,21 -106,15 -106,8"/>
-            </g>
-            <!-- One lotus petal, fanned out around a pivot below the seat -->
-            <path class="g-petal" id="gPetal"
-                  d="M200,292 C189,287 185,270 200,256 C215,270 211,287 200,292 Z"/>
-          </defs>
-
-          <circle class="g-guide" cx="200" cy="200" r="126"/>
-          <circle class="g-guide" cx="200" cy="200" r="170"/>
-
-          <g class="g-lotus">
-            <use href="#gPetal" transform="rotate(-75 200 292)"/>
-            <use href="#gPetal" transform="rotate(-50 200 292)"/>
-            <use href="#gPetal" transform="rotate(-25 200 292)"/>
-            <use href="#gPetal"/>
-            <use href="#gPetal" transform="rotate(25 200 292)"/>
-            <use href="#gPetal" transform="rotate(50 200 292)"/>
-            <use href="#gPetal" transform="rotate(75 200 292)"/>
-          </g>
-
-          <ellipse class="g-moon" cx="200" cy="243" rx="94" ry="21"/>
-
-          <g transform="translate(200,196)">
-            <use href="#gVajraHalf"/>
-            <use href="#gVajraHalf" transform="scale(-1,1)"/>
-            <ellipse class="g-vajra-solid" cx="-27" cy="0" rx="4.5" ry="12"/>
-            <ellipse class="g-vajra-solid" cx="27"  cy="0" rx="4.5" ry="12"/>
-            <circle  class="g-vajra-solid" cx="0"   cy="0" r="19"/>
-          </g>
-        </svg>
-
-        <div class="g-ring g-ring--garland" id="gRingGarland"></div>
-        <div class="g-ring g-ring--heart"   id="gRingHeart"></div>
-        <div class="g-hub" id="gHub">ཧཱུྃ</div>
-      </div>
-    </div>
-
-    <div class="garland-readout">
-      <div class="g-read-tib" id="gReadTib"></div>
-      <div class="g-read-pho" id="gReadPho"></div>
-      <div class="g-read-count" id="gReadCount"></div>
-    </div>
-
-    <div class="garland-controls">
-      <button type="button" class="g-icon-btn" id="gBtnPlay" onclick="toggleGarlandPlay()"
-              aria-label="Pause rotation" title="Pause">
-        <svg id="gIconPause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-        <svg id="gIconPlay" viewBox="0 0 24 24" fill="currentColor" style="display:none"><polygon points="6 3 20 12 6 21"/></svg>
-      </button>
-    </div>
-
-    <div class="garland-tweaks" id="garlandTweaks">
-      <div class="g-tweak-title">Visualization</div>
-
-      <div class="g-tweak-row">
-        <span class="g-tweak-label" id="gLblSpeed">Speed</span>
-        <input type="range" id="gSpeed" min="0" max="10" step="1" aria-labelledby="gLblSpeed" />
-      </div>
-
-      <div class="g-tweak-row">
-        <span class="g-tweak-label">Direction</span>
-        <div class="g-seg" id="gDirSeg" role="group" aria-label="Rotation direction">
-          <button type="button" data-dir="1"  onclick="setGarlandDir(1)">Clockwise</button>
-          <button type="button" data-dir="-1" onclick="setGarlandDir(-1)">Counter</button>
+        <!-- GarlandField -->
+        <div id="omField" style="position:absolute;inset:0;overflow:hidden">
+          <div id="omGlowFront" style="position:absolute;width:130%;height:500px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.05) 0%, rgba(240,234,214,0) 68%)"></div>
+          <div id="omGlowBack" style="position:absolute;width:110%;height:340px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.03) 0%, rgba(240,234,214,0) 68%)"></div>
+          <div id="omGlowCentre" style="position:absolute;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.05) 0%, rgba(240,234,214,0) 65%);z-index:300"></div>
+          <div id="omCentre" style="position:absolute;transform:translate(-50%,-64%);font-family:'Jomolhari',serif;line-height:1;color:#f0ead6;opacity:0.72;z-index:400;white-space:nowrap"></div>
+          <!-- seed syllables, then garland syllables, are appended here -->
         </div>
       </div>
+    </div>
 
-      <div class="g-tweak-row">
-        <span class="g-tweak-label">Syllables</span>
-        <div class="g-seg" id="gOrientSeg" role="group" aria-label="Syllable orientation">
-          <button type="button" data-orient="ring"    onclick="setGarlandOrient('ring')">Follow ring</button>
-          <button type="button" data-orient="upright" onclick="setGarlandOrient('upright')">Upright</button>
+    <button type="button" id="omMinimise" onclick="closeGarland()" aria-label="Minimise" title="Return"
+            style="position:absolute;top:16px;right:16px;width:44px;height:44px;z-index:1000;border-radius:9999px;border:1px solid rgba(240,234,214,0.18);background:rgba(13,19,33,0.55);color:#a89a7a;font-size:22px;line-height:40px;text-align:center;cursor:pointer;padding:0">−</button>
+
+    <div style="position:absolute;left:16px;bottom:16px;z-index:1000;min-width:176px;display:flex;flex-direction:column;gap:12px;padding:12px 14px;background:rgba(13,19,33,0.72);border:1px solid rgba(240,234,214,0.12);border-radius:9px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Angle</span>
+          <span id="omAngleValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
         </div>
+        <input class="om-reg" type="range" min="5" max="90" step="1" id="omAngle" aria-label="View angle" />
       </div>
-
-      <div class="g-tweak-row">
-        <span class="g-tweak-label">Nectar flow</span>
-        <button type="button" class="g-switch" id="gSwNectar" role="switch"
-                onclick="toggleGarlandOpt('nectar')" aria-label="Nectar flow"></button>
-      </div>
-
-      <div class="g-tweak-row">
-        <span class="g-tweak-label">Phonetics</span>
-        <button type="button" class="g-switch" id="gSwPho" role="switch"
-                onclick="toggleGarlandOpt('phonetics')" aria-label="Show phonetics"></button>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Speed</span>
+          <span id="omPeriodValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
+        </div>
+        <input class="om-reg" type="range" min="7" max="27" step="1" id="omPeriod" aria-label="Seconds per round" />
       </div>
     </div>
   </div>
@@ -2040,12 +1594,11 @@ function defaultState() {
       // accumulated elapsed seconds per timer slot (0..3)
       spent: [0, 0, 0, 0]
     },
+    // Mantra garland — the project's TWEAK_DEFAULTS
     garland: {
-      speed: 4,          // 0..10; 0 holds the garland still
-      dir: 1,            // 1 clockwise, -1 counter-clockwise
-      orient: 'ring',    // 'ring' (baseline follows the circle) | 'upright'
-      nectar: true,
-      phonetics: true
+      direction: 'clockwise',
+      viewAngle: 23,
+      period: 17
     }
   };
 }
@@ -4526,11 +4079,10 @@ function renderBlock(b, sz) {
     h += '<div class="block-visualize">' +
       '<button type="button" class="visualize-btn" onclick="openGarland()">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
-      '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/>' +
-      '<circle cx="12" cy="3" r="1.3" fill="currentColor" stroke="none"/>' +
-      '<circle cx="20.8" cy="12" r="1.3" fill="currentColor" stroke="none"/>' +
-      '<circle cx="12" cy="21" r="1.3" fill="currentColor" stroke="none"/>' +
-      '<circle cx="3.2" cy="12" r="1.3" fill="currentColor" stroke="none"/>' +
+      '<ellipse cx="12" cy="12" rx="10" ry="4.6"/>' +
+      '<circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="16.6" r="1.1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="7.4" r="1.1" fill="currentColor" stroke="none"/>' +
       '</svg>Visualize</button></div>';
   }
   h += '</div>';
@@ -5190,250 +4742,263 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════════════════════
 // GARLAND VISUALIZATION
 //
-// "ཐུགས་དབུས་པད་ཟླར་རྡོ་རྗེའི་ལྟེ་བར་ཧཱུཾ། ཡན་ལག་བཞི་ལ་སྙིང་པོ་འབྲུ་དྲུག་དང༌།
-//  དེ་མཐར་ཡིག་བརྒྱའི་ཕྲེང་བས་བསྐོར་བ་ལས།" — HUNG at the hub of the vajra on
-// lotus and moon; the six syllables of the heart mantra around it; and
-// around those, the garland of a hundred syllables turning.
-//
-// The hundred are the written Tibetan units of the mantra, with the
-// stacked clusters (བཛྲ, སརྦ, ཏིཥྛ …) opened into their Sanskrit
-// syllables so the count comes to exactly one hundred.
+// Port of the Claude Design project "Mantra Garland.dc.html".
+// The scene data, the tweak defaults and every number in the
+// projection below are taken from that project unchanged —
+// OM_SCENES / TWEAK_DEFAULTS from the document <helmet>, the
+// geometry from garland.jsx's GarlandField and Rotation.
+// Only the React scaffolding is rewritten as plain DOM: the
+// elements are built once and restyled each frame with what
+// the components would have rendered.
 // ══════════════════════════════════════════════════════
 
-const GARLAND_SYLLABLES = ('ཨོཾ/om|བ/vaj|ཛྲ/ra|ས/sa|ཏྭ/ttva|ས/sa|མ/ma|ཡ/ya|' +
-  'མ/ma|ནུ/nu|པཱ/pā|ལ/la|ཡ/ya|' +
-  'བ/vaj|ཛྲ/ra|ས/sa|ཏྭ/ttva|ཏེ/te|ནོ/no|པ/pa|' +
-  'ཏི/ti|ཥྛ/ṣṭha|དྲྀ/dṛ|ཌྷ/ḍho|མེ/me|བྷ/bha|ཝ/va|' +
-  'སུ/su|ཏོ/to|ཥྱོ/ṣyo|མེ/me|བྷ/bha|ཝ/va|' +
-  'སུ/su|པོ/po|ཥྱོ/ṣyo|མེ/me|བྷ/bha|ཝ/va|' +
-  'ཨ/a|ནུ/nu|ར/ra|ཀྟོ/kto|མེ/me|བྷ/bha|ཝ/va|' +
-  'ས/sar|རྦ/va|སི/si|དྡྷི/ddhi|མྨེ/mme|པྲ/pra|ཡ/ya|ཙྪ/ccha|' +
-  'ས/sar|རྦ/va|ཀ/kar|རྨ/ma|སུ/su|ཙ/ca|མེ/me|' +
-  'ཙི/ci|ཏྟཾ/ttaṃ|ཤྲི/śri|ཡཾ/yaṃ|' +
-  'ཀུ/ku|རུ/ru|ཧཱུྃ/hūṃ|ཧ/ha|ཧ/ha|ཧ/ha|ཧ/ha|ཧོ/hoḥ|' +
-  'བྷ/bha|ག/ga|ཝཱན/vān|' +
-  'ས/sar|རྦ/va|ཏ/ta|ཐཱ/thā|ག/ga|ཏ/ta|བ/vaj|ཛྲ/ra|མཱ/mā|མེ/me|མུ/muñ|ཉྩ/ca|' +
-  'བ/vaj|ཛཱི/rī|བྷ/bha|ཝ/va|མ/ma|ཧཱ/hā|ས/sa|མ/ma|ཡ/ya|ས/sa|ཏྭ/ttva|ཨཱཿ/āḥ'
-).split('|').map(s => s.split('/'));
+// window.OM_SCENES — the single "Rotation" scene
+const OM_SCENE = {
+  name: 'Rotation',
+  dur: 150,
+  mantra: 'ཨོཾ་བཛྲ་སཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་སཏྭ་ཏྭེ་ནོ་པ་ཏིཥྛ། དྲྀ་ཌྷོ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙིཏྟཾ་ཤྲེ་ཡཿ་ཀུ་རུ་ཧཱུྃ། ཧ་ཧ་ཧ་ཧ་ཧོཿ བྷ་ག་ཝན། སརྦ་ཏ་ཐཱ་ག་ཏ། བཛྲ་མཱ་མེ་མུཉྩ། བཛྲཱི་བྷ་ཝ། མ་ཧཱ་ས་མ་ཡ་སཏྭ་ཨཱཿ',
+  center: 'ཧཱུྃ',
+  seedFront: 'ཨོཾ',
+  seedRight: 'ཨཱཿ',
+  seedBack: 'སཏྭ',
+  seedLeft: 'བཛྲ',
+  nat: 216
+};
 
-// The six syllables of the heart mantra — ཨོཾ་བཛྲ་ས་ཏྭ་ཨཱཿ
-const HEART_SYLLABLES = 'ཨོཾ/om|བ/vaj|ཛྲ/ra|ས/sa|ཏྭ/ttva|ཨཱཿ/āḥ'
-  .split('|').map(s => s.split('/'));
+// garland.jsx constants
+const OM_TAU = Math.PI * 2;
+const OM_BONE = '#f0ead6';
+const OM_C_BONE = [240, 234, 214], OM_C_BRIGHT = [255, 253, 244];
+const OM_JOMO = "'Jomolhari', serif";
+const OM_D = 3.2;          // camera distance in units of garland radius
+const OM_GAP_EM = 0.55;
+const OM_SIGMA = 0.085;
+const OM_W = 1080, OM_H = 1920;   // the Rotation scene's stage size
 
-const GARLAND_STEP = 360 / GARLAND_SYLLABLES.length;   // degrees between beads
-const GARLAND_DEG_PER_SPEED = 1.5;                     // deg/sec per speed notch
+const OM_GRAIN_SVG = "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='300' height='300' filter='url(#n)'/></svg>";
+const OM_GRAIN_URL = 'url("data:image/svg+xml,' + encodeURIComponent(OM_GRAIN_SVG) + '")';
+
+function omSyllables(str) { return str.split(/[་།\s]+/).filter(Boolean); }
+function omLerp(a, b, t) { return a + (b - a) * t; }
+function omClamp01(v) { return Math.max(0, Math.min(1, v)); }
+function omRgbMix(c1, c2, t) {
+  return 'rgb(' + Math.round(omLerp(c1[0], c2[0], t)) + ',' +
+                  Math.round(omLerp(c1[1], c2[1], t)) + ',' +
+                  Math.round(omLerp(c1[2], c2[2], t)) + ')';
+}
+
+// Whole revolutions per scene, snapped so the loop seam is always seamless.
+function omRevolutions(dur, period) {
+  return Math.max(1, Math.round(dur / Math.max(1, period)));
+}
 
 let garlandOpen = false;
 let garlandBuilt = false;
 
-const garlandRt = {
-  angle: 0,          // monotonic reading progress, in degrees
-  playing: true,
+const omRt = {
   raf: null,
-  lastTs: 0,
-  lit: -1,
-  size: 0,
-  cx: 0, cy: 0,      // stage centre, in canvas pixels
-  rg: 0,             // garland radius, in canvas pixels
-  cw: 0, ch: 0,
-  ctx: null,
-  sprite: null,
-  parts: [],
-  spawnAcc: 0,
+  t0: 0,
+  toks: [],
+  ems: [],
+  centers: [],
+  sylEls: [],
+  seedEls: [],
   returnFocus: null,
   prevOverflow: ''
 };
 
-function garlandReducedMotion() {
-  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-// — Build the two rings once, then only ever re-measure them —
+// — Build —
 
 function buildGarland() {
   if (garlandBuilt) return;
 
-  const mk = (ring, pairs) => {
-    ring.innerHTML = pairs.map(() =>
-      '<span class="g-syl"><span class="g-syl-in"></span></span>').join('');
-    ring.querySelectorAll('.g-syl-in').forEach((el, i) => { el.textContent = pairs[i][0]; });
-  };
-  mk(document.getElementById('gRingGarland'), GARLAND_SYLLABLES);
-  mk(document.getElementById('gRingHeart'), HEART_SYLLABLES);
+  omRt.toks = omSyllables(OM_SCENE.mantra);
+  const field = document.getElementById('omField');
 
-  const speed = document.getElementById('gSpeed');
-  speed.addEventListener('input', () => {
-    state.garland.speed = Number(speed.value);
-    saveState();
+  document.getElementById('omGrain').style.backgroundImage = OM_GRAIN_URL;
+  document.getElementById('omCentre').textContent = OM_SCENE.center;
+
+  // Seeds sit at front / right / back / left of the ring.
+  const seeds = [OM_SCENE.seedFront, OM_SCENE.seedRight, OM_SCENE.seedBack, OM_SCENE.seedLeft];
+  omRt.seedEls = seeds.map(t => {
+    const el = document.createElement('div');
+    el.textContent = t;
+    el.style.cssText = 'position:absolute;font-family:' + OM_JOMO +
+      ';line-height:1;color:' + OM_BONE + ';opacity:0.70;' +
+      'text-shadow:0 0 14px rgba(240,234,214,0.28);white-space:nowrap';
+    field.appendChild(el);
+    return el;
   });
 
-  // A soft dot, drawn once and stamped for every nectar droplet
-  const sprite = document.createElement('canvas');
-  sprite.width = sprite.height = 32;
-  const sc = sprite.getContext('2d');
-  const grd = sc.createRadialGradient(16, 16, 0, 16, 16, 16);
-  grd.addColorStop(0,    'rgba(255,255,255,0.95)');
-  grd.addColorStop(0.35, 'rgba(255,231,190,0.55)');
-  grd.addColorStop(1,    'rgba(255,196,107,0)');
-  sc.fillStyle = grd;
-  sc.fillRect(0, 0, 32, 32);
-  garlandRt.sprite = sprite;
-  garlandRt.ctx = document.getElementById('garlandFx').getContext('2d');
+  omRt.sylEls = omRt.toks.map(t => {
+    const el = document.createElement('div');
+    el.textContent = t;
+    el.style.cssText = 'position:absolute;font-family:' + OM_JOMO +
+      ';line-height:1;white-space:nowrap';
+    field.appendChild(el);
+    return el;
+  });
 
+  // Registers
+  const angle = document.getElementById('omAngle');
+  const period = document.getElementById('omPeriod');
+  angle.addEventListener('input', () => {
+    state.garland.viewAngle = Number(angle.value);
+    saveState();
+    omSyncRegisters();
+  });
+  period.addEventListener('input', () => {
+    state.garland.period = Number(period.value);
+    saveState();
+    omSyncRegisters();
+  });
+
+  omMeasureEms();
   garlandBuilt = true;
 }
 
-// Seat each syllable at its own angle. Seating runs against the direction of
-// travel so the garland always reads forward as it passes the top marker.
-function seatGarland() {
-  const dir = state.garland.dir;
-  const seat = (ring, pairs, step) => {
-    ring.querySelectorAll('.g-syl').forEach((el, i) => {
-      el.style.setProperty('--a', (-dir * i * step) + 'deg');
-    });
-  };
-  seat(document.getElementById('gRingGarland'), GARLAND_SYLLABLES, GARLAND_STEP);
-  seat(document.getElementById('gRingHeart'), HEART_SYLLABLES, 360 / HEART_SYLLABLES.length);
+// Measured widths (em units) so gaps between syllables are even — a file of ants.
+function omMeasureEms() {
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = '100px Jomolhari, serif';
+  const ready = !!(document.fonts && document.fonts.check('100px Jomolhari'));
+  omRt.ems = omRt.toks.map(t => (ready ? ctx.measureText(t).width : 60) / 100);
+
+  const slots = omRt.ems.map(e => e + OM_GAP_EM);
+  const total = slots.reduce((a, b) => a + b, 0);
+  let cum = 0;
+  omRt.centers = slots.map(sl => {
+    const c = (cum + sl / 2) / total * OM_TAU;
+    cum += sl;
+    return c;
+  });
+
+  if (!ready && document.fonts && document.fonts.load) {
+    document.fonts.load('100px Jomolhari').then(() => omMeasureEms()).catch(() => {});
+  }
 }
 
+function omSyncRegisters() {
+  const g = state.garland;
+  document.getElementById('omAngle').value = g.viewAngle;
+  document.getElementById('omPeriod').value = g.period;
+  document.getElementById('omAngleValue').textContent = g.viewAngle + '°';
+  document.getElementById('omPeriodValue').textContent = g.period + 's / round';
+}
+
+// The stage is a fixed 1080×1920 composition scaled to fit, exactly as the
+// project's Stage does. (Its own measure subtracts a 44px playback bar that
+// only exists inside the design tool.)
 function layoutGarland() {
   if (!garlandOpen) return;
-
-  const field = document.getElementById('garlandField');
-  const stage = document.getElementById('garlandStage');
-  const size = Math.max(200, Math.min(field.clientWidth - 16, field.clientHeight - 8, 760));
-
-  stage.style.width = size + 'px';
-  stage.style.height = size + 'px';
-  garlandRt.size = size;
-
-  const rg = size * 0.425;
-  const rh = size * 0.315;
-
-  // Beads sit shoulder to shoulder: the arc each one gets sets its size.
-  const arc = (2 * Math.PI * rg) / GARLAND_SYLLABLES.length;
-  const garlandFs = Math.max(8, Math.min(arc / 0.58, size * 0.05));
-
-  const ringG = document.getElementById('gRingGarland');
-  const ringH = document.getElementById('gRingHeart');
-  ringG.style.setProperty('--r', rg + 'px');
-  ringG.style.fontSize = garlandFs + 'px';
-  ringH.style.setProperty('--r', rh + 'px');
-  ringH.style.fontSize = (size * 0.075) + 'px';
-  document.getElementById('gHub').style.fontSize = (size * 0.095) + 'px';
-
-  // Canvas: match the overlay box, and record where the stage sits inside it
   const overlay = document.getElementById('garlandOverlay');
-  const canvas = document.getElementById('garlandFx');
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  const ow = overlay.clientWidth, oh = overlay.clientHeight;
-  canvas.width = Math.round(ow * dpr);
-  canvas.height = Math.round(oh * dpr);
-  garlandRt.cw = ow;
-  garlandRt.ch = oh;
-  if (garlandRt.ctx) garlandRt.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-  const or_ = overlay.getBoundingClientRect();
-  const sr = stage.getBoundingClientRect();
-  garlandRt.cx = sr.left - or_.left + sr.width / 2;
-  garlandRt.cy = sr.top - or_.top + sr.height / 2;
-  garlandRt.rg = rg;
+  const s = Math.max(0.05, Math.min(
+    overlay.clientWidth / OM_W,
+    overlay.clientHeight / OM_H
+  ));
+  document.getElementById('garlandStage').style.transform =
+    'translate(-50%,-50%) scale(' + s + ')';
 }
 
-// — The frame loop —
+// — Rotation + GarlandField, per frame —
 
-function garlandLoop(ts) {
-  if (!garlandOpen) return;
-  const rt = garlandRt;
-  const dt = rt.lastTs ? Math.min(0.05, (ts - rt.lastTs) / 1000) : 0;
-  rt.lastTs = ts;
-
+function omRender(progress) {
   const g = state.garland;
-  if (rt.playing && g.speed > 0) {
-    rt.angle = (rt.angle + dt * g.speed * GARLAND_DEG_PER_SPEED) % 36000;
+  const dur = OM_SCENE.nat;        // the scene's natural duration, as passed by SceneStage
+  const period = g.period;
+  const revs = omRevolutions(dur, period);
+
+  // Rotation: 2 cycles / revolution — loop-safe
+  const pulse = 0.5 + 0.2 * Math.sin(2 * OM_TAU * revs * progress);
+  document.getElementById('omPulse').style.opacity = pulse;
+
+  // GarlandField
+  const w = OM_W, h = OM_H;
+  const u = w / 540;
+  const cx = w / 2, cy = h * 0.45;
+
+  // Tilt: 90° = straight down (flat circle), ~5° = floor level.
+  const rad = (g.viewAngle * Math.PI) / 180;
+  const s = Math.sin(rad), ca = Math.cos(rad);
+  const t2 = omClamp01((s - 0.5) / 0.5);
+  const K = w * omLerp(1.95, 1.53, t2);
+  const fsG = 21 * u * omLerp(1, 0.70, t2);
+  const opNorm = Math.pow((ca + 1) / 2, 1.6);
+
+  const flip = g.direction === 'counter' ? -1 : 1;
+  const theta = OM_TAU * revs * progress;
+  const breath = 0.5 + 0.5 * Math.sin(3 * theta);
+
+  const centers = omRt.centers;
+  const theta0 = centers[0] || 0;
+
+  for (let i = 0; i < omRt.toks.length; i++) {
+    const phi = (centers[i] - theta0 - theta) * flip;
+    const sp = Math.sin(phi), cp = Math.cos(phi);
+    const den = OM_D - cp * ca;
+    const x = cx + K * sp / den, y = cy + K * cp * s / den;
+    const m = OM_D / den;
+    const op = 0.17 + 0.53 * Math.pow((cp * ca + 1) / 2, 1.6) / opNorm;
+    const a = Math.atan2(sp, cp);
+    const gg = Math.exp(-(a * a) / (2 * OM_SIGMA * OM_SIGMA));
+    const el = omRt.sylEls[i];
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.transform = 'translate(-50%,-50%) scale(' + (m * (1 + 0.26 * gg)) + ')';
+    el.style.fontSize = fsG + 'px';
+    el.style.color = omRgbMix(OM_C_BONE, OM_C_BRIGHT, gg);
+    el.style.opacity = Math.min(op, 0.70);
+    el.style.zIndex = 400 + Math.round(cp * ca * 90);
+    el.style.textShadow = '0 0 ' + (12 * gg).toFixed(1) +
+      'px rgba(240,234,214,' + (0.5 * gg).toFixed(2) + ')';
   }
 
-  const spin = g.dir * rt.angle;
-  const ringG = document.getElementById('gRingGarland');
-  const ringH = document.getElementById('gRingHeart');
-  ringG.style.transform = 'rotate(' + spin + 'deg)';
-  ringH.style.transform = 'rotate(' + (spin * -0.42) + 'deg)';
-  if (g.orient === 'upright') {
-    ringG.style.setProperty('--spin', spin + 'deg');
-    ringH.style.setProperty('--spin', (spin * -0.42) + 'deg');
+  // Mid-tilt vertical boost keeps the seeds clear of ཧཱུྃ; fades out at both extremes.
+  const rhoY = 0.34 * (1 + 0.53 * Math.exp(-((s - 0.5) * (s - 0.5)) / 0.0648));
+  const seedPhis = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+  for (let i = 0; i < 4; i++) {
+    const sp = Math.sin(seedPhis[i]), cp = Math.cos(seedPhis[i]);
+    const den = OM_D - 0.38 * cp * ca;
+    const x = cx + K * 0.34 * sp / den, y = cy + K * rhoY * cp * s / den;
+    const m = OM_D / den;
+    const el = omRt.seedEls[i];
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.transform = 'translate(-50%,-50%) scale(' + m + ')';
+    el.style.fontSize = (34 * u) + 'px';
+    el.style.zIndex = 400 + Math.round(0.38 * cp * ca * 90);
   }
 
-  // Whichever bead is passing the top marker is the one being recited
-  const lit = ((Math.round(rt.angle / GARLAND_STEP) % GARLAND_SYLLABLES.length) +
-    GARLAND_SYLLABLES.length) % GARLAND_SYLLABLES.length;
-  if (lit !== rt.lit) {
-    const beads = ringG.children;
-    if (rt.lit >= 0 && beads[rt.lit]) beads[rt.lit].classList.remove('is-lit');
-    if (beads[lit]) beads[lit].classList.add('is-lit');
-    rt.lit = lit;
-    document.getElementById('gReadTib').textContent = GARLAND_SYLLABLES[lit][0];
-    document.getElementById('gReadPho').textContent = GARLAND_SYLLABLES[lit][1];
-    document.getElementById('gReadCount').textContent =
-      (lit + 1) + ' / ' + GARLAND_SYLLABLES.length;
-  }
+  const centre = document.getElementById('omCentre');
+  centre.style.left = cx + 'px';
+  centre.style.top = cy + 'px';
+  centre.style.fontSize = (62 * u) + 'px';
+  centre.style.textShadow =
+    '0 0 ' + (28 + 16 * breath).toFixed(1) + 'px rgba(240,234,214,' +
+    (0.22 + 0.14 * breath).toFixed(2) + '), 0 0 ' + (90 * u).toFixed(0) +
+    'px rgba(212,165,90,0.16)';
 
-  garlandNectarFrame(dt);
-  rt.raf = requestAnimationFrame(garlandLoop);
+  const frontY = cy + K * s / (OM_D - ca), backY = cy - K * s / (OM_D + ca);
+  const gf = document.getElementById('omGlowFront');
+  gf.style.left = cx + 'px';
+  gf.style.top = frontY + 'px';
+  const gb = document.getElementById('omGlowBack');
+  gb.style.left = cx + 'px';
+  gb.style.top = backY + 'px';
+  const gc = document.getElementById('omGlowCentre');
+  gc.style.left = cx + 'px';
+  gc.style.top = cy + 'px';
+  gc.style.width = (480 * u) + 'px';
+  gc.style.height = (400 * u) + 'px';
 }
 
-// Nectar: "བདུད་རྩིའི་རྒྱུན་བབས" — a cascade of elixir falling from the
-// mantra, washing downward through the field.
-function garlandNectarFrame(dt) {
-  const rt = garlandRt;
-  const ctx = rt.ctx;
-  if (!ctx) return;
-
-  ctx.clearRect(0, 0, rt.cw, rt.ch);
-
-  if (!state.garland.nectar || garlandReducedMotion()) {
-    if (rt.parts.length) rt.parts.length = 0;
-    return;
-  }
-
-  const scale = rt.size / 400;
-
-  rt.spawnAcc += dt * 34;
-  while (rt.spawnAcc >= 1) {
-    rt.spawnAcc -= 1;
-    if (rt.parts.length >= 170) break;
-    const fromRing = Math.random() < 0.7;
-    const th = Math.random() * Math.PI * 2;
-    const rad = fromRing ? rt.rg * (0.96 + Math.random() * 0.08)
-                         : rt.size * 0.06 * Math.random();
-    rt.parts.push({
-      x: rt.cx + Math.cos(th) * rad,
-      y: rt.cy + Math.sin(th) * rad,
-      vx: (Math.random() - 0.5) * 16 * scale,
-      vy: (22 + Math.random() * 46) * scale,
-      r: (1.1 + Math.random() * 2.3) * scale,
-      t: 0,
-      life: 2.2 + Math.random() * 1.6
-    });
-  }
-
-  ctx.globalCompositeOperation = 'lighter';
-  for (let i = rt.parts.length - 1; i >= 0; i--) {
-    const p = rt.parts[i];
-    p.t += dt;
-    if (p.t >= p.life) { rt.parts.splice(i, 1); continue; }
-    p.vy += 26 * scale * dt;
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-
-    const k = p.t / p.life;
-    // fade in over the first fifth, then out
-    const a = (k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8) * 0.42;
-    ctx.globalAlpha = Math.max(0, a);
-    const d = p.r * 3.6;
-    ctx.drawImage(rt.sprite, p.x - d / 2, p.y - d / 2, d, d);
-  }
-  ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = 'source-over';
+function omLoop(ts) {
+  if (!garlandOpen) return;
+  // The engine's clock: wall time loops over the scene's authored duration,
+  // and progress is wallTime / dur, as SceneStage computes it.
+  const wall = ((ts - omRt.t0) / 1000) % OM_SCENE.dur;
+  omRender(wall / OM_SCENE.dur);
+  omRt.raf = requestAnimationFrame(omLoop);
 }
 
 // — Open / close —
@@ -5442,7 +5007,7 @@ function openGarland() {
   if (garlandOpen) return;
   buildGarland();
 
-  garlandRt.returnFocus = document.activeElement;
+  omRt.returnFocus = document.activeElement;
   if (isAutoScrolling) stopAutoScroll();
   if (isTiltScrolling) stopTiltScroll();
   updatePlayIcon();
@@ -5450,138 +5015,39 @@ function openGarland() {
   const overlay = document.getElementById('garlandOverlay');
   overlay.hidden = false;
   garlandOpen = true;
-  garlandRt.lastTs = 0;
-  garlandRt.lit = -1;
-  garlandRt.parts.length = 0;
-  garlandRt.playing = !garlandReducedMotion();
+  omRt.t0 = performance.now();
 
-  garlandRt.prevOverflow = document.body.style.overflow;
+  omRt.prevOverflow = document.body.style.overflow;
   document.body.style.overflow = 'hidden';
 
-  syncGarlandTweaks();
-  seatGarland();
+  omSyncRegisters();
   layoutGarland();
+  omRender(0);
 
-  // Let the browser paint the hidden state once so the transition runs
-  requestAnimationFrame(() => {
-    overlay.classList.add('open');
-    layoutGarland();
-  });
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => layoutGarland());
-  }
-
-  syncGarlandPlayIcon();
-  garlandRt.raf = requestAnimationFrame(garlandLoop);
-  document.getElementById('gBtnClose').focus({ preventScroll: true });
+  omRt.raf = requestAnimationFrame(omLoop);
+  document.getElementById('omMinimise').focus({ preventScroll: true });
 }
 
 function closeGarland() {
   if (!garlandOpen) return;
   garlandOpen = false;
 
-  const overlay = document.getElementById('garlandOverlay');
-  overlay.classList.remove('open');
-  document.getElementById('garlandTweaks').classList.remove('open');
-  document.getElementById('gBtnTweaks').classList.remove('active');
+  if (omRt.raf) cancelAnimationFrame(omRt.raf);
+  omRt.raf = null;
+  document.getElementById('garlandOverlay').hidden = true;
+  document.body.style.overflow = omRt.prevOverflow;
 
-  if (garlandRt.raf) cancelAnimationFrame(garlandRt.raf);
-  garlandRt.raf = null;
-  garlandRt.parts.length = 0;
-  if (garlandRt.ctx) garlandRt.ctx.clearRect(0, 0, garlandRt.cw, garlandRt.ch);
-
-  document.body.style.overflow = garlandRt.prevOverflow;
-
-  setTimeout(() => { if (!garlandOpen) overlay.hidden = true; }, 440);
-
-  const back = garlandRt.returnFocus;
+  const back = omRt.returnFocus;
   if (back && back.focus) back.focus({ preventScroll: true });
-}
-
-// — Controls —
-
-function toggleGarlandPlay() {
-  garlandRt.playing = !garlandRt.playing;
-  syncGarlandPlayIcon();
-}
-
-function syncGarlandPlayIcon() {
-  const on = garlandRt.playing;
-  document.getElementById('gIconPlay').style.display = on ? 'none' : 'block';
-  document.getElementById('gIconPause').style.display = on ? 'block' : 'none';
-  const btn = document.getElementById('gBtnPlay');
-  btn.setAttribute('aria-label', on ? 'Pause rotation' : 'Resume rotation');
-  btn.title = on ? 'Pause' : 'Play';
-}
-
-function toggleGarlandTweaks() {
-  const panel = document.getElementById('garlandTweaks');
-  const open = !panel.classList.contains('open');
-  panel.classList.toggle('open', open);
-  document.getElementById('gBtnTweaks').classList.toggle('active', open);
-}
-
-function setGarlandDir(dir) {
-  state.garland.dir = dir;
-  saveState();
-  seatGarland();
-  syncGarlandTweaks();
-}
-
-function setGarlandOrient(orient) {
-  state.garland.orient = orient;
-  saveState();
-  syncGarlandTweaks();
-}
-
-function toggleGarlandOpt(key) {
-  state.garland[key] = !state.garland[key];
-  saveState();
-  syncGarlandTweaks();
-}
-
-function syncGarlandTweaks() {
-  const g = state.garland;
-
-  document.getElementById('gSpeed').value = g.speed;
-
-  document.querySelectorAll('#gDirSeg button').forEach(b => {
-    b.classList.toggle('active', Number(b.dataset.dir) === g.dir);
-  });
-  document.querySelectorAll('#gOrientSeg button').forEach(b => {
-    b.classList.toggle('active', b.dataset.orient === g.orient);
-  });
-
-  const upright = g.orient === 'upright';
-  document.querySelectorAll('#garlandOverlay .g-ring').forEach(r => {
-    r.classList.toggle('is-upright', upright);
-  });
-
-  const sw = (el, on) => {
-    el.classList.toggle('on', on);
-    el.setAttribute('aria-checked', on ? 'true' : 'false');
-  };
-  sw(document.getElementById('gSwNectar'), g.nectar);
-  sw(document.getElementById('gSwPho'), g.phonetics);
-
-  document.getElementById('garlandOverlay').classList.toggle('no-pho', !g.phonetics);
 }
 
 window.addEventListener('resize', layoutGarland);
 window.addEventListener('orientationchange', () => setTimeout(layoutGarland, 120));
 
 document.addEventListener('keydown', e => {
-  if (!garlandOpen) return;
-  if (e.key === 'Escape') {
+  if (garlandOpen && e.key === 'Escape') {
     e.preventDefault();
-    if (document.getElementById('garlandTweaks').classList.contains('open')) {
-      toggleGarlandTweaks();
-    } else {
-      closeGarland();
-    }
-  } else if (e.key === ' ' && !/^(INPUT|BUTTON|TEXTAREA)$/.test(e.target.tagName)) {
-    e.preventDefault();
-    toggleGarlandPlay();
+    closeGarland();
   }
 });
 
