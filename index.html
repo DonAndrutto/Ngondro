@@ -1159,6 +1159,86 @@
       background: linear-gradient(to right, transparent,
         color-mix(in srgb, var(--accent) 55%, transparent), transparent);
     }
+
+    /* ══════════════════════════════════════════
+       MANTRA GARLAND
+       A port of the Claude Design project
+       "Mantra Garland.dc.html" (garland.jsx +
+       animations-v2.jsx). The composition is a
+       fixed 1080×1920 stage scaled to fit; every
+       value inside it — geometry, colours, type
+       sizes, opacities — comes from garland.jsx
+       unchanged. Only the React scaffolding is
+       rewritten as plain DOM to match this app.
+       ══════════════════════════════════════════ */
+
+    /* — Trigger button under the hundred-syllable mantra (app chrome) — */
+    .block-visualize {
+      display: flex;
+      justify-content: center;
+      margin-top: var(--sp-4);
+    }
+    .visualize-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: var(--sp-2) var(--sp-5);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: var(--ls-caps);
+      text-transform: uppercase;
+      color: var(--accent);
+      background: transparent;
+      border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background var(--dur-2) var(--ease-out),
+                  color var(--dur-2) var(--ease-out),
+                  border-color var(--dur-2) var(--ease-out),
+                  transform var(--dur-1) var(--ease-out);
+    }
+    .visualize-btn svg { width: 15px; height: 15px; flex: none; }
+    .visualize-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .visualize-btn:active { transform: scale(var(--press-scale)); }
+    .visualize-btn:focus { outline: none; }
+    .visualize-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+    /* — Host surface. The design's page background. — */
+    .garland-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      background: #0a0f1a;
+      overflow: hidden;
+      overscroll-behavior: contain;
+    }
+    .garland-overlay[hidden] { display: none; }
+
+    /* The 1080×1920 composition, scaled to fit the viewport. The design's
+       Stage does the same with transform: scale(); it subtracts a 44px
+       playback bar that only exists inside the design tool. */
+    .garland-stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 1080px;
+      height: 1920px;
+      transform-origin: center;
+      background: #0a0f1a;
+      overflow: hidden;
+    }
+
+    /* — Registers, verbatim from the project's <helmet> — */
+    input[type=range].om-reg { -webkit-appearance: none; appearance: none; width: 100%; height: 18px; background: transparent; margin: 0; cursor: pointer; }
+    input[type=range].om-reg::-webkit-slider-runnable-track { height: 2px; background: rgba(240,234,214,0.22); border-radius: 2px; }
+    input[type=range].om-reg::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #d4a55a; margin-top: -6px; border: none; }
+    input[type=range].om-reg::-moz-range-track { height: 2px; background: rgba(240,234,214,0.22); border-radius: 2px; }
+    input[type=range].om-reg::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #d4a55a; border: none; }
   </style>
 </head>
 
@@ -1440,6 +1520,55 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════
+       MANTRA GARLAND — the "Mantra Garland.dc.html" project.
+       The stage holds the Rotation scene: background wash,
+       breathing pulse, grain, then the garland field. Every
+       element inside the field is positioned per frame by
+       the GARLAND VISUALIZATION block at the end of the
+       script, following garland.jsx exactly.
+       ══════════════════════════════════════════════════════ -->
+  <div class="garland-overlay" id="garlandOverlay" role="dialog" aria-modal="true"
+       aria-label="Mantra garland" hidden>
+
+    <div class="garland-stage" id="garlandStage">
+      <!-- Rotation: the scene wrapper -->
+      <div id="omScene" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, #182136 0%, #0d1424 48%, #0a0f1a 78%)">
+        <div id="omPulse" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, rgba(235,228,205,0.045) 0%, rgba(235,228,205,0) 55%)"></div>
+        <div id="omGrain" style="position:absolute;inset:0;opacity:0.05;mix-blend-mode:overlay"></div>
+
+        <!-- GarlandField -->
+        <div id="omField" style="position:absolute;inset:0;overflow:hidden">
+          <div id="omGlowFront" style="position:absolute;width:130%;height:500px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.05) 0%, rgba(240,234,214,0) 68%)"></div>
+          <div id="omGlowBack" style="position:absolute;width:110%;height:340px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.03) 0%, rgba(240,234,214,0) 68%)"></div>
+          <div id="omGlowCentre" style="position:absolute;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.05) 0%, rgba(240,234,214,0) 65%);z-index:300"></div>
+          <div id="omCentre" style="position:absolute;transform:translate(-50%,-64%);font-family:'Jomolhari',serif;line-height:1;color:#f0ead6;opacity:0.72;z-index:400;white-space:nowrap"></div>
+          <!-- seed syllables, then garland syllables, are appended here -->
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="omMinimise" onclick="closeGarland()" aria-label="Minimise" title="Return"
+            style="position:absolute;top:16px;right:16px;width:44px;height:44px;z-index:1000;border-radius:9999px;border:1px solid rgba(240,234,214,0.18);background:rgba(13,19,33,0.55);color:#a89a7a;font-size:22px;line-height:40px;text-align:center;cursor:pointer;padding:0">−</button>
+
+    <div style="position:absolute;left:16px;bottom:16px;z-index:1000;min-width:176px;display:flex;flex-direction:column;gap:12px;padding:12px 14px;background:rgba(13,19,33,0.72);border:1px solid rgba(240,234,214,0.12);border-radius:9px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Angle</span>
+          <span id="omAngleValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
+        </div>
+        <input class="om-reg" type="range" min="5" max="90" step="1" id="omAngle" aria-label="View angle" />
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Speed</span>
+          <span id="omPeriodValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
+        </div>
+        <input class="om-reg" type="range" min="7" max="27" step="1" id="omPeriod" aria-label="Seconds per round" />
+      </div>
+    </div>
+  </div>
+
 <script>
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1464,6 +1593,12 @@ function defaultState() {
       soundEnabled: true,
       // accumulated elapsed seconds per timer slot (0..3)
       spent: [0, 0, 0, 0]
+    },
+    // Mantra garland — the project's TWEAK_DEFAULTS
+    garland: {
+      direction: 'clockwise',
+      viewAngle: 23,
+      period: 17
     }
   };
 }
@@ -1476,6 +1611,7 @@ function loadState() {
     const parsed = JSON.parse(s);
     const merged = { ...d, ...parsed };
     merged.timer = { ...d.timer, ...(parsed.timer || {}) };
+    merged.garland = { ...d.garland, ...(parsed.garland || {}) };
     if (!Array.isArray(merged.timer.spent) || merged.timer.spent.length !== 4) {
       merged.timer.spent = [0, 0, 0, 0];
     }
@@ -2623,7 +2759,8 @@ const TABS_DATA = {
           tibetan: 'ཨོཾ་བཛྲ་ས་ཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་ས་ཏྭ་ཏེ་ནོ་པ། ཏིཥྛ་དྲྀ་ཌྷ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡ་ཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙི་ཏྟཾ་ཤྲི་ཡཾ། ཀུརུཧཱུྃཧཧཧཧཧོ། བྷགཝཱན། སརྦ་ཏ་ཐཱ་ག་ཏ་བཛྲ་མཱ་མེ་མུཉྩ་བཛཱི་བྷ་ཝ་མཧཱ་ས་མ་ཡ་ས་ཏྭ་ཨཱཿ',
           phonetics: 'om vajra sattva samaya manu palaya vajra sattva teno pa tikta dridho me bhawa suto khayo mebhawa supo khayo mebhawa anu rakto mebhawa sarwa siddhi me prayatsa sarwa karma sutsa me tsitam shriyamkuru hung ha ha ha ha ho bhagawan sarwa tathagata vajra mamemuntsa vajri bhawa maha samaya sattva ah',
           translation: '(The Hundred Syllable Mantra)',
-          variant: 'repeated'
+          variant: 'repeated',
+          visualize: true
         },
         {
           id: 'ng-5-18',
@@ -3938,6 +4075,16 @@ function renderBlock(b, sz) {
   if (showT && b.tibetan) h += '<div class="tib" style="font-size:' + sz.tibSz + '">' + esc(b.tibetan) + '</div>';
   if (showP && b.phonetics) h += '<div class="pho" style="font-size:' + sz.phoSz + '">' + esc(b.phonetics) + '</div>';
   if (showE && b.translation) h += '<div class="eng" style="font-size:' + sz.engSz + '">' + esc(b.translation) + '</div>';
+  if (b.visualize) {
+    h += '<div class="block-visualize">' +
+      '<button type="button" class="visualize-btn" onclick="openGarland()">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
+      '<ellipse cx="12" cy="12" rx="10" ry="4.6"/>' +
+      '<circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="16.6" r="1.1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="7.4" r="1.1" fill="currentColor" stroke="none"/>' +
+      '</svg>Visualize</button></div>';
+  }
   h += '</div>';
   return h;
 }
@@ -4589,6 +4736,318 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden && timerRuntime.activeKey !== -1) {
     pauseActiveTimer();
     for (let k = 0; k < TIMER_COUNT; k++) renderTimerControls(k);
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// GARLAND VISUALIZATION
+//
+// Port of the Claude Design project "Mantra Garland.dc.html".
+// The scene data, the tweak defaults and every number in the
+// projection below are taken from that project unchanged —
+// OM_SCENES / TWEAK_DEFAULTS from the document <helmet>, the
+// geometry from garland.jsx's GarlandField and Rotation.
+// Only the React scaffolding is rewritten as plain DOM: the
+// elements are built once and restyled each frame with what
+// the components would have rendered.
+// ══════════════════════════════════════════════════════
+
+// window.OM_SCENES — the single "Rotation" scene
+const OM_SCENE = {
+  name: 'Rotation',
+  dur: 150,
+  mantra: 'ཨོཾ་བཛྲ་སཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་སཏྭ་ཏྭེ་ནོ་པ་ཏིཥྛ། དྲྀ་ཌྷོ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙིཏྟཾ་ཤྲེ་ཡཿ་ཀུ་རུ་ཧཱུྃ། ཧ་ཧ་ཧ་ཧ་ཧོཿ བྷ་ག་ཝན། སརྦ་ཏ་ཐཱ་ག་ཏ། བཛྲ་མཱ་མེ་མུཉྩ། བཛྲཱི་བྷ་ཝ། མ་ཧཱ་ས་མ་ཡ་སཏྭ་ཨཱཿ',
+  center: 'ཧཱུྃ',
+  seedFront: 'ཨོཾ',
+  seedRight: 'ཨཱཿ',
+  seedBack: 'སཏྭ',
+  seedLeft: 'བཛྲ',
+  nat: 216
+};
+
+// garland.jsx constants
+const OM_TAU = Math.PI * 2;
+const OM_BONE = '#f0ead6';
+const OM_C_BONE = [240, 234, 214], OM_C_BRIGHT = [255, 253, 244];
+const OM_JOMO = "'Jomolhari', serif";
+const OM_D = 3.2;          // camera distance in units of garland radius
+const OM_GAP_EM = 0.55;
+const OM_SIGMA = 0.085;
+const OM_W = 1080, OM_H = 1920;   // the Rotation scene's stage size
+
+const OM_GRAIN_SVG = "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='300' height='300' filter='url(#n)'/></svg>";
+const OM_GRAIN_URL = 'url("data:image/svg+xml,' + encodeURIComponent(OM_GRAIN_SVG) + '")';
+
+function omSyllables(str) { return str.split(/[་།\s]+/).filter(Boolean); }
+function omLerp(a, b, t) { return a + (b - a) * t; }
+function omClamp01(v) { return Math.max(0, Math.min(1, v)); }
+function omRgbMix(c1, c2, t) {
+  return 'rgb(' + Math.round(omLerp(c1[0], c2[0], t)) + ',' +
+                  Math.round(omLerp(c1[1], c2[1], t)) + ',' +
+                  Math.round(omLerp(c1[2], c2[2], t)) + ')';
+}
+
+// Whole revolutions per scene, snapped so the loop seam is always seamless.
+function omRevolutions(dur, period) {
+  return Math.max(1, Math.round(dur / Math.max(1, period)));
+}
+
+let garlandOpen = false;
+let garlandBuilt = false;
+
+const omRt = {
+  raf: null,
+  t0: 0,
+  toks: [],
+  ems: [],
+  centers: [],
+  sylEls: [],
+  seedEls: [],
+  returnFocus: null,
+  prevOverflow: ''
+};
+
+// — Build —
+
+function buildGarland() {
+  if (garlandBuilt) return;
+
+  omRt.toks = omSyllables(OM_SCENE.mantra);
+  const field = document.getElementById('omField');
+
+  document.getElementById('omGrain').style.backgroundImage = OM_GRAIN_URL;
+  document.getElementById('omCentre').textContent = OM_SCENE.center;
+
+  // Seeds sit at front / right / back / left of the ring.
+  const seeds = [OM_SCENE.seedFront, OM_SCENE.seedRight, OM_SCENE.seedBack, OM_SCENE.seedLeft];
+  omRt.seedEls = seeds.map(t => {
+    const el = document.createElement('div');
+    el.textContent = t;
+    el.style.cssText = 'position:absolute;font-family:' + OM_JOMO +
+      ';line-height:1;color:' + OM_BONE + ';opacity:0.70;' +
+      'text-shadow:0 0 14px rgba(240,234,214,0.28);white-space:nowrap';
+    field.appendChild(el);
+    return el;
+  });
+
+  omRt.sylEls = omRt.toks.map(t => {
+    const el = document.createElement('div');
+    el.textContent = t;
+    el.style.cssText = 'position:absolute;font-family:' + OM_JOMO +
+      ';line-height:1;white-space:nowrap';
+    field.appendChild(el);
+    return el;
+  });
+
+  // Registers
+  const angle = document.getElementById('omAngle');
+  const period = document.getElementById('omPeriod');
+  angle.addEventListener('input', () => {
+    state.garland.viewAngle = Number(angle.value);
+    saveState();
+    omSyncRegisters();
+  });
+  period.addEventListener('input', () => {
+    state.garland.period = Number(period.value);
+    saveState();
+    omSyncRegisters();
+  });
+
+  omMeasureEms();
+  garlandBuilt = true;
+}
+
+// Measured widths (em units) so gaps between syllables are even — a file of ants.
+function omMeasureEms() {
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = '100px Jomolhari, serif';
+  const ready = !!(document.fonts && document.fonts.check('100px Jomolhari'));
+  omRt.ems = omRt.toks.map(t => (ready ? ctx.measureText(t).width : 60) / 100);
+
+  const slots = omRt.ems.map(e => e + OM_GAP_EM);
+  const total = slots.reduce((a, b) => a + b, 0);
+  let cum = 0;
+  omRt.centers = slots.map(sl => {
+    const c = (cum + sl / 2) / total * OM_TAU;
+    cum += sl;
+    return c;
+  });
+
+  if (!ready && document.fonts && document.fonts.load) {
+    document.fonts.load('100px Jomolhari').then(() => omMeasureEms()).catch(() => {});
+  }
+}
+
+function omSyncRegisters() {
+  const g = state.garland;
+  document.getElementById('omAngle').value = g.viewAngle;
+  document.getElementById('omPeriod').value = g.period;
+  document.getElementById('omAngleValue').textContent = g.viewAngle + '°';
+  document.getElementById('omPeriodValue').textContent = g.period + 's / round';
+}
+
+// The stage is a fixed 1080×1920 composition scaled to fit, exactly as the
+// project's Stage does. (Its own measure subtracts a 44px playback bar that
+// only exists inside the design tool.)
+function layoutGarland() {
+  if (!garlandOpen) return;
+  const overlay = document.getElementById('garlandOverlay');
+  const s = Math.max(0.05, Math.min(
+    overlay.clientWidth / OM_W,
+    overlay.clientHeight / OM_H
+  ));
+  document.getElementById('garlandStage').style.transform =
+    'translate(-50%,-50%) scale(' + s + ')';
+}
+
+// — Rotation + GarlandField, per frame —
+
+function omRender(progress) {
+  const g = state.garland;
+  const dur = OM_SCENE.nat;        // the scene's natural duration, as passed by SceneStage
+  const period = g.period;
+  const revs = omRevolutions(dur, period);
+
+  // Rotation: 2 cycles / revolution — loop-safe
+  const pulse = 0.5 + 0.2 * Math.sin(2 * OM_TAU * revs * progress);
+  document.getElementById('omPulse').style.opacity = pulse;
+
+  // GarlandField
+  const w = OM_W, h = OM_H;
+  const u = w / 540;
+  const cx = w / 2, cy = h * 0.45;
+
+  // Tilt: 90° = straight down (flat circle), ~5° = floor level.
+  const rad = (g.viewAngle * Math.PI) / 180;
+  const s = Math.sin(rad), ca = Math.cos(rad);
+  const t2 = omClamp01((s - 0.5) / 0.5);
+  const K = w * omLerp(1.95, 1.53, t2);
+  const fsG = 21 * u * omLerp(1, 0.70, t2);
+  const opNorm = Math.pow((ca + 1) / 2, 1.6);
+
+  const flip = g.direction === 'counter' ? -1 : 1;
+  const theta = OM_TAU * revs * progress;
+  const breath = 0.5 + 0.5 * Math.sin(3 * theta);
+
+  const centers = omRt.centers;
+  const theta0 = centers[0] || 0;
+
+  for (let i = 0; i < omRt.toks.length; i++) {
+    const phi = (centers[i] - theta0 - theta) * flip;
+    const sp = Math.sin(phi), cp = Math.cos(phi);
+    const den = OM_D - cp * ca;
+    const x = cx + K * sp / den, y = cy + K * cp * s / den;
+    const m = OM_D / den;
+    const op = 0.17 + 0.53 * Math.pow((cp * ca + 1) / 2, 1.6) / opNorm;
+    const a = Math.atan2(sp, cp);
+    const gg = Math.exp(-(a * a) / (2 * OM_SIGMA * OM_SIGMA));
+    const el = omRt.sylEls[i];
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.transform = 'translate(-50%,-50%) scale(' + (m * (1 + 0.26 * gg)) + ')';
+    el.style.fontSize = fsG + 'px';
+    el.style.color = omRgbMix(OM_C_BONE, OM_C_BRIGHT, gg);
+    el.style.opacity = Math.min(op, 0.70);
+    el.style.zIndex = 400 + Math.round(cp * ca * 90);
+    el.style.textShadow = '0 0 ' + (12 * gg).toFixed(1) +
+      'px rgba(240,234,214,' + (0.5 * gg).toFixed(2) + ')';
+  }
+
+  // Mid-tilt vertical boost keeps the seeds clear of ཧཱུྃ; fades out at both extremes.
+  const rhoY = 0.34 * (1 + 0.53 * Math.exp(-((s - 0.5) * (s - 0.5)) / 0.0648));
+  const seedPhis = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+  for (let i = 0; i < 4; i++) {
+    const sp = Math.sin(seedPhis[i]), cp = Math.cos(seedPhis[i]);
+    const den = OM_D - 0.38 * cp * ca;
+    const x = cx + K * 0.34 * sp / den, y = cy + K * rhoY * cp * s / den;
+    const m = OM_D / den;
+    const el = omRt.seedEls[i];
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.transform = 'translate(-50%,-50%) scale(' + m + ')';
+    el.style.fontSize = (34 * u) + 'px';
+    el.style.zIndex = 400 + Math.round(0.38 * cp * ca * 90);
+  }
+
+  const centre = document.getElementById('omCentre');
+  centre.style.left = cx + 'px';
+  centre.style.top = cy + 'px';
+  centre.style.fontSize = (62 * u) + 'px';
+  centre.style.textShadow =
+    '0 0 ' + (28 + 16 * breath).toFixed(1) + 'px rgba(240,234,214,' +
+    (0.22 + 0.14 * breath).toFixed(2) + '), 0 0 ' + (90 * u).toFixed(0) +
+    'px rgba(212,165,90,0.16)';
+
+  const frontY = cy + K * s / (OM_D - ca), backY = cy - K * s / (OM_D + ca);
+  const gf = document.getElementById('omGlowFront');
+  gf.style.left = cx + 'px';
+  gf.style.top = frontY + 'px';
+  const gb = document.getElementById('omGlowBack');
+  gb.style.left = cx + 'px';
+  gb.style.top = backY + 'px';
+  const gc = document.getElementById('omGlowCentre');
+  gc.style.left = cx + 'px';
+  gc.style.top = cy + 'px';
+  gc.style.width = (480 * u) + 'px';
+  gc.style.height = (400 * u) + 'px';
+}
+
+function omLoop(ts) {
+  if (!garlandOpen) return;
+  // The engine's clock: wall time loops over the scene's authored duration,
+  // and progress is wallTime / dur, as SceneStage computes it.
+  const wall = ((ts - omRt.t0) / 1000) % OM_SCENE.dur;
+  omRender(wall / OM_SCENE.dur);
+  omRt.raf = requestAnimationFrame(omLoop);
+}
+
+// — Open / close —
+
+function openGarland() {
+  if (garlandOpen) return;
+  buildGarland();
+
+  omRt.returnFocus = document.activeElement;
+  if (isAutoScrolling) stopAutoScroll();
+  if (isTiltScrolling) stopTiltScroll();
+  updatePlayIcon();
+
+  const overlay = document.getElementById('garlandOverlay');
+  overlay.hidden = false;
+  garlandOpen = true;
+  omRt.t0 = performance.now();
+
+  omRt.prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
+  omSyncRegisters();
+  layoutGarland();
+  omRender(0);
+
+  omRt.raf = requestAnimationFrame(omLoop);
+  document.getElementById('omMinimise').focus({ preventScroll: true });
+}
+
+function closeGarland() {
+  if (!garlandOpen) return;
+  garlandOpen = false;
+
+  if (omRt.raf) cancelAnimationFrame(omRt.raf);
+  omRt.raf = null;
+  document.getElementById('garlandOverlay').hidden = true;
+  document.body.style.overflow = omRt.prevOverflow;
+
+  const back = omRt.returnFocus;
+  if (back && back.focus) back.focus({ preventScroll: true });
+}
+
+window.addEventListener('resize', layoutGarland);
+window.addEventListener('orientationchange', () => setTimeout(layoutGarland, 120));
+
+document.addEventListener('keydown', e => {
+  if (garlandOpen && e.key === 'Escape') {
+    e.preventDefault();
+    closeGarland();
   }
 });
 
