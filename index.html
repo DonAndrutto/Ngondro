@@ -1224,13 +1224,193 @@
        playback bar that only exists inside the design tool. */
     .garland-stage {
       position: absolute;
-      left: 50%;
-      top: 50%;
+      left: 0;
+      top: 0;
       width: 1080px;
       height: 1920px;
-      transform-origin: center;
+      transform-origin: 0 0;
       background: #0a0f1a;
       overflow: hidden;
+    }
+
+    /* Nectar cascade — an optional layer over the stage, under the chrome. */
+    .garland-fx {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 500;
+      pointer-events: none;
+    }
+
+    /* ── Chrome around the composition ──────────────────────
+       The heading and the two corner buttons are carried over
+       from the first build of this feature, retinted to the
+       project's own palette: bone #f0ead6, gold #d4a55a,
+       muted #a89a7a on the #0d1321 panel ground.
+       ─────────────────────────────────────────────────────── */
+    .garland-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--sp-3);
+      padding: max(16px, env(safe-area-inset-top)) 16px 0;
+      pointer-events: none;
+    }
+    .garland-bar > * { pointer-events: auto; }
+    .garland-heading {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      padding-top: 2px;
+    }
+    .garland-heading .g-tib {
+      font-family: 'Jomolhari', serif;
+      font-size: 0.95rem;
+      line-height: 2;
+      color: #d4a55a;
+    }
+    .garland-heading .g-eng {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: var(--ls-caps-sm);
+      text-transform: uppercase;
+      color: #a89a7a;
+    }
+    .g-bar-actions { display: flex; align-items: center; gap: var(--sp-2); }
+    .g-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      background: rgba(13,19,33,0.55);
+      color: #a89a7a;
+      border: 1px solid rgba(240,234,214,0.18);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background var(--dur-2), color var(--dur-2),
+                  border-color var(--dur-2), transform var(--dur-1);
+    }
+    .g-icon-btn svg { width: 17px; height: 17px; }
+    .g-icon-btn:hover { background: rgba(13,19,33,0.85); color: #f0ead6; border-color: rgba(240,234,214,0.34); }
+    .g-icon-btn:active { transform: scale(var(--press-scale)); }
+    .g-icon-btn.active { color: #d4a55a; border-color: rgba(212,165,90,0.55); }
+    .g-icon-btn:focus { outline: none; }
+    .g-icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a0f1a, 0 0 0 4px #d4a55a; }
+
+    /* Settings popover — hangs under the settings button so it never
+       covers the project's own registers in the opposite corner. */
+    .garland-tweaks {
+      position: absolute;
+      top: max(72px, calc(env(safe-area-inset-top) + 56px));
+      right: 16px;
+      z-index: 1001;
+      width: min(calc(100vw - 32px), 17rem);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 14px;
+      background: rgba(13,19,33,0.92);
+      backdrop-filter: blur(14px) saturate(130%);
+      -webkit-backdrop-filter: blur(14px) saturate(130%);
+      border: 1px solid rgba(240,234,214,0.12);
+      border-radius: 9px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+    }
+    .garland-tweaks.open { opacity: 1; transform: none; pointer-events: auto; }
+    .g-tweak-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a89a7a;
+      margin-bottom: 8px;
+    }
+    .g-tweak-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      padding: 9px 0;
+    }
+    .g-tweak-row + .g-tweak-row { border-top: 1px solid rgba(240,234,214,0.08); }
+    .g-tweak-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      color: rgba(240,234,214,0.9);
+    }
+    .g-switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex: none;
+      background: rgba(240,234,214,0.16);
+      border: 1px solid rgba(240,234,214,0.14);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background var(--dur-2);
+    }
+    .g-switch::after {
+      content: "";
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #f0ead6;
+      transition: transform var(--dur-2) var(--ease-out);
+    }
+    .g-switch.on { background: #d4a55a; }
+    .g-switch.on::after { transform: translateX(18px); }
+    .g-switch:focus { outline: none; }
+    .g-switch:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a0f1a, 0 0 0 4px #d4a55a; }
+
+    /* Readout — the syllable currently at the front of the ring. */
+    .garland-readout {
+      position: absolute;
+      left: 50%;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      z-index: 1000;
+      transform: translateX(-50%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .garland-readout.on { display: flex; }
+    .g-read-pho {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      letter-spacing: 0.03em;
+      color: rgba(240,234,214,0.86);
+    }
+    .g-read-count {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a89a7a;
+    }
+    /* Sit clear of the project's register panel on narrow screens, where a
+       centred readout would otherwise clip its top-right corner. */
+    @media (max-width: 520px) {
+      .garland-readout { bottom: 156px; }
     }
 
     /* — Registers, verbatim from the project's <helmet> — */
@@ -1548,8 +1728,48 @@
       </div>
     </div>
 
-    <button type="button" id="omMinimise" onclick="closeGarland()" aria-label="Minimise" title="Return"
-            style="position:absolute;top:16px;right:16px;width:44px;height:44px;z-index:1000;border-radius:9999px;border:1px solid rgba(240,234,214,0.18);background:rgba(13,19,33,0.55);color:#a89a7a;font-size:22px;line-height:40px;text-align:center;cursor:pointer;padding:0">−</button>
+    <canvas class="garland-fx" id="garlandFx" aria-hidden="true"></canvas>
+
+    <div class="garland-bar">
+      <div class="garland-heading">
+        <span class="g-tib">ཡིག་བརྒྱའི་ཕྲེང་བ</span>
+        <span class="g-eng">The garland of a hundred syllables</span>
+      </div>
+      <div class="g-bar-actions">
+        <button type="button" class="g-icon-btn" id="gBtnTweaks" onclick="toggleGarlandTweaks()"
+                aria-label="Visualization settings" aria-expanded="false" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="8" r="2.5" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="2.5" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <button type="button" class="g-icon-btn" id="gBtnClose" onclick="closeGarland()"
+                aria-label="Close visualization" title="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="garland-tweaks" id="garlandTweaks" role="group" aria-label="Visualization settings">
+      <div class="g-tweak-title">Visualization</div>
+      <div class="g-tweak-row">
+        <span class="g-tweak-label">Phonetics</span>
+        <button type="button" class="g-switch" id="gSwPho" role="switch"
+                onclick="toggleGarlandOpt('phonetics')" aria-label="Phonetics"></button>
+      </div>
+      <div class="g-tweak-row">
+        <span class="g-tweak-label">Syllable count</span>
+        <button type="button" class="g-switch" id="gSwCount" role="switch"
+                onclick="toggleGarlandOpt('count')" aria-label="Syllable count"></button>
+      </div>
+      <div class="g-tweak-row">
+        <span class="g-tweak-label">Nectar flow</span>
+        <button type="button" class="g-switch" id="gSwNectar" role="switch"
+                onclick="toggleGarlandOpt('nectar')" aria-label="Nectar flow"></button>
+      </div>
+    </div>
+
+    <div class="garland-readout" id="garlandReadout">
+      <div class="g-read-pho" id="gReadPho"></div>
+      <div class="g-read-count" id="gReadCount"></div>
+    </div>
 
     <div style="position:absolute;left:16px;bottom:16px;z-index:1000;min-width:176px;display:flex;flex-direction:column;gap:12px;padding:12px 14px;background:rgba(13,19,33,0.72);border:1px solid rgba(240,234,214,0.12);border-radius:9px">
       <div style="display:flex;flex-direction:column;gap:4px">
@@ -1594,11 +1814,16 @@ function defaultState() {
       // accumulated elapsed seconds per timer slot (0..3)
       spent: [0, 0, 0, 0]
     },
-    // Mantra garland — the project's TWEAK_DEFAULTS
+    // Mantra garland — the project's TWEAK_DEFAULTS, plus this build's
+    // three options. All three start off, so the visualization opens
+    // exactly as the project authored it.
     garland: {
       direction: 'clockwise',
       viewAngle: 23,
-      period: 17
+      period: 17,
+      phonetics: false,
+      count: false,
+      nectar: false
     }
   };
 }
@@ -4792,17 +5017,63 @@ function omRevolutions(dur, period) {
   return Math.max(1, Math.round(dur / Math.max(1, period)));
 }
 
+// The view-angle-derived quantities garland.jsx computes. Shared by the
+// renderer and the viewport fit so the two can never drift apart.
+function omGeom(viewAngle) {
+  const rad = (viewAngle * Math.PI) / 180;
+  const s = Math.sin(rad), ca = Math.cos(rad);
+  const t2 = omClamp01((s - 0.5) / 0.5);
+  return {
+    s: s, ca: ca, t2: t2,
+    K: OM_W * omLerp(1.95, 1.53, t2),
+    fsG: 21 * (OM_W / 540) * omLerp(1, 0.70, t2),
+    opNorm: Math.pow((ca + 1) / 2, 1.6)
+  };
+}
+
+// Transliteration, one entry per syllable on the ring, in ring order.
+const OM_PHONETICS = ('om vajra sattva sa ma ya ' +
+  'ma nu pā la ya ' +
+  'vajra sattva tve no pa tiṣṭha ' +
+  'dṛ ḍho me bha va ' +
+  'su to ṣyo me bha va ' +
+  'su po ṣyo me bha va ' +
+  'a nu rakto me bha va ' +
+  'sarva siddhi mme pra yaccha ' +
+  'sarva karma su ca me ' +
+  'cittaṃ śre yaḥ ku ru hūṃ ' +
+  'ha ha ha ha hoḥ ' +
+  'bha ga van ' +
+  'sarva ta thā ga ta ' +
+  'vajra mā me muñca ' +
+  'vajrī bha va ' +
+  'ma hā sa ma ya sattva āḥ').split(' ');
+
+function omReducedMotion() {
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
 let garlandOpen = false;
 let garlandBuilt = false;
 
 const omRt = {
   raf: null,
   t0: 0,
+  lastTs: 0,
   toks: [],
   ems: [],
   centers: [],
   sylEls: [],
   seedEls: [],
+  front: -1,        // index of the syllable currently at the front of the ring
+  scale: 1,         // stage transform: screen = origin + composition * scale
+  ox: 0, oy: 0,
+  gm: null,         // last frame's geometry, for nectar spawn points
+  ctx: null,
+  sprite: null,
+  parts: [],
+  spawnAcc: 0,
+  cw: 0, ch: 0,
   returnFocus: null,
   prevOverflow: ''
 };
@@ -4846,12 +5117,26 @@ function buildGarland() {
     state.garland.viewAngle = Number(angle.value);
     saveState();
     omSyncRegisters();
+    layoutGarland();          // the fit follows the ring, which follows the angle
   });
   period.addEventListener('input', () => {
     state.garland.period = Number(period.value);
     saveState();
     omSyncRegisters();
   });
+
+  // A soft dot, drawn once and stamped for every nectar droplet
+  const sprite = document.createElement('canvas');
+  sprite.width = sprite.height = 32;
+  const sc = sprite.getContext('2d');
+  const grd = sc.createRadialGradient(16, 16, 0, 16, 16, 16);
+  grd.addColorStop(0,    'rgba(255,255,255,0.95)');
+  grd.addColorStop(0.35, 'rgba(240,234,214,0.55)');
+  grd.addColorStop(1,    'rgba(212,165,90,0)');
+  sc.fillStyle = grd;
+  sc.fillRect(0, 0, 32, 32);
+  omRt.sprite = sprite;
+  omRt.ctx = document.getElementById('garlandFx').getContext('2d');
 
   omMeasureEms();
   garlandBuilt = true;
@@ -4886,18 +5171,53 @@ function omSyncRegisters() {
   document.getElementById('omPeriodValue').textContent = g.period + 's / round';
 }
 
-// The stage is a fixed 1080×1920 composition scaled to fit, exactly as the
-// project's Stage does. (Its own measure subtracts a 44px playback bar that
-// only exists inside the design tool.)
+// The stage is the project's fixed 1080×1920 composition, scaled to the
+// viewport. The project's own Stage uses "contain", which letterboxes a
+// portrait frame into a landscape screen; here it scales up to cover
+// instead, easing back only as far as it must to keep the whole ring on
+// screen. At the default 23° that fills a desktop edge to edge; past
+// roughly 40° the ring grows taller than a landscape viewport, and the fit
+// yields rather than slicing off its front and back.
 function layoutGarland() {
   if (!garlandOpen) return;
   const overlay = document.getElementById('garlandOverlay');
-  const s = Math.max(0.05, Math.min(
-    overlay.clientWidth / OM_W,
-    overlay.clientHeight / OM_H
-  ));
+  const vw = overlay.clientWidth, vh = overlay.clientHeight;
+
+  const contain = Math.min(vw / OM_W, vh / OM_H);
+  const cover   = Math.max(vw / OM_W, vh / OM_H);
+
+  // y(phi) = cy + K·cos(phi)·s / (D − cos(phi)·ca) is monotonic in cos(phi),
+  // so the ring's vertical extremes are exactly its front and back points.
+  const gm = omGeom(state.garland.viewAngle);
+  const den = OM_D * OM_D - gm.ca * gm.ca;
+  const ringH = gm.K * gm.s * 2 * OM_D / den;
+  const fitRing = vh / (ringH + 2.4 * gm.fsG * (OM_D / (OM_D - gm.ca)));
+
+  const s = Math.max(0.05, Math.max(contain, Math.min(cover, fitRing)));
+
+  // Anchor on the ring's own centre, not the frame's. Perspective pushes the
+  // ring below the frame centre at shallow angles and back up to cy at 90°,
+  // so centring the frame would let the ring drift out of view once the
+  // frame is larger than the viewport.
+  const ringCy = OM_H * 0.45 + gm.K * gm.s * gm.ca / den;
+  const ox = vw / 2 - (OM_W / 2) * s;
+  const oy = vh / 2 - ringCy * s;
+
+  omRt.scale = s;
+  omRt.ox = ox;
+  omRt.oy = oy;
   document.getElementById('garlandStage').style.transform =
-    'translate(-50%,-50%) scale(' + s + ')';
+    'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+
+  // The nectar canvas covers the viewport, so droplets stay crisp whatever
+  // the stage scale is.
+  const canvas = document.getElementById('garlandFx');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = Math.round(vw * dpr);
+  canvas.height = Math.round(vh * dpr);
+  omRt.cw = vw;
+  omRt.ch = vh;
+  if (omRt.ctx) omRt.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 // — Rotation + GarlandField, per frame —
@@ -4918,12 +5238,9 @@ function omRender(progress) {
   const cx = w / 2, cy = h * 0.45;
 
   // Tilt: 90° = straight down (flat circle), ~5° = floor level.
-  const rad = (g.viewAngle * Math.PI) / 180;
-  const s = Math.sin(rad), ca = Math.cos(rad);
-  const t2 = omClamp01((s - 0.5) / 0.5);
-  const K = w * omLerp(1.95, 1.53, t2);
-  const fsG = 21 * u * omLerp(1, 0.70, t2);
-  const opNorm = Math.pow((ca + 1) / 2, 1.6);
+  const gm = omGeom(g.viewAngle);
+  const s = gm.s, ca = gm.ca, K = gm.K, fsG = gm.fsG, opNorm = gm.opNorm;
+  omRt.gm = gm;
 
   const flip = g.direction === 'counter' ? -1 : 1;
   const theta = OM_TAU * revs * progress;
@@ -4931,6 +5248,9 @@ function omRender(progress) {
 
   const centers = omRt.centers;
   const theta0 = centers[0] || 0;
+
+  // Whichever syllable the projection brightens most is the one at the front.
+  let frontG = -1, front = omRt.front;
 
   for (let i = 0; i < omRt.toks.length; i++) {
     const phi = (centers[i] - theta0 - theta) * flip;
@@ -4951,6 +5271,14 @@ function omRender(progress) {
     el.style.zIndex = 400 + Math.round(cp * ca * 90);
     el.style.textShadow = '0 0 ' + (12 * gg).toFixed(1) +
       'px rgba(240,234,214,' + (0.5 * gg).toFixed(2) + ')';
+    if (gg > frontG) { frontG = gg; front = i; }
+  }
+
+  if (front !== omRt.front) {
+    omRt.front = front;
+    document.getElementById('gReadPho').textContent = OM_PHONETICS[front] || '';
+    document.getElementById('gReadCount').textContent =
+      (front + 1) + ' / ' + omRt.toks.length;
   }
 
   // Mid-tilt vertical boost keeps the seeds clear of ཧཱུྃ; fades out at both extremes.
@@ -4992,13 +5320,117 @@ function omRender(progress) {
   gc.style.height = (400 * u) + 'px';
 }
 
+// — Nectar: "བདུད་རྩིའི་རྒྱུན་བབས", a cascade of elixir falling from the
+//   garland. Droplets are seeded on the ring through the same projection
+//   the syllables use, so they leave the mantra itself and inherit its
+//   perspective; the canvas covers the viewport, so composition points are
+//   mapped through the stage transform. —
+
+function omNectarFrame(dt) {
+  const ctx = omRt.ctx;
+  if (!ctx) return;
+  ctx.clearRect(0, 0, omRt.cw, omRt.ch);
+
+  if (!state.garland.nectar || omReducedMotion()) {
+    if (omRt.parts.length) omRt.parts.length = 0;
+    return;
+  }
+
+  const gm = omRt.gm;
+  if (!gm) return;
+  const sc = omRt.scale;
+  const ox = omRt.ox, oy = omRt.oy;
+
+  omRt.spawnAcc += dt * 30;
+  while (omRt.spawnAcc >= 1) {
+    omRt.spawnAcc -= 1;
+    if (omRt.parts.length >= 170) break;
+    const phi = Math.random() * OM_TAU;
+    const sp = Math.sin(phi), cp = Math.cos(phi);
+    const den = OM_D - cp * gm.ca;
+    const m = OM_D / den;
+    const x = ox + (OM_W / 2 + gm.K * sp / den) * sc;
+    // Much of the ring runs off the sides of the frame; skip droplets that
+    // would never be seen rather than integrating them.
+    if (x < -40 || x > omRt.cw + 40) continue;
+    const y = oy + (OM_H * 0.45 + gm.K * cp * gm.s / den) * sc;
+    omRt.parts.push({
+      x: x, y: y,
+      vx: (Math.random() - 0.5) * 14 * sc * m,
+      vy: (26 + Math.random() * 44) * sc * m,
+      r: (1.1 + Math.random() * 2.2) * sc * m,
+      t: 0,
+      life: 2.0 + Math.random() * 1.6
+    });
+  }
+
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = omRt.parts.length - 1; i >= 0; i--) {
+    const p = omRt.parts[i];
+    p.t += dt;
+    if (p.t >= p.life) { omRt.parts.splice(i, 1); continue; }
+    p.vy += 24 * sc * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    const k = p.t / p.life;
+    // fade in over the first fifth, then out
+    const a = (k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8) * 0.42;
+    ctx.globalAlpha = Math.max(0, a);
+    const d = p.r * 3.6;
+    ctx.drawImage(omRt.sprite, p.x - d / 2, p.y - d / 2, d, d);
+  }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+}
+
 function omLoop(ts) {
   if (!garlandOpen) return;
+  const dt = omRt.lastTs ? Math.min(0.05, (ts - omRt.lastTs) / 1000) : 0;
+  omRt.lastTs = ts;
   // The engine's clock: wall time loops over the scene's authored duration,
   // and progress is wallTime / dur, as SceneStage computes it.
   const wall = ((ts - omRt.t0) / 1000) % OM_SCENE.dur;
   omRender(wall / OM_SCENE.dur);
+  omNectarFrame(dt);
   omRt.raf = requestAnimationFrame(omLoop);
+}
+
+// — Settings —
+
+function toggleGarlandTweaks() {
+  const panel = document.getElementById('garlandTweaks');
+  const open = !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  const btn = document.getElementById('gBtnTweaks');
+  btn.classList.toggle('active', open);
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function toggleGarlandOpt(key) {
+  state.garland[key] = !state.garland[key];
+  saveState();
+  syncGarlandTweaks();
+}
+
+function syncGarlandTweaks() {
+  const g = state.garland;
+  const sw = (id, on) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('on', on);
+    el.setAttribute('aria-checked', on ? 'true' : 'false');
+  };
+  sw('gSwPho', g.phonetics);
+  sw('gSwCount', g.count);
+  sw('gSwNectar', g.nectar);
+
+  document.getElementById('garlandReadout').classList.toggle('on', g.phonetics || g.count);
+  document.getElementById('gReadPho').style.display = g.phonetics ? '' : 'none';
+  document.getElementById('gReadCount').style.display = g.count ? '' : 'none';
+
+  if (!g.nectar) {
+    omRt.parts.length = 0;
+    if (omRt.ctx) omRt.ctx.clearRect(0, 0, omRt.cw, omRt.ch);
+  }
 }
 
 // — Open / close —
@@ -5016,16 +5448,21 @@ function openGarland() {
   overlay.hidden = false;
   garlandOpen = true;
   omRt.t0 = performance.now();
+  omRt.lastTs = 0;
+  omRt.front = -1;
+  omRt.parts.length = 0;
+  omRt.spawnAcc = 0;
 
   omRt.prevOverflow = document.body.style.overflow;
   document.body.style.overflow = 'hidden';
 
   omSyncRegisters();
+  syncGarlandTweaks();
   layoutGarland();
   omRender(0);
 
   omRt.raf = requestAnimationFrame(omLoop);
-  document.getElementById('omMinimise').focus({ preventScroll: true });
+  document.getElementById('gBtnClose').focus({ preventScroll: true });
 }
 
 function closeGarland() {
@@ -5034,7 +5471,14 @@ function closeGarland() {
 
   if (omRt.raf) cancelAnimationFrame(omRt.raf);
   omRt.raf = null;
+  omRt.parts.length = 0;
+  if (omRt.ctx) omRt.ctx.clearRect(0, 0, omRt.cw, omRt.ch);
+
   document.getElementById('garlandOverlay').hidden = true;
+  document.getElementById('garlandTweaks').classList.remove('open');
+  const btn = document.getElementById('gBtnTweaks');
+  btn.classList.remove('active');
+  btn.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = omRt.prevOverflow;
 
   const back = omRt.returnFocus;
@@ -5045,10 +5489,22 @@ window.addEventListener('resize', layoutGarland);
 window.addEventListener('orientationchange', () => setTimeout(layoutGarland, 120));
 
 document.addEventListener('keydown', e => {
-  if (garlandOpen && e.key === 'Escape') {
-    e.preventDefault();
+  if (!garlandOpen || e.key !== 'Escape') return;
+  e.preventDefault();
+  if (document.getElementById('garlandTweaks').classList.contains('open')) {
+    toggleGarlandTweaks();
+  } else {
     closeGarland();
   }
+});
+
+// A tap anywhere off the popover dismisses it.
+document.addEventListener('pointerdown', e => {
+  if (!garlandOpen) return;
+  const panel = document.getElementById('garlandTweaks');
+  if (!panel.classList.contains('open')) return;
+  if (panel.contains(e.target) || document.getElementById('gBtnTweaks').contains(e.target)) return;
+  toggleGarlandTweaks();
 });
 
 (function init() {
