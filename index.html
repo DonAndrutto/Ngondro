@@ -1219,15 +1219,14 @@
     }
     .garland-overlay[hidden] { display: none; }
 
-    /* The 1080×1920 composition, scaled to fit the viewport. The design's
-       Stage does the same with transform: scale(); it subtracts a 44px
-       playback bar that only exists inside the design tool. */
+    /* The stage always covers the viewport, so the scene's wash reaches
+       every edge and no letterbox is ever possible. Its size is set in
+       script, in composition units, and scaled to screen pixels; the
+       1080×1920 field is then placed inside it. */
     .garland-stage {
       position: absolute;
       left: 0;
       top: 0;
-      width: 1080px;
-      height: 1920px;
       transform-origin: 0 0;
       background: #0a0f1a;
       overflow: hidden;
@@ -1317,7 +1316,7 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      padding: 14px;
+      padding: 14px 16px 16px;
       background: rgba(13,19,33,0.92);
       backdrop-filter: blur(14px) saturate(130%);
       -webkit-backdrop-filter: blur(14px) saturate(130%);
@@ -1377,17 +1376,24 @@
     .g-switch:focus { outline: none; }
     .g-switch:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a0f1a, 0 0 0 4px #d4a55a; }
 
-    /* Readout — the syllable currently at the front of the ring. */
+    /* Readout — the syllable currently at the front of the ring. Carries the
+       same panel ground as the other chrome: at steep view angles the ring's
+       front row reaches the bottom of the screen, and without it the two
+       would collide. */
     .garland-readout {
       position: absolute;
-      left: 50%;
-      bottom: max(20px, env(safe-area-inset-bottom));
+      left: 16px;
+      bottom: max(16px, env(safe-area-inset-bottom));
       z-index: 1000;
-      transform: translateX(-50%);
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 3px;
+      min-width: 176px;
+      padding: 9px 14px 11px;
+      background: rgba(13,19,33,0.72);
+      border: 1px solid rgba(240,234,214,0.12);
+      border-radius: 9px;
       text-align: center;
       pointer-events: none;
     }
@@ -1398,19 +1404,6 @@
       font-size: 1.05rem;
       letter-spacing: 0.03em;
       color: rgba(240,234,214,0.86);
-    }
-    .g-read-count {
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #a89a7a;
-    }
-    /* Sit clear of the project's register panel on narrow screens, where a
-       centred readout would otherwise clip its top-right corner. */
-    @media (max-width: 520px) {
-      .garland-readout { bottom: 156px; }
     }
 
     /* — Registers, verbatim from the project's <helmet> — */
@@ -1717,8 +1710,11 @@
         <div id="omPulse" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 44%, rgba(235,228,205,0.045) 0%, rgba(235,228,205,0) 55%)"></div>
         <div id="omGrain" style="position:absolute;inset:0;opacity:0.05;mix-blend-mode:overlay"></div>
 
-        <!-- GarlandField -->
-        <div id="omField" style="position:absolute;inset:0;overflow:hidden">
+        <!-- GarlandField. Kept at exactly the project's 1080×1920 rect so
+             every coordinate inside it is unchanged, but placed by script
+             within a scene that spans the viewport, and left unclipped so
+             the screen edge — not the video frame — is what crops it. -->
+        <div id="omField" style="position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:visible">
           <div id="omGlowFront" style="position:absolute;width:130%;height:500px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.05) 0%, rgba(240,234,214,0) 68%)"></div>
           <div id="omGlowBack" style="position:absolute;width:110%;height:340px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.03) 0%, rgba(240,234,214,0) 68%)"></div>
           <div id="omGlowCentre" style="position:absolute;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at center, rgba(240,234,214,0.05) 0%, rgba(240,234,214,0) 65%);z-index:300"></div>
@@ -1747,17 +1743,31 @@
       </div>
     </div>
 
+    <!-- Every control lives here: the project's own Angle and Speed
+         registers, keeping their markup and styling, plus this build's
+         two options. -->
     <div class="garland-tweaks" id="garlandTweaks" role="group" aria-label="Visualization settings">
       <div class="g-tweak-title">Visualization</div>
-      <div class="g-tweak-row">
+
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Angle</span>
+          <span id="omAngleValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
+        </div>
+        <input class="om-reg" type="range" min="5" max="90" step="1" id="omAngle" aria-label="View angle" />
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:10px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Speed</span>
+          <span id="omPeriodValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
+        </div>
+        <input class="om-reg" type="range" min="7" max="27" step="1" id="omPeriod" aria-label="Seconds per round" />
+      </div>
+
+      <div class="g-tweak-row" style="margin-top:6px">
         <span class="g-tweak-label">Phonetics</span>
         <button type="button" class="g-switch" id="gSwPho" role="switch"
                 onclick="toggleGarlandOpt('phonetics')" aria-label="Phonetics"></button>
-      </div>
-      <div class="g-tweak-row">
-        <span class="g-tweak-label">Syllable count</span>
-        <button type="button" class="g-switch" id="gSwCount" role="switch"
-                onclick="toggleGarlandOpt('count')" aria-label="Syllable count"></button>
       </div>
       <div class="g-tweak-row">
         <span class="g-tweak-label">Nectar flow</span>
@@ -1768,24 +1778,6 @@
 
     <div class="garland-readout" id="garlandReadout">
       <div class="g-read-pho" id="gReadPho"></div>
-      <div class="g-read-count" id="gReadCount"></div>
-    </div>
-
-    <div style="position:absolute;left:16px;bottom:16px;z-index:1000;min-width:176px;display:flex;flex-direction:column;gap:12px;padding:12px 14px;background:rgba(13,19,33,0.72);border:1px solid rgba(240,234,214,0.12);border-radius:9px">
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
-          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Angle</span>
-          <span id="omAngleValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
-        </div>
-        <input class="om-reg" type="range" min="5" max="90" step="1" id="omAngle" aria-label="View angle" />
-      </div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
-          <span style="font-family:Inter,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#a89a7a">Speed</span>
-          <span id="omPeriodValue" style="font-family:Inter,sans-serif;font-size:11px;font-weight:400;color:#f0ead6;opacity:0.8"></span>
-        </div>
-        <input class="om-reg" type="range" min="7" max="27" step="1" id="omPeriod" aria-label="Seconds per round" />
-      </div>
     </div>
   </div>
 
@@ -1822,7 +1814,6 @@ function defaultState() {
       viewAngle: 23,
       period: 17,
       phonetics: false,
-      count: false,
       nectar: false
     }
   };
@@ -5171,20 +5162,16 @@ function omSyncRegisters() {
   document.getElementById('omPeriodValue').textContent = g.period + 's / round';
 }
 
-// The stage is the project's fixed 1080×1920 composition, scaled to the
-// viewport. The project's own Stage uses "contain", which letterboxes a
-// portrait frame into a landscape screen; here it scales up to cover
-// instead, easing back only as far as it must to keep the whole ring on
-// screen. At the default 23° that fills a desktop edge to edge; past
-// roughly 40° the ring grows taller than a landscape viewport, and the fit
-// yields rather than slicing off its front and back.
+// The project's Stage fits its 1080×1920 frame inside the viewport, which
+// letterboxes a portrait composition onto a landscape screen. Here the
+// stage always COVERS the viewport instead — the scene's wash is stretched
+// to the screen and the 1080×1920 field is placed inside it — so there is
+// no letterbox at any angle, and the zoom is free to follow the ring
+// rather than being forced up to hide bars.
 function layoutGarland() {
   if (!garlandOpen) return;
   const overlay = document.getElementById('garlandOverlay');
   const vw = overlay.clientWidth, vh = overlay.clientHeight;
-
-  const contain = Math.min(vw / OM_W, vh / OM_H);
-  const cover   = Math.max(vw / OM_W, vh / OM_H);
 
   // y(phi) = cy + K·cos(phi)·s / (D − cos(phi)·ca) is monotonic in cos(phi),
   // so the ring's vertical extremes are exactly its front and back points.
@@ -5193,21 +5180,33 @@ function layoutGarland() {
   const ringH = gm.K * gm.s * 2 * OM_D / den;
   const fitRing = vh / (ringH + 2.4 * gm.fsG * (OM_D / (OM_D - gm.ca)));
 
-  const s = Math.max(0.05, Math.max(contain, Math.min(cover, fitRing)));
+  // Zoom until the ring fills the height, but never past the frame's own
+  // width — beyond that the flanks would be cropped harder than the
+  // project ever intended, and a shallow angle would blow the syllables up
+  // several times over.
+  const cover = Math.max(vw / OM_W, vh / OM_H);
+  const s = Math.max(0.05, Math.min(cover, fitRing));
 
-  // Anchor on the ring's own centre, not the frame's. Perspective pushes the
-  // ring below the frame centre at shallow angles and back up to cy at 90°,
-  // so centring the frame would let the ring drift out of view once the
-  // frame is larger than the viewport.
+  // Place the field so the ring's centre — not the frame's — lands at the
+  // centre of the screen. Perspective puts those in different places: the
+  // ring sits below the frame centre at shallow angles and climbs back to
+  // cy by 90°.
   const ringCy = OM_H * 0.45 + gm.K * gm.s * gm.ca / den;
-  const ox = vw / 2 - (OM_W / 2) * s;
-  const oy = vh / 2 - ringCy * s;
+  const fx = vw / (2 * s) - OM_W / 2;
+  const fy = vh / (2 * s) - ringCy;
 
   omRt.scale = s;
-  omRt.ox = ox;
-  omRt.oy = oy;
-  document.getElementById('garlandStage').style.transform =
-    'translate(' + ox + 'px,' + oy + 'px) scale(' + s + ')';
+  omRt.ox = fx * s;
+  omRt.oy = fy * s;
+
+  const stage = document.getElementById('garlandStage');
+  stage.style.width = (vw / s) + 'px';
+  stage.style.height = (vh / s) + 'px';
+  stage.style.transform = 'scale(' + s + ')';
+
+  const field = document.getElementById('omField');
+  field.style.left = fx + 'px';
+  field.style.top = fy + 'px';
 
   // The nectar canvas covers the viewport, so droplets stay crisp whatever
   // the stage scale is.
@@ -5277,8 +5276,6 @@ function omRender(progress) {
   if (front !== omRt.front) {
     omRt.front = front;
     document.getElementById('gReadPho').textContent = OM_PHONETICS[front] || '';
-    document.getElementById('gReadCount').textContent =
-      (front + 1) + ' / ' + omRt.toks.length;
   }
 
   // Mid-tilt vertical boost keeps the seeds clear of ཧཱུྃ; fades out at both extremes.
@@ -5420,12 +5417,9 @@ function syncGarlandTweaks() {
     el.setAttribute('aria-checked', on ? 'true' : 'false');
   };
   sw('gSwPho', g.phonetics);
-  sw('gSwCount', g.count);
   sw('gSwNectar', g.nectar);
 
-  document.getElementById('garlandReadout').classList.toggle('on', g.phonetics || g.count);
-  document.getElementById('gReadPho').style.display = g.phonetics ? '' : 'none';
-  document.getElementById('gReadCount').style.display = g.count ? '' : 'none';
+  document.getElementById('garlandReadout').classList.toggle('on', g.phonetics);
 
   if (!g.nectar) {
     omRt.parts.length = 0;
