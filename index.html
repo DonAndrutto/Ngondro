@@ -4254,16 +4254,16 @@ const TABS_DATA = {
         {
           id: 'ng-9-3',
           type: 'RECITATION',
-          tibetan: 'སྲིད་པར་མིང་ཙམ་མེད་པ་དང༔',
-          phonetics: 'si par ming tsam me pa dang',
-          translation: 'may they be emptied so not even their names remain,'
+          tibetan: 'སྲིད་ན་འགའ་ཡང་མི་གནས་པར༔',
+          phonetics: 'si na ga yang mi ne par',
+          translation: 'may no one remain in samsaric existence,'
         },
         {
           id: 'ng-9-4',
           type: 'RECITATION',
-          tibetan: 'དོན་གཉིས་ལྷུན་གྱིས་གྲུབ་པར་ཤོག།',
-          phonetics: 'dön nyi lhun gyi drup par shok',
-          translation: 'and may the two benefits be spontaneously accomplished.'
+          tibetan: 'ཐམས་ཅད་སངས་རྒྱས་མྱུར་ཐོབ་ཤོག༔',
+          phonetics: 'tam che sang gye nyur tob shok',
+          translation: 'and may all swiftly attain buddhahood.'
         },
         {
           id: 'ng-9-5',
@@ -4319,19 +4319,23 @@ const TABS_DATA = {
 // ══════════════════════════════════════════════════════
 // CONTENT — POLISH
 //
-// One entry per block id in TABS_DATA, carrying whichever of
-// `phonetics`, `translation`, `caption`, `alt` and `label`
-// that block has in English. The Tibetan is never localized.
+// `blocks` holds one entry per block id in TABS_DATA, carrying
+// whichever of `phonetics`, `translation`, `caption`, `alt` and
+// `label` that block has in English. The Tibetan is never
+// localized. `omit` lists blocks the Polish edition of the
+// liturgy does not carry at all; they are left out entirely
+// while Polish is the active language.
 //
 // Sources: "Joga Powstawania" (PL 1.0) for the YOGA tab and
 // "Dobra Ścieżka do Przebudzenia" (Ngöndro, Yeshe Khorlo PL)
-// for the NGONDRO tab. Passages absent from those documents —
-// the short mandala offering, and the two dedication lines
-// whose Tibetan differs from the Polish edition — were
-// translated for this build and are noted in the PR.
+// for the NGONDRO tab.
 // ══════════════════════════════════════════════════════
 
 const CONTENT_PL = {
+  // The Polish edition skips the short mandala offering, keeping only
+  // the three-kaya offering above it.
+  omit: ['ng-6-25', 'ng-6-26', 'ng-6-27', 'ng-6-28', 'ng-6-29', 'ng-6-30'],
+
   sectionTitles: {
     'section-1': '1. Joga Powstawania',
     'section-2': '2. Kluczowy Punkt Ciała i Błogosławieństwo Mowy',
@@ -4982,29 +4986,6 @@ const CONTENT_PL = {
     'ng-6-24': {
       translation: 'W przeprowadzonym w ten sposób, wykonanym w jak największej liczbie powtórzeń ofiarowaniu chodzi o pomnażanie nagromadzeń na poziomie względnym, tj na poziomie przyczyny. Na zakończenie bóstwa i ofiary rozpuszczają się w światło. Przybiera ono formę sylaby HUNG, która w nas wnika. Następnie pozostawaj niewzruszenie w stanie nie podążania za trzema obiektami (podmiotem, czynnością i obiektem czynności). Jest to nagromadzenie ostateczne tj nagromadzenie rezultatu.'
     },
-    'ng-6-25': {
-      translation: 'Jeśli nie jesteś w stanie gromadzić ofiarowania mandali trzech kaji, użyj krótkiego ofiarowania mandali:'
-    },
-    'ng-6-26': {
-      phonetics: 'SA ŻHI PÖ KJI DZIUG SZING ME TOG TRAM',
-      translation: 'Ziemię namaszczoną wonnościami i usłaną kwiatami,'
-    },
-    'ng-6-27': {
-      phonetics: 'RI RAB LING ŻHI NJI DE GJEN PA DI',
-      translation: 'górę Meru, cztery kontynenty, ozdobione słońcem i księżycem —'
-    },
-    'ng-6-28': {
-      phonetics: 'SANG GJE ŻHING DU MIG TE PUL ŁA JI',
-      translation: 'wyobrażając je sobie jako krainę buddów, ofiarowuję je.'
-    },
-    'ng-6-29': {
-      phonetics: 'DRO KÜN NAM DAG ŻHING LA CZÖ PAR SZOG',
-      translation: 'Niech dzięki temu wszystkie istoty przebywają w całkowicie czystej krainie!'
-    },
-    'ng-6-30': {
-      phonetics: 'IDAM GURU RATNA MANDALAKAM NIRJATAJAMI',
-      translation: 'Tobie, drogocenny Nauczycielu, posyłam tę klejnotną mandalę!'
-    },
     'ng-6-timer': { label: 'Mandala — spocznij w równowadze' },
     'ng-7-1': {
       translation: 'Powodzenie zintegrowania się z głęboką ścieżką zależy od szacunku i oddania dla nauczyciela. Musisz je zatem w sobie wzbudzić, to niezbędne. Recytuj z wiarą i pewnością: „O Guru, Ty jeden znasz mnie naprawdę!“'
@@ -5339,12 +5320,12 @@ const CONTENT_PL = {
       translation: 'niech zniweczone zostanie zło samsarycznego odrodzenia'
     },
     'ng-9-3': {
-      phonetics: 'SI PAR MING TSAM ME PA DANG',
-      translation: 'niech opustoszeją tak, by nie zostało nawet ich imię,'
+      phonetics: 'SI NA GA JANG MI NE PAR',
+      translation: 'i niech nikt nie pozostanie w samsarze!'
     },
     'ng-9-4': {
-      phonetics: 'DÖN NJI LHÜN GJI DRUB PAR SZOG',
-      translation: 'i niech dwa cele spełnią się spontanicznie.'
+      phonetics: 'TAM CZE SANG GJE NJUR TOB SIOG',
+      translation: 'Niech wszyscy szybko osiągną stan buddy!'
     },
     'ng-9-5': {
       phonetics: 'SEM CZEN NAM NI TAM CZE KJI',
@@ -5393,6 +5374,14 @@ function sectionTitle(sec) {
   const titles = bundle && bundle.sectionTitles;
   if (titles && titles[sec.id]) return titles[sec.id];
   return sec.title;
+}
+
+// A section's blocks, minus any the active language's edition leaves out.
+function sectionBlocks(sec) {
+  const bundle = CONTENT_L10N[state.lang];
+  const omit = bundle && bundle.omit;
+  if (!omit || !omit.length) return sec.blocks;
+  return sec.blocks.filter(b => omit.indexOf(b.id) === -1);
 }
 
 // ══════════════════════════════════════════════════════
@@ -5664,14 +5653,15 @@ function renderContent() {
     html += '<div class="section-heading">' + esc(sectionTitle(sec)) + '</div>';
 
     const sz = { tibSz, phoSz, engSz, instrTibSz };
+    const blocks = sectionBlocks(sec);
     let bi = 0, refrainN = 0;
-    while (bi < sec.blocks.length) {
-      const b = sec.blocks[bi];
+    while (bi < blocks.length) {
+      const b = blocks[bi];
       if (b.variant === 'repeated') {
         // Wrap a contiguous run of repeated lines in one refrain panel
         let inner = '', bj = bi;
-        while (bj < sec.blocks.length && sec.blocks[bj].variant === 'repeated') {
-          inner += renderBlock(sec.blocks[bj], sz);
+        while (bj < blocks.length && blocks[bj].variant === 'repeated') {
+          inner += renderBlock(blocks[bj], sz);
           bj++;
         }
         html += '<div class="refrain-group" id="refrain-' + si + '-' + (refrainN++) +
