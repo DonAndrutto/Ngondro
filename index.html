@@ -1101,6 +1101,145 @@
     .scroll-top-btn:focus-visible { outline: none; box-shadow: var(--elev-2), var(--inset-hi), var(--ring); }
 
     /* ══════════════════════════════════════════
+       HELP OVERLAY
+
+       A circled ? in the header names every control
+       that is currently on screen, then gets out of
+       the way. It appears and disappears instantly:
+       nothing here transitions, so a label is never
+       measured or read mid-flight.
+       ══════════════════════════════════════════ */
+
+    /* Sibling of the controls beside it: the border, radius family,
+       type and colour tokens of .lang-btn, drawn as a circle and
+       sized to sit between .lang-btn (21px) and .lang-select-btn (23px). */
+    .help-btn {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      line-height: 1;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--dur-2),
+                  color var(--dur-2),
+                  border-color var(--dur-2),
+                  transform var(--dur-1);
+    }
+
+    @media (hover: hover) {
+      .help-btn:hover { color: var(--accent); border-color: var(--accent); }
+    }
+    .help-btn:active { transform: scale(var(--press-scale)); }
+    .help-btn:focus { outline: none; }
+    .help-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+    .help-btn[aria-expanded="true"] {
+      background: var(--card);
+      color: var(--accent);
+      border-color: var(--accent);
+      box-shadow: var(--elev-1);
+    }
+
+    /* The content recedes; the chrome, being its DOM sibling, is
+       untouched and so appears to float above it. No scrim is
+       threaded between the existing layers. */
+    .help-recede {
+      filter: blur(3px);
+      opacity: 0.38;
+    }
+
+    .help-overlay {
+      position: fixed;
+      inset: 0;
+      /* above the chrome (50–60), below the dialogs (200+) and the
+         garland (400) — none of which can be open at the same time,
+         since each covers the ? that opens this. */
+      z-index: 150;
+    }
+    .help-overlay[hidden] { display: none; }
+
+    /* The way out: a real button over the whole viewport, so a tap
+       anywhere, Enter or Space all dismiss, and a screen reader has
+       an exit. It sits over the controls on purpose — tapping a
+       just-named control closes the overlay instead of firing it. */
+    .help-dismiss {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .help-dismiss:focus { outline: none; }
+    .help-dismiss:focus-visible { outline: none; }
+
+    .help-wires,
+    .help-labels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    /* Connectors below, opaque labels above: a line running past an
+       intervening row is hidden by that label, not drawn through it. */
+    .help-wires  { z-index: 1; }
+    .help-labels { z-index: 2; }
+
+    .help-wire {
+      position: absolute;
+      width: 1px;
+      background: color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+
+    .help-label {
+      position: absolute;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 600;
+      line-height: 1.15;
+      text-transform: uppercase;
+      letter-spacing: var(--ls-caps);
+      white-space: nowrap;
+      color: var(--accent);
+      background: var(--card);
+      border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      border-radius: var(--radius-sm);
+      padding: 3px 6px;
+      box-shadow: var(--elev-1);
+    }
+
+    /* The hint is an aside, not a label: it may wrap on a very narrow
+       screen — a longer translation must not run off the edge — but it
+       never gets smaller type than the labels it sits among. */
+    .help-hint {
+      position: absolute;
+      z-index: 3;
+      max-width: calc(100% - 12px);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 500;
+      line-height: 1.35;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: var(--ls-caps-sm);
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════
        FULLSCREEN overrides
        ══════════════════════════════════════════ */
     body.fullscreen .sticky-stack,
@@ -1143,6 +1282,21 @@
       .bar-btn { width: 38px; height: 38px; }
       .nav-btn { padding: var(--sp-3) var(--sp-5); font-size: 1rem; }
     }
+    /* The ? costs the header 26px it did not have to spare on a phone,
+       so the narrow breakpoint pays for it out of padding and gaps
+       rather than out of the title. Tightening here buys back roughly
+       twice what the button costs, which also pulls the language
+       switch — clipped off the right edge below 368px before this —
+       back onto the screen. */
+    @media (max-width: 420px) {
+      .header-inner { padding: var(--sp-2); }
+      .header-controls { gap: 0.125rem; }
+      .header-divider { margin: 0 0.05rem; }
+      .lang-btn,
+      .donate-link,
+      .lang-select-btn { padding-left: 0.3rem; padding-right: 0.3rem; }
+    }
+
     @media (max-width: 380px) {
       .bar-inner { justify-content: center; }
       .bar-group { margin: 2px 0; }
@@ -1689,6 +1843,11 @@
 
         <div class="header-divider"></div>
 
+        <button type="button" class="help-btn" id="helpBtn" onclick="toggleHelp()"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="helpOverlay"
+                data-i18n-title="helpTitle" data-i18n-aria="helpTitle"
+                title="Help" aria-label="Help">?</button>
+
         <div class="lang-select" id="langSelect">
           <div class="lang-backdrop" onclick="closeLangMenu()"></div>
           <button type="button" class="lang-select-btn" id="langSelectBtn"
@@ -1778,6 +1937,22 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       HELP OVERLAY — filled in by layoutHelp() each time it
+       opens, emptied each time it closes. Nothing inside is
+       authored here, because which controls are on screen
+       depends on the tab, the scroll position and whether
+       the app is in fullscreen.
+       ══════════════════════════════════════════════════════ -->
+  <div class="help-overlay" id="helpOverlay" role="dialog" aria-modal="true"
+       data-i18n-aria="helpTitle" aria-label="Help" hidden>
+    <button type="button" class="help-dismiss" id="helpDismiss" onclick="closeHelp()"
+            data-i18n-aria="helpDismiss" aria-label="Tap anywhere to close"></button>
+    <div class="help-wires" id="helpWires" aria-hidden="true"></div>
+    <div class="help-labels" id="helpLabels" aria-hidden="true"></div>
+    <div class="help-hint" id="helpHint" data-i18n="helpDismiss" aria-hidden="true">Tap anywhere to close</div>
   </div>
 
   <div class="timer-dialog-backdrop" id="timerDialogBackdrop" onclick="closeTimerDialog()"></div>
@@ -1985,7 +2160,18 @@ const UI_STRINGS = {
     garlandPhonetics: 'Phonetics',
     garlandNectar: 'Nectar flow',
     settings: 'Settings',
-    close: 'Close'
+    close: 'Close',
+
+    /* Help overlay. Every other control it names borrows the string
+       already used for that control above, so nothing on screen ever
+       carries two different names. Only the three script toggles need
+       their own: their faces read TIB / PHO / ENG, which is the thing
+       the overlay exists to spell out. */
+    helpTitle: 'Help',
+    helpDismiss: 'Tap anywhere to close',
+    helpTib: 'Tibetan',
+    helpPho: 'Phonetics',
+    helpEng: 'Translation'
   },
 
   pl: {
@@ -2053,7 +2239,13 @@ const UI_STRINGS = {
     garlandPhonetics: 'Fonetyka',
     garlandNectar: 'Strumień nektaru',
     settings: 'Ustawienia',
-    close: 'Zamknij'
+    close: 'Zamknij',
+
+    helpTitle: 'Pomoc',
+    helpDismiss: 'Dotknij dowolnego miejsca, aby zamknąć',
+    helpTib: 'Tybetański',
+    helpPho: 'Fonetyka',
+    helpEng: 'Tłumaczenie'
   }
 };
 
@@ -5655,6 +5847,9 @@ function changeFontSize(delta) {
 // ══════════════════════════════════════════════════════
 
 function switchTab(tab) {
+  // The overlay describes one screen, so it goes when the screen does.
+  closeHelp(false);
+
   // Close index if open
   closeIndex();
 
@@ -5683,6 +5878,7 @@ function switchTab(tab) {
 // ══════════════════════════════════════════════════════
 
 function toggleIndex() {
+  closeHelp(false);
   const panel = document.getElementById('indexPanel');
   const backdrop = document.getElementById('indexBackdrop');
   const btn = document.querySelector('.tab-btn[data-tab="INDEX"]');
@@ -7039,6 +7235,7 @@ function syncGarlandTweaks() {
 
 function openGarland() {
   if (garlandOpen) return;
+  closeHelp(false);
   buildGarland();
 
   omRt.returnFocus = document.activeElement;
@@ -7092,6 +7289,14 @@ window.addEventListener('orientationchange', () => setTimeout(layoutGarland, 120
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  /* First in the chain: whenever the help overlay is up it is the
+     topmost thing on screen, since everything below it covers the ?
+     that opens it. */
+  if (helpOpen) {
+    e.preventDefault();
+    closeHelp();
+    return;
+  }
   if (!garlandOpen) {
     const sel = document.getElementById('langSelect');
     if (sel && sel.classList.contains('open')) {
@@ -7117,6 +7322,278 @@ document.addEventListener('pointerdown', e => {
   if (panel.contains(e.target) || document.getElementById('gBtnTweaks').contains(e.target)) return;
   toggleGarlandTweaks();
 });
+
+// ══════════════════════════════════════════════════════
+// HELP OVERLAY
+//
+// The circled ? names every control that is actually on
+// screen, then gets out of the way. It opens only on tap —
+// never by itself, not even on a first run — changes no
+// setting, moves nothing and stores nothing.
+//
+// Only the content containers recede. The chrome is their
+// DOM sibling, so it stays sharp for free and appears to
+// float, and no scrim has to be threaded between the
+// existing layers.
+//
+// Labels cannot sit under their controls. Measured on this
+// app: the bar buttons are 38–40px and flush inside their
+// groups, while their names run 1.5–2.9× wider, so 9 of 9
+// adjacent pairs collide at 360px and 6 of 9 still collide
+// at 1100px. Each zone therefore packs its labels into rows
+// growing away from the bar, joined to their control by a
+// hairline drawn beneath the opaque labels.
+// ══════════════════════════════════════════════════════
+
+/* {selector, string key}. Filtered against what is genuinely on
+   screen every time the overlay opens, because the answer changes
+   with the tab, the scroll position and fullscreen. Each key is the
+   name this app already uses for that control, so the overlay never
+   introduces a second name for one thing. */
+const HELP_TARGETS = [
+  { sel: '#btnTib',                                key: 'helpTib' },
+  { sel: '#btnPho',                                key: 'helpPho' },
+  { sel: '#btnEng',                                key: 'helpEng' },
+  { sel: '#donateLink',                            key: 'donate' },
+  { sel: '#helpBtn',                               key: 'helpTitle' },
+  { sel: '#langSelectBtn',                         key: 'langMenu' },
+  { sel: '.tab-btn[data-tab="YOGA"]',              key: 'tabYoga' },
+  { sel: '.tab-btn[data-tab="INDEX"]',             key: 'tabIndex' },
+  { sel: '.tab-btn[data-tab="NGONDRO"]',           key: 'tabNgondro' },
+  { sel: '#scrollTopBtn',                          key: 'scrollTop' },
+  { sel: '.bar-btn[onclick="changeSpeed(-1)"]',    key: 'barSlower' },
+  { sel: '#btnPlay',                               key: 'barPlayPause' },
+  { sel: '.bar-btn[onclick="changeSpeed(1)"]',     key: 'barFaster' },
+  { sel: '#btnFS',                                 key: 'barFullscreen' },
+  { sel: '#btnTilt',                               key: 'barTilt' },
+  { sel: '#btnTimerCfg',                           key: 'timerSettings' },
+  { sel: '#btnTheme',                              key: 'barTheme' },
+  { sel: '.bar-btn[onclick="changeFontSize(-1)"]', key: 'barSmaller' },
+  { sel: '.bar-btn[onclick="changeFontSize(1)"]',  key: 'barLarger' }
+];
+
+const HELP_PAD = 6;      /* keep a label this far off the viewport edge */
+const HELP_GUTTER = 8;   /* clear space between two labels in one row */
+const HELP_BAR_GAP = 6;  /* bar to the first row of labels */
+const HELP_ROW_GAP = 4;  /* row to row */
+
+let helpOpen = false;
+let helpPrevFocus = null;
+let helpResumeAuto = false;
+let helpResumeTilt = false;
+let helpScrollX = 0;
+let helpScrollY = 0;
+
+/* On screen for real, not merely present in the document. */
+function helpOnScreen(el) {
+  if (!el) return false;
+  const cs = getComputedStyle(el);
+  if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+  if (parseFloat(cs.opacity) < 0.05) return false;
+  /* offsetParent is null inside a display:none subtree — and also for
+     anything fixed, which is on screen all the same. */
+  if (el.offsetParent === null && cs.position !== 'fixed') return false;
+  const r = el.getBoundingClientRect();
+  if (r.width <= 0 || r.height <= 0) return false;
+  return r.right > 0 && r.bottom > 0 &&
+         r.left < window.innerWidth && r.top < window.innerHeight;
+}
+
+/* Greedy row packing: sorted by centre x, each label goes into the
+   lowest row — the one nearest the bar — whose occupied spans it
+   clears by the gutter. The result is a staircase, not a grid. */
+function helpPackRows(items, vw) {
+  items.sort((a, b) => a.cx - b.cx);
+  const rows = [];
+  items.forEach(item => {
+    const left = Math.max(HELP_PAD, Math.min(item.cx - item.w / 2, vw - HELP_PAD - item.w));
+    const from = left - HELP_GUTTER;
+    const to = left + item.w + HELP_GUTTER;
+    let r = 0;
+    while (rows[r] && rows[r].some(span => from < span[1] && to > span[0])) r++;
+    if (!rows[r]) rows[r] = [];
+    rows[r].push([left, left + item.w]);
+    item.left = left;
+    item.row = r;
+  });
+  return rows.length;
+}
+
+function helpWire(layer, cx, from, to) {
+  const el = document.createElement('div');
+  el.className = 'help-wire';
+  el.style.left = Math.round(cx) + 'px';
+  el.style.top = Math.round(Math.min(from, to)) + 'px';
+  el.style.height = Math.max(0, Math.round(Math.abs(to - from))) + 'px';
+  layer.appendChild(el);
+}
+
+function helpPlaceHint(hint, vw, bandTop, bandBottom) {
+  const r = hint.getBoundingClientRect();
+  hint.style.left = Math.max(HELP_PAD, Math.round((vw - r.width) / 2)) + 'px';
+  const room = bandBottom - bandTop;
+  const y = room >= r.height
+    ? bandTop + (room - r.height) / 2            /* centred in the quiet band */
+    : bandBottom - r.height - HELP_ROW_GAP;      /* no band left: tuck it above */
+  hint.style.top = Math.round(Math.max(HELP_PAD, y)) + 'px';
+}
+
+function layoutHelp() {
+  const wires = document.getElementById('helpWires');
+  const labels = document.getElementById('helpLabels');
+  const hint = document.getElementById('helpHint');
+
+  wires.textContent = '';
+  labels.textContent = '';
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const stack = document.getElementById('stickyStack');
+  const stackRect = stack.getBoundingClientRect();
+  const stackLive = stackRect.height > 0;
+
+  const chrome = [];
+  const bottom = [];
+  HELP_TARGETS.forEach(target => {
+    const el = document.querySelector(target.sel);
+    if (!helpOnScreen(el)) return;
+    const r = el.getBoundingClientRect();
+    const item = { cx: r.left + r.width / 2, top: r.top, bottom: r.bottom, text: t(target.key) };
+    (stackLive && stack.contains(el) ? chrome : bottom).push(item);
+  });
+
+  const all = chrome.concat(bottom);
+  hint.style.display = all.length ? '' : 'none';
+  if (!all.length) return;
+
+  /* Build every label before measuring any of them. The overlay is
+     already shown by now, so these measure for real rather than zero. */
+  all.forEach(item => {
+    const el = document.createElement('span');
+    el.className = 'help-label';
+    el.textContent = item.text;
+    el.style.left = '0px';
+    el.style.top = '0px';
+    labels.appendChild(el);
+    item.el = el;
+  });
+  all.forEach(item => {
+    const r = item.el.getBoundingClientRect();
+    item.w = r.width;
+    item.h = r.height;
+  });
+
+  /* The chrome is one slab: its labels hang below it, and each wire
+     rises to its underside at the control's own centre x. Stopping at
+     the slab is what keeps a header wire from being drawn across the
+     tab bar underneath it. */
+  let chromeBottom = stackLive ? stackRect.bottom : 0;
+  if (chrome.length) {
+    const rows = helpPackRows(chrome, vw);
+    const h = Math.max.apply(null, chrome.map(item => item.h));
+    chrome.forEach(item => {
+      const top = stackRect.bottom + HELP_BAR_GAP + item.row * (h + HELP_ROW_GAP);
+      item.el.style.left = item.left + 'px';
+      item.el.style.top = top + 'px';
+      helpWire(wires, item.cx, stackRect.bottom, top);
+    });
+    chromeBottom = stackRect.bottom + HELP_BAR_GAP + rows * h + (rows - 1) * HELP_ROW_GAP;
+  }
+
+  /* The bar and the back-to-top button beside it: labels stand above,
+     rows building upward away from the bar. */
+  let bottomTop = vh;
+  if (bottom.length) {
+    const edge = Math.min.apply(null, bottom.map(item => item.top));
+    const rows = helpPackRows(bottom, vw);
+    const h = Math.max.apply(null, bottom.map(item => item.h));
+    bottom.forEach(item => {
+      const top = edge - HELP_BAR_GAP - (item.row + 1) * h - item.row * HELP_ROW_GAP;
+      item.el.style.left = item.left + 'px';
+      item.el.style.top = top + 'px';
+      helpWire(wires, item.cx, top + h, edge);
+    });
+    bottomTop = edge - HELP_BAR_GAP - rows * h - (rows - 1) * HELP_ROW_GAP;
+  }
+
+  helpPlaceHint(hint, vw, chromeBottom, bottomTop);
+}
+
+function openHelp() {
+  if (helpOpen) return;
+  helpOpen = true;
+
+  /* Hold whatever would move the page underneath. Both engines drive
+     their own indicator as they stop, so the ▶/❚❚ face keeps telling
+     the truth about the engine rather than about the overlay. */
+  helpResumeAuto = isAutoScrolling;
+  helpResumeTilt = isTiltScrolling;
+  if (isAutoScrolling) stopAutoScroll();
+  if (isTiltScrolling) stopTiltScroll();
+
+  helpScrollX = window.scrollX;
+  helpScrollY = window.scrollY;
+  helpPrevFocus = document.activeElement;
+
+  document.getElementById('contentArea').classList.add('help-recede');
+  document.getElementById('indexPanel').classList.add('help-recede');
+
+  document.getElementById('helpOverlay').hidden = false;   /* shown before measuring */
+  document.getElementById('helpBtn').setAttribute('aria-expanded', 'true');
+
+  layoutHelp();
+
+  document.getElementById('helpDismiss').focus({ preventScroll: true });
+
+  if (window.scrollX !== helpScrollX || window.scrollY !== helpScrollY) {
+    window.scrollTo(helpScrollX, helpScrollY);
+  }
+}
+
+function closeHelp(restoreFocus) {
+  if (!helpOpen) return;
+  helpOpen = false;
+
+  document.getElementById('helpOverlay').hidden = true;
+  document.getElementById('helpWires').textContent = '';
+  document.getElementById('helpLabels').textContent = '';
+
+  document.getElementById('contentArea').classList.remove('help-recede');
+  document.getElementById('indexPanel').classList.remove('help-recede');
+  document.getElementById('helpBtn').setAttribute('aria-expanded', 'false');
+
+  if (restoreFocus !== false) {
+    const btn = document.getElementById('helpBtn');
+    const back = helpOnScreen(btn) ? btn : helpPrevFocus;
+    if (back && back.focus) back.focus({ preventScroll: true });
+  }
+  helpPrevFocus = null;
+
+  if (window.scrollX !== helpScrollX || window.scrollY !== helpScrollY) {
+    window.scrollTo(helpScrollX, helpScrollY);
+  }
+
+  /* Resume exactly what was held, and nothing else. */
+  if (helpResumeAuto) startAutoScroll();
+  if (helpResumeTilt) startTiltScroll();
+  helpResumeAuto = false;
+  helpResumeTilt = false;
+}
+
+function toggleHelp() {
+  helpOpen ? closeHelp() : openHelp();
+}
+
+/* Which controls exist depends on the viewport, so re-pack rather than
+   leave stale labels behind. */
+window.addEventListener('resize', () => { if (helpOpen) layoutHelp(); });
+window.addEventListener('orientationchange', () => {
+  if (helpOpen) setTimeout(() => { if (helpOpen) layoutHelp(); }, 120);
+});
+
+/* Routes a tap cannot intercept. */
+window.addEventListener('popstate', () => closeHelp(false));
+window.addEventListener('hashchange', () => closeHelp(false));
 
 (function init() {
   applyTheme();
