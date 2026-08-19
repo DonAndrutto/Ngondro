@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KGK Ngöndro — Tibetan Prayer Assistant</title>
+  <title>Künzang Gongdü Ngöndro — Tibetan Prayer Assistant</title>
 
   <!-- App & tab icon: the Yeshe Khorlo (YK) emblem on black. Everything is
        inlined as data URIs so the icon and install manifest work fully
@@ -176,23 +176,41 @@
       transition: background 0.3s, border 0.3s;
     }
 
+    /* A masthead: Introduction in the upper-left corner with the
+       controls opposite it, and the title on a line of its own beneath
+       them. Sharing a line with the controls would push the title off
+       centre — at 56rem there is not room for it to sit on the true
+       centre with the controls beside it, and a longer translation of
+       Donate pushes it further still — so it gets the full width, which
+       also buys it the size to be read first. */
     .header-inner {
       max-width: 56rem;
       margin: 0 auto;
-      display: flex;
+      display: grid;
+      grid-template-areas:
+        "lead controls"
+        "title title";
+      grid-template-columns: auto 1fr;
       align-items: center;
-      justify-content: space-between;
       padding: var(--sp-2) var(--sp-4);
-      gap: var(--sp-2);
+      column-gap: var(--sp-3);
+      row-gap: var(--sp-2);
     }
 
+    .header-lead     { grid-area: lead;     justify-self: start; }
+    .header-controls { grid-area: controls; justify-self: end; }
+
     .header-title {
+      grid-area: title;
+      justify-self: center;
       font-family: 'EB Garamond', serif;
-      font-size: 0.85rem;
+      font-size: 1.4rem;
       font-weight: 600;
+      line-height: var(--lh-tight);
       color: var(--accent);
       white-space: nowrap;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
+      text-align: center;
     }
 
     .header-controls {
@@ -1273,7 +1291,7 @@
       .content-area { padding: var(--sp-5) var(--sp-4) var(--sp-9); }
     }
     @media (max-width: 640px) {
-      .header-title { font-size: 0.75rem; }
+      .header-title { font-size: 1.15rem; }
       .header-inner { padding: var(--sp-2) var(--sp-3); }
       .content-area { padding: var(--sp-5) var(--sp-3) var(--sp-9); }
       .section-block { margin-bottom: var(--sp-6); }
@@ -1290,6 +1308,7 @@
        back onto the screen. */
     @media (max-width: 420px) {
       .header-inner { padding: var(--sp-2); }
+      .header-title { font-size: 1.05rem; }
       .header-controls { gap: 0.125rem; }
       .header-divider { margin: 0 0.05rem; }
       .lang-btn,
@@ -1668,6 +1687,401 @@
     input[type=range].om-reg::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #d4a55a; margin-top: -6px; border: none; }
     input[type=range].om-reg::-moz-range-track { height: 2px; background: rgba(240,234,214,0.22); border-radius: 2px; }
     input[type=range].om-reg::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #d4a55a; border: none; }
+    /* ══════════════════════════════════════════
+       INTRODUCTION — the header's upper-left entry
+       point, the sheet it opens, and the welcome
+       card the app opens with.
+       ══════════════════════════════════════════ */
+
+    /* Header entry point. Borrows .lang-btn's border, radius, type and
+       colour tokens so it reads as a sibling of the controls opposite
+       it rather than as a stray element. */
+    .intro-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      padding: var(--sp-1) var(--sp-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--dur-2),
+                  color var(--dur-2),
+                  border-color var(--dur-2),
+                  transform var(--dur-1);
+    }
+    .intro-btn svg { width: 13px; height: 13px; flex: none; }
+    @media (hover: hover) {
+      .intro-btn:hover { color: var(--accent); border-color: var(--accent); }
+    }
+    .intro-btn:active { transform: scale(var(--press-scale)); }
+    .intro-btn:focus { outline: none; }
+    .intro-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+    .intro-btn[aria-expanded="true"] {
+      background: var(--card);
+      color: var(--accent);
+      border-color: var(--accent);
+      box-shadow: var(--elev-1);
+    }
+
+    /* The header runs out of room for the word before it runs out of
+       room for the button, so on the narrowest screens the icon carries
+       the meaning and the name lives on in the title and aria-label. */
+    @media (max-width: 420px) {
+      .intro-btn-label { display: none; }
+      .intro-btn { padding-left: 0.35rem; padding-right: 0.35rem; }
+    }
+
+    /* Everything underneath an open card recedes — the same idea as
+       .help-recede, with more blur because the sheet above is opaque
+       and covers most of the screen. */
+    body.overlay-blur .sticky-stack,
+    body.overlay-blur .content-area,
+    body.overlay-blur .bottom-bar,
+    body.overlay-blur .scroll-top-btn,
+    body.overlay-blur .index-backdrop,
+    body.overlay-blur .index-panel {
+      filter: blur(6px);
+      pointer-events: none;
+    }
+
+    /* ── Introduction sheet ── */
+    .intro-overlay {
+      position: fixed;
+      inset: 0;
+      /* above the chrome (50–60) and the dialogs (200–221), below the
+         garland (400) — none of which can be open at the same time. */
+      z-index: 250;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-4);
+    }
+    .intro-overlay[hidden] { display: none; }
+
+    /* A real button filling the overlay behind the sheet, so a tap
+       outside, Enter or Space all close, and a screen reader has a way
+       out that is not the × alone. */
+    .intro-dismiss {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+      background: color-mix(in srgb, var(--bg) 45%, transparent);
+      opacity: 0;
+      transition: opacity var(--dur-3) var(--ease-out);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .intro-overlay.open .intro-dismiss { opacity: 1; }
+    .intro-dismiss:focus { outline: none; }
+    .intro-dismiss:focus-visible { outline: none; }
+
+    .intro-sheet {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      width: min(46rem, 100%);
+      min-height: min(64vh, 100%);
+      max-height: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+      transition: opacity var(--dur-3) var(--ease-out),
+                  transform var(--dur-3) var(--ease-spring);
+    }
+    .intro-overlay.open .intro-sheet { opacity: 1; transform: none; }
+
+    .intro-head {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      flex: none;
+      padding: var(--sp-3) var(--sp-4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Upper-left: the way out is the first thing under the thumb and
+       the first stop in the sheet's tab order. */
+    .intro-close {
+      width: 30px;
+      height: 30px;
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--dur-2),
+                  color var(--dur-2),
+                  border-color var(--dur-2),
+                  transform var(--dur-1);
+    }
+    .intro-close svg { width: 14px; height: 14px; }
+    @media (hover: hover) {
+      .intro-close:hover { color: var(--accent); border-color: var(--accent); }
+    }
+    .intro-close:active { transform: scale(var(--press-scale)); }
+    .intro-close:focus { outline: none; }
+    .intro-close:focus-visible { outline: none; box-shadow: var(--ring); }
+
+    .intro-head-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: var(--ls-caps);
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .intro-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: var(--sp-4) var(--sp-5) var(--sp-5);
+    }
+
+    .intro-acc { flex: 0 0 auto; }
+
+    /* With both sections collapsed there is nothing to scroll, so the
+       two of them share the sheet evenly rather than huddling at the
+       top of a page-sized panel. The moment either opens, they go back
+       to their natural heights and the sheet scrolls. */
+    .intro-scroll:not(:has(.intro-acc.open)) .intro-acc { flex: 1 1 0; }
+
+    .intro-acc + .intro-acc {
+      margin-top: var(--sp-4);
+      padding-top: var(--sp-4);
+      border-top: 1px solid var(--border);
+    }
+
+    .intro-acc-head {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-3);
+      padding: 0;
+      border: none;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .intro-acc-head:focus { outline: none; }
+    .intro-acc-head:focus-visible {
+      outline: none;
+      box-shadow: var(--ring);
+      border-radius: var(--radius-sm);
+    }
+
+    .intro-acc-title {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      line-height: var(--lh-tight);
+      color: var(--accent);
+    }
+    .intro-acc-head .chev {
+      width: 16px;
+      height: 16px;
+      flex: none;
+      color: var(--text-muted);
+      transition: transform var(--dur-2) var(--ease-out);
+    }
+    .intro-acc.open .intro-acc-head .chev { transform: rotate(180deg); }
+
+    /* The preview is the section's opening paragraph, clamped to its
+       first few lines: each section says what it is without the sheet
+       becoming a wall of text, and nothing has to be kept in sync. */
+    .intro-preview {
+      margin-top: var(--sp-2);
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: var(--lh-snug);
+    }
+    .intro-acc.open .intro-preview { display: none; }
+
+    .intro-body { margin-top: var(--sp-3); }
+    .intro-acc:not(.open) .intro-body { display: none; }
+
+    .intro-body p { margin-bottom: var(--sp-3); line-height: var(--lh-body); }
+    .intro-body h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: var(--ls-caps);
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: var(--sp-5) 0 var(--sp-2);
+    }
+    .intro-body > h3:first-child { margin-top: 0; }
+    .intro-body ul { margin: 0 0 var(--sp-3) 1.15rem; }
+    .intro-body li { margin-bottom: var(--sp-1); line-height: var(--lh-snug); }
+    .intro-body dl { margin: 0 0 var(--sp-3); }
+    .intro-body dt { font-weight: 600; margin-top: var(--sp-2); line-height: var(--lh-snug); }
+    .intro-body dd { margin: 0; color: var(--text-muted); line-height: var(--lh-snug); }
+    .intro-body strong { font-weight: 600; }
+    .intro-body em { font-style: italic; }
+
+    .intro-more {
+      display: inline-flex;
+      align-items: center;
+      margin-top: var(--sp-2);
+      padding: var(--sp-1) 0;
+      border: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: var(--ls-caps-sm);
+      text-transform: uppercase;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .intro-more:focus { outline: none; }
+    .intro-more:focus-visible {
+      outline: none;
+      box-shadow: var(--ring);
+      border-radius: var(--radius-sm);
+    }
+
+    /* ── Welcome card ── */
+    .welcome-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 220;
+      background: color-mix(in srgb, var(--bg) 45%, transparent);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur-3) var(--ease-out);
+    }
+    .welcome-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .welcome-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.96);
+      z-index: 221;
+      display: flex;
+      flex-direction: column;
+      width: min(92vw, 32rem);
+      max-height: 86vh;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur-3) var(--ease-out),
+                  transform var(--dur-3) var(--ease-spring);
+    }
+    .welcome-card.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .welcome-card:focus { outline: none; }
+
+    .welcome-title {
+      flex: none;
+      padding: var(--sp-5) var(--sp-5) var(--sp-3);
+      font-family: 'EB Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: var(--lh-tight);
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .welcome-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 var(--sp-5);
+      font-size: 0.95rem;
+    }
+    .welcome-body p { margin-bottom: var(--sp-3); line-height: var(--lh-body); }
+    .welcome-body strong { font-weight: 600; }
+    .welcome-body em { font-style: italic; }
+
+    .welcome-actions {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      padding: var(--sp-4) var(--sp-5) var(--sp-5);
+    }
+    .welcome-btn {
+      width: 100%;
+      padding: var(--sp-3) var(--sp-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background var(--dur-2),
+                  color var(--dur-2),
+                  border-color var(--dur-2),
+                  transform var(--dur-1);
+    }
+    @media (hover: hover) {
+      .welcome-btn:hover { color: var(--accent); border-color: var(--accent); }
+    }
+    .welcome-btn:active { transform: scale(var(--press-scale)); }
+    .welcome-btn:focus { outline: none; }
+    .welcome-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+    .welcome-btn.is-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    @media (hover: hover) {
+      .welcome-btn.is-primary:hover { background: var(--accent); color: #fff; opacity: 0.92; }
+    }
+
+    @media (max-width: 640px) {
+      .intro-overlay   { padding: var(--sp-2); }
+      .intro-scroll    { padding: var(--sp-4) var(--sp-4) var(--sp-5); }
+      .intro-acc-title { font-size: 1.15rem; }
+      .welcome-title   { font-size: 1.3rem; }
+      .welcome-body,
+      .welcome-actions { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+    }
+
   </style>
 </head>
 
@@ -1752,6 +2166,11 @@
       phase = 'done';
       document.documentElement.style.overflow = '';
       if (loader.parentNode) loader.parentNode.removeChild(loader);
+      /* The welcome card waits for the entrance to clear the screen.
+         If this runs before the app script has defined it, init()
+         picks the handover up from the flag instead. */
+      window.__ykLoaderDone = true;
+      if (window.openWelcome) window.openWelcome();
     }
 
     function frame(now) {
@@ -1830,7 +2249,17 @@
   <div class="sticky-stack" id="stickyStack">
   <header class="app-header" id="appHeader">
     <div class="header-inner">
-      <span class="header-title">KGK Ngöndro</span>
+      <div class="header-lead">
+        <button type="button" class="intro-btn" id="introBtn" onclick="openIntro()"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="introOverlay"
+                data-i18n-title="introduction" data-i18n-aria="introduction"
+                title="Introduction" aria-label="Introduction">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span class="intro-btn-label" data-i18n="introduction">Introduction</span>
+        </button>
+      </div>
+
+      <h1 class="header-title" data-i18n="appTitle">Künzang Gongdü Ngöndro</h1>
 
       <div class="header-controls">
         <button class="lang-btn active" id="btnTib" onclick="toggleLang('tibetan')">TIB</button>
@@ -1985,6 +2414,71 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════
+       INTRODUCTION — About the Text and How to Use, each
+       showing its opening lines until it is expanded. The
+       prose itself lives in INTRO_L10N and is drawn in by
+       buildIntro(), so a language switch redraws the sheet
+       rather than leaving the previous edition behind.
+       ══════════════════════════════════════════════════════ -->
+  <div class="intro-overlay" id="introOverlay" hidden>
+    <button type="button" class="intro-dismiss" onclick="closeIntro()"
+            data-i18n-aria="introDismiss" aria-label="Tap outside to close"></button>
+
+    <div class="intro-sheet" role="dialog" aria-modal="true" aria-labelledby="introHeadTitle">
+      <div class="intro-head">
+        <button type="button" class="intro-close" id="introClose" onclick="closeIntro()"
+                data-i18n-title="close" data-i18n-aria="introCloseBtn"
+                title="Close" aria-label="Close introduction">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <span class="intro-head-title" id="introHeadTitle" data-i18n="introduction">Introduction</span>
+      </div>
+
+      <div class="intro-scroll" id="introScroll">
+        <section class="intro-acc" id="introAbout">
+          <button type="button" class="intro-acc-head" onclick="toggleIntroSection('introAbout')"
+                  aria-expanded="false" aria-controls="introAboutBody">
+            <span class="intro-acc-title" data-i18n="introAbout">About the Text</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="intro-preview" id="introAboutPreview" aria-hidden="true"></div>
+          <div class="intro-body" id="introAboutBody"></div>
+          <button type="button" class="intro-more" onclick="toggleIntroSection('introAbout')">Read more</button>
+        </section>
+
+        <section class="intro-acc" id="introHow">
+          <button type="button" class="intro-acc-head" onclick="toggleIntroSection('introHow')"
+                  aria-expanded="false" aria-controls="introHowBody">
+            <span class="intro-acc-title" data-i18n="introHowTo">How to Use</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="intro-preview" id="introHowPreview" aria-hidden="true"></div>
+          <div class="intro-body" id="introHowBody"></div>
+          <button type="button" class="intro-more" onclick="toggleIntroSection('introHow')">Read more</button>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       WELCOME CARD — shown once the entrance animation has
+       cleared, before the liturgy is read. Three ways on:
+       the long introduction, How to Use, or straight to
+       the text.
+       ══════════════════════════════════════════════════════ -->
+  <div class="welcome-backdrop" id="welcomeBackdrop" onclick="closeWelcome()"></div>
+  <div class="welcome-card" id="welcomeCard" role="dialog" aria-modal="true"
+       aria-labelledby="welcomeTitle" tabindex="-1">
+    <div class="welcome-title" id="welcomeTitle" data-i18n="appTitle">Künzang Gongdü Ngöndro</div>
+    <div class="welcome-body" id="welcomeBody"></div>
+    <div class="welcome-actions">
+      <button type="button" class="welcome-btn" onclick="welcomeGo('about')" data-i18n="welcomeReadFull">Read the full introduction</button>
+      <button type="button" class="welcome-btn" onclick="welcomeGo('howTo')" data-i18n="introHowTo">How to Use</button>
+      <button type="button" class="welcome-btn is-primary" onclick="closeWelcome()" data-i18n="welcomeProceed">Proceed to the Text</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
        MANTRA GARLAND — the "Mantra Garland.dc.html" project.
        The stage holds the Rotation scene: background wash,
        breathing pulse, grain, then the garland field. Every
@@ -2096,14 +2590,25 @@ const LANGS = {
 
 const UI_STRINGS = {
   en: {
-    docTitle: 'KGK Ngöndro — Tibetan Prayer Assistant',
+    docTitle: 'Künzang Gongdü Ngöndro — Tibetan Prayer Assistant',
     loaderEnter: 'Enter — Kunzang Gongdu Ngöndro',
+    appTitle: 'Künzang Gongdü Ngöndro',
 
     langMenu: 'Language',
     langTib: 'TIB',
     langPho: 'PHO',
     langTrans: 'ENG',
     donate: 'Donate',
+
+    introduction: 'Introduction',
+    introAbout: 'About the Text',
+    introHowTo: 'How to Use',
+    introExpand: 'Read more',
+    introCollapse: 'Show less',
+    introDismiss: 'Tap outside to close',
+    introCloseBtn: 'Close introduction',
+    welcomeReadFull: 'Read the full introduction',
+    welcomeProceed: 'Proceed to the Text',
 
     tabYoga: 'Yoga of Arising',
     tabIndex: 'Index',
@@ -2175,14 +2680,25 @@ const UI_STRINGS = {
   },
 
   pl: {
-    docTitle: 'KGK Ngöndro — tybetański asystent modlitwy',
+    docTitle: 'Künzang Gongdü Ngöndro — tybetański asystent modlitwy',
     loaderEnter: 'Wejdź — Kunzang Gongdu Ngöndro',
+    appTitle: 'Künzang Gongdü Ngöndro',
 
     langMenu: 'Język',
     langTib: 'TYB',
     langPho: 'FON',
     langTrans: 'POL',
     donate: 'Wesprzyj',
+
+    introduction: 'Wprowadzenie',
+    introAbout: 'O tekście',
+    introHowTo: 'Jak korzystać',
+    introExpand: 'Czytaj więcej',
+    introCollapse: 'Zwiń',
+    introDismiss: 'Dotknij poza oknem, aby zamknąć',
+    introCloseBtn: 'Zamknij wprowadzenie',
+    welcomeReadFull: 'Przeczytaj pełne wprowadzenie',
+    welcomeProceed: 'Przejdź do tekstu',
 
     tabYoga: 'Joga Powstawania',
     tabIndex: 'Spis treści',
@@ -5784,6 +6300,7 @@ function applyLanguage() {
   document.getElementById('langSelectBtn').setAttribute('aria-label', t('langMenu'));
   renderLangMenu();
 
+  buildIntro();
   renderContent();
   renderIndex();
   syncTimerModeUI();
@@ -7289,7 +7806,11 @@ window.addEventListener('orientationchange', () => setTimeout(layoutGarland, 120
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
-  /* First in the chain: whenever the help overlay is up it is the
+  /* The welcome card and the introduction sheet cover the whole app,
+     the ? included, so they answer Escape before anything below. */
+  if (welcomeOpen) { e.preventDefault(); closeWelcome(); return; }
+  if (introOpen)   { e.preventDefault(); closeIntro();   return; }
+  /* Next in the chain: whenever the help overlay is up it is the
      topmost thing on screen, since everything below it covers the ?
      that opens it. */
   if (helpOpen) {
@@ -7351,6 +7872,7 @@ document.addEventListener('pointerdown', e => {
    name this app already uses for that control, so the overlay never
    introduces a second name for one thing. */
 const HELP_TARGETS = [
+  { sel: '#introBtn',                              key: 'introduction' },
   { sel: '#btnTib',                                key: 'helpTib' },
   { sel: '#btnPho',                                key: 'helpPho' },
   { sel: '#btnEng',                                key: 'helpEng' },
@@ -7595,6 +8117,322 @@ window.addEventListener('orientationchange', () => {
 window.addEventListener('popstate', () => closeHelp(false));
 window.addEventListener('hashchange', () => closeHelp(false));
 
+// ══════════════════════════════════════════════════════
+// INTRODUCTION — prose, sheet and welcome card
+//
+// The prose is data rather than markup, so a language can
+// carry its own edition of it and the sheet is redrawn on a
+// language switch. A language without one falls back to
+// English, exactly the way the interface strings do.
+//
+// Block shapes: { h } heading, { p } paragraph, { ul } list,
+// { dl } term / definition pairs. Inline **bold** and
+// *italic* are honoured; everything else is escaped.
+// ══════════════════════════════════════════════════════
+
+const INTRO_L10N = {
+  en: {
+    about: [
+      { p: 'The **Kunzang Gongdu Ngondro** is the preliminary practice liturgy for Pema Lingpa’s Dzogchen cycle *Künzang Gongpa Kündü* — *The Synthesis of the Entire Wisdom Mind of Samantabhadra*.' },
+      { p: 'Ngondro literally means “that which goes before.” These practices prepare the practitioner for the main practice of Dzogchen, while at the same time forming a complete path of practice in their own right. For practitioners of this lineage, the Ngondro may become a lifelong daily practice rather than something simply completed and left behind.' },
+      { p: 'The Kunzang Gongdu Ngondro belongs to the broad tradition of preliminary practices found throughout Vajrayana Buddhism. What distinguishes it is the way the perspective of the Great Completeness, or Dzogchen, runs through virtually every part of the liturgy.' },
+
+      { h: 'The practices' },
+      { p: 'The practice begins with the common preliminaries: contemplations intended to turn the mind away from habitual involvement in samsara and make it workable for practice. These include the four considerations that turn the mind towards Dharma, together with contemplation of the four immeasurables: immeasurable love, compassion, joy, and impartiality.' },
+      { p: 'They are followed by the five special preliminaries:' },
+      { ul: [
+        'Going for refuge',
+        'Developing the spirit of awakening, or bodhicitta',
+        'Purification through the practice of Vajrasattva',
+        'Mandala offering and the gathering of the accumulations',
+        'Guru Yoga'
+      ] },
+      { p: 'These five practices form the central body of the Ngondro.' },
+
+      { h: 'Preparation for Dzogchen' },
+      { p: 'Traditionally, Ngondro prepares the practitioner for the main practices of Dzogchen: *Tregchö*, “Cutting Through,” and *Thögal*, “Crossing Over.” The conventional requirement is to complete one hundred thousand repetitions of each of the five special preliminaries. These accumulations establish familiarity with the practices while training body, speech, and mind over a sustained period.' },
+      { p: 'Recognising that completing the full traditional accumulations can take considerable time for lay practitioners, Gangteng Tulku Rinpoche has permitted students to begin receiving further Dzogchen instructions after completing ten per cent of the prescribed accumulations, provided that they make a commitment to complete the Ngondro within their lifetime. This makes it possible for practitioners to begin studying and practising Ati Yoga while continuing to deepen and complete the preliminaries.' },
+      { p: 'The Ngondro should therefore not be understood merely as an entrance examination for Dzogchen. Its practices continue to accompany and support the practitioner throughout the path.' },
+
+      { h: 'What makes this Ngondro distinctive?' },
+      { p: 'The structure of the Kunzang Gongdu Ngondro is broadly recognisable from other Vajrayana preliminary practices, but its perspective is distinctly Dzogchen. Again and again, familiar practices such as refuge, bodhicitta, purification, offering and Guru Yoga are expressed in the language and vision of the Great Completeness — *Dzogpa Chenpo*.' },
+      { p: 'The liturgy therefore does more than accumulate the conventional causes and conditions for later practice. Within the preliminaries themselves, the practitioner is repeatedly given glimpses of the view that will become central in the main practice. In this sense, the Ngondro serves both as preparation and as an entryway into the distinctive perspective of Dzogchen.' },
+
+      { h: 'A living lineage' },
+      { p: 'Another defining feature of the practice is its lineage of transmission. In Vajrayana, a liturgy does not stand by itself as an isolated text. It is practised within a living stream of transmission passed from teacher to student. Through receiving the empowerment, instructions and reading transmission of a practice, the practitioner becomes connected to that lineage.' },
+      { p: 'The lineage of the Kunzang Gongdu traces its origin to the primordial Buddha Samantabhadra, and passes through figures including Padmasambhava and Yeshe Tsogyal, the great eighth-century masters associated with the establishment of Vajrayana Buddhism in Tibet. The cycle was later revealed by the fifteenth-century Bhutanese treasure revealer Pema Lingpa. Its transmission continued through the holders of Pema Lingpa’s revealed teachings, known collectively as the *Pedling Chökor*, including Gyalse Pema Trinle, the first Gangteng Tulku, and later masters such as Dudjom Rinpoche Jigdral Yeshe Dorje.' },
+      { p: 'The lineage continues today through the ninth Gangteng Tulku, Kunzang Rigdzin Pema Namgyal. Gangteng Tulku Rinpoche continues to transmit Pema Lingpa’s Kunzang Gongdu Dzogchen teachings to students who have completed the required preliminary practice. In Bhutan, these teachings and practices remain active in Rinpoche’s monasteries, retreat centres and hermitages. Internationally, they are transmitted primarily through the Yeshe Khorlo centres.' },
+
+      { h: 'Pema Lingpa and the larger cycle' },
+      { p: 'Pema Lingpa was a fifteenth-century Bhutanese master and treasure revealer, or *tertön*. He is traditionally counted among the five sovereign treasure revealers, sometimes referred to as the Five Tertön Kings. His revealed teachings encompass the principal categories traditionally associated with a major treasure revealer: teachings of the Guru, Great Completeness and Compassionate Mind — *bLa, rDzogs, Thugs gSum*.' },
+      { p: 'The Guru teachings include peaceful and wrathful manifestations of Guru Rinpoche, particularly the cycles of *Lama Norbu Gyamtsho* — The Guru Teachings, Like an Ocean of Jewels, and *Guru Drakpo* — The Wrathful Guru.' },
+      { p: 'Pema Lingpa’s Great Completeness teachings include a group known as the Father, Mother and Child Dzogchen cycles:' },
+      { dl: [
+        ['Father Great Completeness — *Künzang Gongpa Kündü*', 'The Synthesis of the Entire Wisdom Mind of Samantabhadra'],
+        ['Mother Great Completeness — *Longsel Sangwa Nyingchu*', 'The Quintessence of the Luminous Expanse'],
+        ['Child Great Completeness — *Nyimei Gyu Buchung*', 'The Non-dual Tantra of the Small Child']
+      ] },
+      { p: 'Of these, the Kunzang Gongpa Kündü is today among the most widely practised. Its transmission remains active, supported by a substantial body of oral and written commentary, daily practitioners and practitioners undertaking its teachings in strict retreat.' },
+
+      { h: 'The liturgy' },
+      { p: 'The present Ngondro liturgy was composed by Dudjom Rinpoche Jigdral Yeshe Dorje in Swayambhu, Nepal, in 1976, at the request of Gangteng Tulku Rinpoche. It was composed on the basis of Pema Lingpa’s original treasure text, presenting the preliminary practices of the Kunzang Gongdu cycle in a form suitable for regular practice.' },
+
+      { h: 'Using the app' },
+      { p: 'This app was created as a digital companion to the liturgy. Its purpose is simple: to make the text easy to read, recite, contemplate and practise without allowing the technology itself to become a distraction.' },
+      { p: 'The display can be adapted to the needs of the practitioner. The original Tibetan text, phonetic pronunciation and translation can each be shown or hidden independently, and the interface currently supports both English and Polish. An index allows quick movement between sections of the practice.' },
+      { p: 'For recitation, the app includes automatic scrolling with adjustable speed, as well as tilt-to-scroll, allowing the text to move simply by changing the angle of the device. A full-screen mode and adjustable text size make the liturgy practical to use on a phone, tablet or desktop computer. A day/night display can also be selected, particularly useful for practice in low light.' },
+
+      { h: 'Meditation timer' },
+      { p: 'At several points in the liturgy, the practitioner is instructed to stop reciting and remain in meditative equipoise. The app therefore includes a meditation timer designed specifically around the structure of the Ngondro.' },
+      { p: 'For example, if you intend to spend sixty minutes in meditation during a complete session, you can set a sixty-minute countdown before beginning. When you reach a section calling for meditation — such as the dissolution following refuge and bodhicitta — a play button appears. You can meditate for twenty minutes, pause the timer, continue the liturgy, and resume it at the next appropriate interval. The app will remember that forty minutes remain. A chime sounds when the full allotted meditation period has been completed.' },
+
+      { h: 'Visual aids' },
+      { p: 'The app also contains visual supports for practices involving more elaborate visualisation, including images of the Refuge Tree, Vajrasattva, and the visualisation associated with Guru Yoga.' },
+      { p: 'Within the Vajrasattva section, selecting **VISUALIZE** opens an interactive representation of the 100-syllable mantra. Both the viewing angle and the speed of rotation of the mantra can be adjusted, allowing the practitioner to examine the visualisation from different perspectives before returning to the practice itself.' },
+
+      { h: 'The importance of authentic transmission' },
+      { p: 'The app is intended as a companion to an existing practice tradition, not as a substitute for transmission and instruction from a qualified teacher.' },
+      { p: 'The Kunzang Gongdu Ngondro belongs to Vajrayana. Those practising the liturgy should therefore have received at least its reading transmission (*lung*) from an authorised lineage holder. Ideally, practitioners should also have received the appropriate empowerment (*wang*) and instructions connected with the practice.' },
+      { p: 'Those wishing to receive the transmission or learn more about the practice may contact their local Yeshe Khorlo Centre.' },
+
+      { h: 'Translation and development' },
+      { p: 'Credit for the English translation on which the initial version of the text was based goes to Richard Barron and Sarah Harding. The digital edition and app were developed by Andrzej R. Rybszleger, interpreter and translator for Gangteng Tulku Rinpoche.' }
+    ],
+
+    howTo: [
+      { p: 'The app allows you to adapt the liturgy to the way you practise.' },
+      { p: 'You can independently show or hide the Tibetan text, phonetic pronunciation and translation, change the text size, switch between day and night display, and use the index to move directly to any section of the practice.' },
+      { p: 'For hands-free recitation, use **Auto Scroll** and adjust its speed, or enable **Tilt to Scroll** to move through the text by tilting your device.' },
+      { p: 'Where the liturgy calls for resting in meditation, the built-in timer can be started directly from the relevant section. If you pause it and continue reciting, the remaining meditation time carries over to the next meditation interval.' },
+      { p: 'Visualisation aids are provided for the Refuge Tree, Vajrasattva and Guru Yoga. In the Vajrasattva section, tap **VISUALIZE** to open the interactive 100-syllable mantra, where its angle and speed of rotation can be adjusted.' },
+      { p: 'Tap the **?** icon at any time for a quick overview of the controls.' }
+    ],
+
+    welcome: [
+      { p: 'The **Kunzang Gongdu Ngondro** is the preliminary practice liturgy for Pema Lingpa’s Dzogchen cycle *Künzang Gongpa Kündü* — *The Synthesis of the Entire Wisdom Mind of Samantabhadra*.' },
+      { p: 'It includes the common preliminaries and the five special practices of **refuge, bodhicitta, Vajrasattva purification, mandala offering and Guru Yoga**. Together they prepare the practitioner for the main practices of Dzogchen while remaining a complete path of daily practice in their own right.' },
+      { p: 'A distinctive feature of this Ngondro is that the perspective of the **Great Completeness — Dzogchen — runs throughout the liturgy**, so that the preliminaries themselves repeatedly introduce the practitioner to the view of the teachings for which they prepare.' },
+      { p: 'The practice belongs to the living transmission lineage of **Pema Lingpa**, today continued by **Gangteng Tulku Rinpoche**.' },
+      { p: 'This text is intended for practitioners who have received at least its **reading transmission (*lung*)** from an authorised source, and ideally the corresponding empowerment and instructions.' }
+    ]
+  }
+};
+
+function introBundle() {
+  return INTRO_L10N[state.lang] || INTRO_L10N.en;
+}
+
+/* Escape first, then the two inline marks — bold before italic, so a
+   nested **phrase (*term*)** keeps both. */
+function introInline(s) {
+  return esc(s)
+    .replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+?)\*/g, '<em>$1</em>');
+}
+
+function introRender(blocks) {
+  return blocks.map(b => {
+    if (b.h)  return '<h3>' + introInline(b.h) + '</h3>';
+    if (b.p)  return '<p>' + introInline(b.p) + '</p>';
+    if (b.ul) return '<ul>' + b.ul.map(li => '<li>' + introInline(li) + '</li>').join('') + '</ul>';
+    if (b.dl) return '<dl>' + b.dl.map(row =>
+      '<dt>' + introInline(row[0]) + '</dt><dd>' + introInline(row[1]) + '</dd>').join('') + '</dl>';
+    return '';
+  }).join('');
+}
+
+/* The opening paragraph stands in for the whole section; CSS clamps it
+   to its first few lines, so there is no separate summary to keep in
+   step with the text it summarises. */
+function introPreview(blocks) {
+  const first = blocks.filter(b => b.p)[0];
+  return first ? '<p>' + introInline(first.p) + '</p>' : '';
+}
+
+/* Draw the prose for the active language. Called from applyLanguage(),
+   so the sheet never keeps the previous edition's text. */
+function buildIntro() {
+  const b = introBundle();
+  const fill = (id, html) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  };
+  fill('introAboutPreview', introPreview(b.about));
+  fill('introAboutBody',    introRender(b.about));
+  fill('introHowPreview',   introPreview(b.howTo));
+  fill('introHowBody',      introRender(b.howTo));
+  fill('welcomeBody',       introRender(b.welcome));
+
+  /* The two expanders are named by their own state rather than by a
+     data-i18n attribute, so they are relabelled here. */
+  ['introAbout', 'introHow'].forEach(id => {
+    const sec = document.getElementById(id);
+    if (sec) setIntroSection(id, sec.classList.contains('open'));
+  });
+}
+
+function setIntroSection(id, open) {
+  const sec = document.getElementById(id);
+  if (!sec) return;
+  sec.classList.toggle('open', !!open);
+  const head = sec.querySelector('.intro-acc-head');
+  if (head) head.setAttribute('aria-expanded', String(!!open));
+  const more = sec.querySelector('.intro-more');
+  if (more) more.textContent = open ? t('introCollapse') : t('introExpand');
+}
+
+function toggleIntroSection(id) {
+  const sec = document.getElementById(id);
+  if (!sec) return;
+  setIntroSection(id, !sec.classList.contains('open'));
+}
+
+// ── Opening and closing ───────────────────────────────────────────────
+
+let introOpen = false;
+let introPrevFocus = null;
+let introHideTimer = null;
+
+let welcomeOpen = false;
+let welcomeShown = false;
+let welcomePrevFocus = null;
+
+let overlayLocked = false;
+let overlayPrevOverflow = '';
+let overlayResumeAuto = false;
+let overlayResumeTilt = false;
+
+/* One page-lock for both cards: whichever is up blurs and freezes what
+   lies behind it, and the lock lifts only once neither is up — so
+   handing over from the welcome card to the sheet does not flash the
+   liturgy back into focus in between. */
+function overlaySync() {
+  const want = introOpen || welcomeOpen;
+  if (want === overlayLocked) return;
+  overlayLocked = want;
+
+  if (want) {
+    /* Hold whatever would move the page underneath, the way the help
+       overlay does. Both engines drive their own indicator as they
+       stop, so the ▶/❚❚ face keeps telling the truth. */
+    overlayResumeAuto = isAutoScrolling;
+    overlayResumeTilt = isTiltScrolling;
+    if (isAutoScrolling) stopAutoScroll();
+    if (isTiltScrolling) stopTiltScroll();
+
+    overlayPrevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('overlay-blur');
+  } else {
+    document.body.style.overflow = overlayPrevOverflow;
+    document.body.classList.remove('overlay-blur');
+
+    if (overlayResumeAuto) startAutoScroll();
+    if (overlayResumeTilt) startTiltScroll();
+    overlayResumeAuto = false;
+    overlayResumeTilt = false;
+  }
+}
+
+/* `section` picks which part opens expanded: 'about', 'howTo', or
+   nothing at all, in which case both show their preview. */
+function openIntro(section) {
+  const ov = document.getElementById('introOverlay');
+  if (!ov) return;
+
+  if (introHideTimer) { clearTimeout(introHideTimer); introHideTimer = null; }
+
+  setIntroSection('introAbout', section === 'about');
+  setIntroSection('introHow',   section === 'howTo');
+
+  const scroller = document.getElementById('introScroll');
+  if (scroller) scroller.scrollTop = 0;
+
+  if (introOpen) return;
+  introOpen = true;
+  introPrevFocus = document.activeElement;
+  overlaySync();
+
+  ov.hidden = false;
+  document.getElementById('introBtn').setAttribute('aria-expanded', 'true');
+  requestAnimationFrame(() => { if (introOpen) ov.classList.add('open'); });
+  document.getElementById('introClose').focus({ preventScroll: true });
+}
+
+function closeIntro(restoreFocus) {
+  if (!introOpen) return;
+  introOpen = false;
+
+  const ov = document.getElementById('introOverlay');
+  ov.classList.remove('open');
+  document.getElementById('introBtn').setAttribute('aria-expanded', 'false');
+
+  /* Let the sheet finish leaving before it is taken out of the layout. */
+  if (introHideTimer) clearTimeout(introHideTimer);
+  introHideTimer = setTimeout(() => {
+    introHideTimer = null;
+    if (!introOpen) ov.hidden = true;
+  }, 340);
+
+  overlaySync();
+
+  if (restoreFocus !== false) {
+    /* Back to the button that opened it whenever that button is on
+       screen — in fullscreen the header is gone, so fall back to
+       whatever held focus before. */
+    const btn = document.getElementById('introBtn');
+    const back = (btn && btn.offsetParent !== null) ? btn : introPrevFocus;
+    if (back && back.focus) back.focus({ preventScroll: true });
+  }
+  introPrevFocus = null;
+}
+
+/* DOM only: used both by the plain close and by the hand-over to the
+   sheet, which must not let the page-lock lift in between. */
+function hideWelcomeCard() {
+  welcomeOpen = false;
+  document.getElementById('welcomeBackdrop').classList.remove('open');
+  document.getElementById('welcomeCard').classList.remove('open');
+}
+
+/* Shown once per visit, after the entrance animation has cleared. */
+function openWelcome() {
+  if (welcomeShown || welcomeOpen || introOpen) return;
+  const card = document.getElementById('welcomeCard');
+  if (!card) return;
+
+  welcomeShown = true;
+  welcomeOpen = true;
+  welcomePrevFocus = document.activeElement;
+  overlaySync();
+
+  document.getElementById('welcomeBackdrop').classList.add('open');
+  card.classList.add('open');
+  card.scrollTop = 0;
+  card.focus({ preventScroll: true });
+}
+
+function closeWelcome() {
+  if (!welcomeOpen) return;
+  hideWelcomeCard();
+  overlaySync();
+
+  const back = welcomePrevFocus;
+  welcomePrevFocus = null;
+  if (back && back.focus && document.contains(back)) back.focus({ preventScroll: true });
+}
+
+function welcomeGo(section) {
+  if (!welcomeOpen) return;
+  hideWelcomeCard();
+  welcomePrevFocus = null;
+  openIntro(section);
+}
+
+/* Routes a tap cannot intercept. */
+window.addEventListener('popstate',   () => closeIntro(false));
+window.addEventListener('hashchange', () => closeIntro(false));
+
 (function init() {
   applyTheme();
 
@@ -7621,6 +8459,10 @@ window.addEventListener('hashchange', () => closeHelp(false));
       updateTabIndicator();
     });
   }
+
+  /* If the entrance finished before this script ran, the welcome card
+     is ours to raise; otherwise the loader raises it on its way out. */
+  if (window.__ykLoaderDone) openWelcome();
 })();
 
 </script>
