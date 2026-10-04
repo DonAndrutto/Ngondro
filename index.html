@@ -2120,6 +2120,66 @@
       .welcome-actions { padding-left: var(--sp-4); padding-right: var(--sp-4); }
     }
 
+    /* One proportional row; fullscreen leaves a single reachable control. */
+    [hidden] { display:none !important; }
+    .bar-inner { display:block; max-width:36rem; }
+    .reader-toolbar { display:grid; grid-template-columns:repeat(var(--reader-tool-count,9),minmax(0,1fr)); gap:2px; margin:0; }
+    .reader-toolbar .bar-btn { width:100%; min-width:0; }
+    .bar-btn:disabled { opacity:0.35; cursor:default; transform:none; }
+    body.fullscreen .reader-toolbar { display:flex; width:max-content; margin-left:auto; }
+    body.fullscreen .reader-toolbar .bar-btn:not(#btnFS),
+    body.fullscreen #scrollTopBtn, body.fullscreen .page-navigation { display:none; }
+    body.fullscreen .reader-toolbar #btnFS { width:40px; }
+
+    .page-navigation { position:fixed; bottom:var(--reader-bar-h,74px); left:50%; transform:translateX(-50%);
+      z-index:45; display:flex; align-items:center; justify-content:space-between; gap:12px;
+      width:min(20rem,calc(100% - 32px)); height:36px; background:var(--bg); }
+    .page-navigation .bar-btn { width:40px; height:32px; }
+    .page-position { font:12px/1.5 'Inter',sans-serif; color:var(--text-muted); text-align:center; }
+    html.paged-reading, .paged-reading body { height:100%; overflow:hidden; overflow-anchor:none; }
+    .paged-reading *, .paged-reading *::before, .paged-reading *::after {
+      animation:none !important; transition:none !important; scroll-behavior:auto !important;
+    }
+    .paged-reading .content-area { position:fixed; top:var(--page-top); left:0; right:0;
+      height:var(--page-height); padding:0 16px; overflow:hidden;
+      font-size:min(var(--reader-fs),var(--page-font-cap)); }
+    .paged-reading .section-block { display:none; margin:0; }
+    .paged-reading .section-block.page-section { display:block; width:var(--page-width); height:100%;
+      column-width:var(--page-width); column-gap:32px; column-fill:auto; }
+    .paged-reading .block, .paged-reading .refrain-group { content-visibility:visible; contain-intrinsic-size:none; }
+    .paged-reading .block { break-inside:auto; }
+    .paged-reading .tib, .paged-reading .pho, .paged-reading .eng { orphans:2; widows:2; }
+    .paged-reading .section-heading { break-after:avoid-column; }
+    .paged-reading .block-image img { max-height:calc(var(--page-height) - 64px); object-fit:contain; }
+    .paged-reading #scrollTopBtn { bottom:calc(var(--reader-bar-h,74px) + 44px); }
+    @media (orientation:landscape) and (max-height:480px) {
+      .paged-reading .header-inner { height:48px; grid-template-areas:"lead title options controls";
+        grid-template-columns:auto auto minmax(0,1fr) auto; grid-template-rows:28px; column-gap:12px; }
+      .paged-reading .header-title { font-size:1.05rem; }
+      .paged-reading .intro-btn-label { display:none; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *, *::before, *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+    }
+
+    .header-inner { height:80px; grid-template-areas:"lead title controls" "options options options";
+      grid-template-columns:1fr auto 1fr; grid-template-rows:27px 26px; row-gap:4px; align-content:center; }
+    .header-options { grid-area:options; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .header-title { font-size:1.4rem; }
+    .index-item.is-current { background:var(--accent-10); color:var(--accent); font-weight:700;
+      box-shadow:inset 3px 0 var(--accent); }
+    html.reader-positioning,html.reader-positioning body { overflow-anchor:none; scroll-behavior:auto !important; }
+    .block.position-target { content-visibility:visible; }
+    .paged-reading .block-timer, .paged-reading .block-nav, .paged-reading .block-visualize { break-inside:avoid-column; }
+    @media(max-width:600px) {
+      .header-inner { height:73px; padding:4px 12px; column-gap:6px; }
+      .header-title { font-size:1.15rem; }
+      .intro-btn-label { display:none; }
+    }
+    @media(max-width:380px) {
+      .header-inner { height:71px; padding:4px 8px; }
+      .header-title { font-size:0.95rem; }
+    }
   </style>
 </head>
 
@@ -2130,6 +2190,7 @@
        never flash the wrong theme. Full state handling lives in init(). */
     try {
       var __saved = JSON.parse(localStorage.getItem('kgk-ngondro-settings') || 'null');
+      if (__saved && __saved.readingMode === 'pages') document.documentElement.classList.add('paged-reading');
       if (__saved && __saved.isDark) document.documentElement.setAttribute('data-theme', 'dark');
       if (__saved && __saved.lang) document.documentElement.setAttribute('lang', __saved.lang);
     } catch (e) {}
@@ -2300,12 +2361,6 @@
       <h1 class="header-title" data-i18n="appTitle">Künzang Gongdü Ngöndro</h1>
 
       <div class="header-controls">
-        <button class="lang-btn active" id="btnTib" onclick="toggleLang('tibetan')">TIB</button>
-        <button class="lang-btn active" id="btnPho" onclick="toggleLang('phonetics')">PHO</button>
-        <button class="lang-btn active" id="btnEng" onclick="toggleLang('translation')">ENG</button>
-
-        <div class="header-divider"></div>
-
         <a class="donate-link" id="donateLink" data-i18n="donate" href="https://www.paypal.com/donate/?business=JZS5LVZKPPY5J&no_recurring=0&item_name=Help+fund+Dharma+translation+projects.&currency_code=USD" target="_blank" rel="noopener">Donate</a>
 
         <div class="header-divider"></div>
@@ -2314,7 +2369,11 @@
                 aria-haspopup="dialog" aria-expanded="false" aria-controls="helpOverlay"
                 data-i18n-title="helpTitle" data-i18n-aria="helpTitle"
                 title="Help" aria-label="Help">?</button>
-
+      </div>
+      <div class="header-options">
+        <button class="lang-btn active" id="btnTib" onclick="toggleLang('tibetan')">TIB</button>
+        <button class="lang-btn active" id="btnPho" onclick="toggleLang('phonetics')">PHO</button>
+        <button class="lang-btn active" id="btnEng" onclick="toggleLang('translation')">ENG</button>
         <div class="lang-select" id="langSelect">
           <div class="lang-backdrop" onclick="closeLangMenu()"></div>
           <button type="button" class="lang-select-btn" id="langSelectBtn"
@@ -2335,7 +2394,7 @@
         <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
         <span data-i18n="tabYoga">Yoga of Arising</span>
       </button>
-      <button class="tab-btn" data-tab="INDEX" onclick="toggleIndex()">
+      <button class="tab-btn" data-tab="INDEX" onclick="toggleIndex()" aria-expanded="false" aria-controls="indexPanel">
         <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         <span data-i18n="tabIndex">Index</span>
       </button>
@@ -2349,7 +2408,7 @@
   </div>
 
   <div class="index-backdrop" id="indexBackdrop" onclick="toggleIndex()"></div>
-  <div class="index-panel" id="indexPanel">
+  <div class="index-panel" id="indexPanel" inert>
     <div class="index-inner" id="indexList">
       </div>
   </div>
@@ -2361,10 +2420,18 @@
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
   </button>
 
+  <nav class="page-navigation" id="pageNavigation" data-i18n-aria="pageNavigation" aria-label="Page navigation" hidden>
+    <button type="button" class="bar-btn" id="btnPreviousPage" onclick="turnReadingPage(-1)" data-i18n-title="pagePrevious" data-i18n-aria="pagePrevious" title="Previous page" aria-label="Previous page">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <span class="page-position" id="pagePosition" role="status" aria-live="polite" aria-atomic="true"></span>
+    <button type="button" class="bar-btn" id="btnNextPage" onclick="turnReadingPage(1)" data-i18n-title="pageNext" data-i18n-aria="pageNext" title="Next page" aria-label="Next page">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </nav>
   <div class="bottom-bar">
     <div class="bar-inner">
-
-      <div class="bar-group">
+      <div class="bar-group reader-toolbar" style="--reader-tool-count:10">
         <button class="bar-btn" onclick="changeSpeed(-1)" data-i18n-title="barSlower" data-i18n-aria="barSlower" title="Slower" aria-label="Slower">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
@@ -2375,9 +2442,9 @@
         <button class="bar-btn" onclick="changeSpeed(1)" data-i18n-title="barFaster" data-i18n-aria="barFaster" title="Faster" aria-label="Faster">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
-      </div>
-
-      <div class="bar-group">
+        <button type="button" class="bar-btn" id="btnPage" onclick="toggleReadingMode()" aria-pressed="false" data-i18n-title="barPages" data-i18n-aria="barPages" title="Page turning mode" aria-label="Page turning mode">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+        </button>
         <button class="bar-btn" id="btnFS" onclick="toggleFullScreen()" data-i18n-title="barFullscreen" data-i18n-aria="barFullscreen" title="Fullscreen" aria-label="Fullscreen">
           <svg id="iconFSEnter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           <svg id="iconFSExit" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
@@ -2392,9 +2459,6 @@
           <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-      </div>
-
-      <div class="bar-group">
         <button class="bar-btn" onclick="changeFontSize(-1)" data-i18n-title="barSmaller" data-i18n-aria="barSmaller" title="Smaller text" aria-label="Smaller text">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
         </button>
@@ -2402,7 +2466,6 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
         </button>
       </div>
-
     </div>
   </div>
 
@@ -2691,6 +2754,11 @@ const UI_STRINGS = {
     barTheme: 'Toggle theme',
     barSmaller: 'Smaller text',
     barLarger: 'Larger text',
+    barPages: 'Page turning mode',
+    pagePrevious: 'Previous page',
+    pageNext: 'Next page',
+    pageNavigation: 'Page navigation',
+    pagePosition: 'Page {page} of {count}, section {section} of {sections}',
     scrollTop: 'Back to top',
 
     timerSettings: 'Timer settings',
@@ -2781,6 +2849,11 @@ const UI_STRINGS = {
     barTheme: 'Zmień motyw',
     barSmaller: 'Mniejszy tekst',
     barLarger: 'Większy tekst',
+    barPages: 'Tryb stronicowania',
+    pagePrevious: 'Poprzednia strona',
+    pageNext: 'Następna strona',
+    pageNavigation: 'Nawigacja stron',
+    pagePosition: 'Strona {page} z {count}, część {section} z {sections}',
     scrollTop: 'Do góry',
 
     timerSettings: 'Ustawienia minutnika',
@@ -2848,6 +2921,7 @@ function defaultState() {
     showTranslation: true,
     activeTab: 'YOGA',
     scrollSpeed: 2,
+    readingMode: 'scroll',
     timer: {
       mode: 'countdown',
       totalMinutes: 15,
@@ -2880,6 +2954,8 @@ function loadState() {
     if (!Array.isArray(merged.timer.spent) || merged.timer.spent.length !== 4) {
       merged.timer.spent = [0, 0, 0, 0];
     }
+    if (!['scroll', 'pages'].includes(merged.readingMode)) merged.readingMode = 'scroll';
+    if (!['YOGA', 'NGONDRO'].includes(merged.activeTab)) merged.activeTab = 'YOGA';
     if (!LANGS[merged.lang]) merged.lang = 'en';
     return merged;
   } catch { return defaultState(); }
@@ -6399,9 +6475,11 @@ function syncScriptToggles() {
 }
 
 function applyLangs() {
+  const anchor = captureReadingAnchor();
   syncScriptToggles();
   // Which runs are visible changes every block's height.
   invalidateGeometry();
+  if (state.readingMode === 'pages') layoutReadingPage(anchor);
 }
 
 function toggleLang(which) {
@@ -6422,8 +6500,13 @@ function toggleLang(which) {
 function changeFontSize(delta) {
   const next = Math.max(12, Math.min(40, state.fontSize + delta * 2));
   if (next === state.fontSize) return;
+  const anchor = captureReadingAnchor();
+  stopAutoScroll();
+  stopTiltScroll();
+  cancelPark();
   state.fontSize = next;
   applyFontSize();
+  holdReadingPosition(anchor);
   saveState();
 }
 
@@ -6442,6 +6525,8 @@ function applyFontSize() {
 // ══════════════════════════════════════════════════════
 
 function switchTab(tab) {
+  if (!TABS_DATA[tab]) return;
+  cancelPark();
   // The overlay describes one screen, so it goes when the screen does.
   closeHelp(false);
 
@@ -6461,7 +6546,11 @@ function switchTab(tab) {
 
   renderContent();
   renderIndex();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (state.readingMode === 'pages') {
+    readingPage.section = 0;
+    readingPage.index = 0;
+    layoutReadingPage();
+  } else window.scrollTo({ top: 0, behavior: 'smooth' });
 
   // Stop any scrolling
   stopAutoScroll();
@@ -6479,15 +6568,20 @@ function toggleIndex() {
   const btn = document.querySelector('.tab-btn[data-tab="INDEX"]');
   const willOpen = !panel.classList.contains('open');
   panel.classList.toggle('open', willOpen);
+  panel.inert = !willOpen;
   backdrop.classList.toggle('open', willOpen);
   btn.classList.toggle('active', willOpen);
+  btn.setAttribute('aria-expanded', String(willOpen));
+  if (willOpen) queueIndexLocationUpdate(true);
   updateTabIndicator();
 }
 
 function closeIndex() {
   document.getElementById('indexPanel').classList.remove('open');
+  document.getElementById('indexPanel').inert = true;
   document.getElementById('indexBackdrop').classList.remove('open');
   document.querySelector('.tab-btn[data-tab="INDEX"]').classList.remove('active');
+  document.querySelector('.tab-btn[data-tab="INDEX"]').setAttribute('aria-expanded', 'false');
   updateTabIndicator();
 }
 
@@ -6507,13 +6601,39 @@ function renderIndex() {
   container.innerHTML =
     '<div class="index-heading">' + esc(t('indexHeading')) + '</div>' +
     INDEX_LINKS.map((link, i) =>
-      '<button class="index-item" onclick="jumpToIndex(' + i + ')">' + esc(t(link.key)) + '</button>'
+      '<button type="button" class="index-item" data-index-tab="' + link.tab + '" data-section-idx="' + link.sectionIdx +
+      '" onclick="jumpToIndex(' + i + ')">' + esc(t(link.key)) + '</button>'
     ).join('');
+  queueIndexLocationUpdate(true);
 }
+
+let indexLocationFrame = 0;
+function queueIndexLocationUpdate() {
+  if (indexLocationFrame) return;
+  indexLocationFrame = requestAnimationFrame(() => {
+    indexLocationFrame = 0;
+    let section = state.readingMode === 'pages' ? readingPage.section : 0;
+    if (state.readingMode !== 'pages') {
+      const line = readerLine();
+      for (let i = 0; i < trackedSectionNodes.length; i++) {
+        if (trackedSectionNodes[i].getBoundingClientRect().top > line + 1) break;
+        section = i;
+      }
+    }
+    document.querySelectorAll('#indexList .index-item').forEach(row => {
+      const current = row.dataset.indexTab === state.activeTab && Number(row.dataset.sectionIdx) === section;
+      row.classList.toggle('is-current', current);
+      if (current) row.setAttribute('aria-current', 'location');
+      else row.removeAttribute('aria-current');
+    });
+  });
+}
+window.addEventListener('scroll', queueIndexLocationUpdate, {passive:true});
 
 function jumpToIndex(i) {
   const link = INDEX_LINKS[i];
   if (!link) return;
+  cancelPark();
 
   closeIndex();
 
@@ -6526,60 +6646,144 @@ function jumpToIndex(i) {
       b.classList.toggle('active', b.dataset.tab === link.tab);
     });
     updateTabIndicator();
-    renderContent();
+    renderContent({animate:false});
     stopAutoScroll();
     stopTiltScroll();
   }
 
-  // Wait for layout/render before scrolling
+  const requested = navigationToken;
+  // The same destination route opens the containing page in page mode.
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => scrollToSectionEl(link.sectionIdx, true));
+    if (requested === navigationToken) scrollToSectionEl(link.sectionIdx, false);
   });
 }
 
-/* Park an element at a given distance from the top of the viewport, and
-   keep nudging until it stays there.
+// Position against live geometry while occluded blocks settle. A new input
+// cancels this work, and long jumps never animate through the text.
+let parkToken = 0;
+let navigationToken = 0;
+let parkFrame = 0;
+let parkedBlock = null;
 
-   One pass is not enough: the blocks scrolled past are still occluded, so
-   their heights are estimates, and the moment the browser renders them it
-   substitutes their real sizes and everything below shifts. Correcting by
-   the element's own live viewport position converges regardless — each
-   nudge is measured against where the element actually is now, not
-   against a total that is still settling. */
-function parkElementAt(el, offset, smooth, done) {
-  if (!el) return;
-  const jump = behavior => {
-    const cur = window.scrollY || window.pageYOffset || 0;
-    window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + cur - offset),
-                      behavior: behavior });
-  };
-  jump(smooth ? 'smooth' : 'auto');
+function cancelPark() {
+  parkToken++;
+  navigationToken++;
+  if (parkFrame) cancelAnimationFrame(parkFrame);
+  parkFrame = 0;
+  if (parkedBlock) parkedBlock.classList.remove('position-target');
+  parkedBlock = null;
+  document.documentElement.classList.remove('reader-positioning');
+}
+window.addEventListener('wheel', cancelPark, {passive:true});
+window.addEventListener('touchstart', cancelPark, {passive:true});
+window.addEventListener('pointerdown', cancelPark, {passive:true});
+window.addEventListener('keydown', e => {
+  if (!e.target.closest('input, textarea') &&
+      ['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key)) cancelPark();
+});
 
-  let tries = 0, stable = 0;
-  const settle = () => {
-    const delta = el.getBoundingClientRect().top - offset;
-    if (Math.abs(delta) > 1) {
-      window.scrollBy({ top: delta, behavior: 'auto' });
-      stable = 0;
-    } else if (++stable >= 4) {
-      // held still for four straight frames: everything above has resolved
+function readerLine() {
+  const stack = document.getElementById('stickyStack');
+  return (stack && !document.body.classList.contains('fullscreen') ? stack.getBoundingClientRect().bottom : 0) + 20;
+}
+
+function characterRange(node, offset) {
+  if (!node || node.nodeType !== Node.TEXT_NODE || !node.length) return null;
+  const range = document.createRange();
+  const start = Math.min(offset, node.length - 1);
+  range.setStart(node, start);
+  range.setEnd(node, Math.min(node.length, start + 1));
+  return range;
+}
+
+function captureReadingAnchor() {
+  if (state.readingMode === 'pages') return capturePageAnchor();
+  const area = document.getElementById('contentArea');
+  if (!area || !trackedBlockNodes.length) return null;
+  const line = readerLine();
+  // Binary search the block boxes. Never force layout of every off-screen run.
+  let lo = 0, hi = trackedBlockNodes.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (trackedBlockNodes[mid].getBoundingClientRect().bottom <= line) lo = mid + 1;
+    else hi = mid;
+  }
+  const block = trackedBlockNodes[lo];
+  const bounds = block.getBoundingClientRect();
+  const y = Math.max(line + 3, bounds.top + 3);
+  if (y < innerHeight - 70) {
+    for (const x of [bounds.left + bounds.width * 0.5, bounds.left + bounds.width * 0.25, bounds.left + 12]) {
+      let range = null;
+      if (document.caretPositionFromPoint) {
+        const caret = document.caretPositionFromPoint(x, y);
+        if (caret) range = characterRange(caret.offsetNode, caret.offset);
+      } else if (document.caretRangeFromPoint) {
+        const caret = document.caretRangeFromPoint(x, y);
+        if (caret) range = characterRange(caret.startContainer, caret.startOffset);
+      }
+      if (range && block.contains(range.startContainer)) {
+        const rect = range.getBoundingClientRect();
+        if (rect.height && rect.bottom > line) return {block, range, top:rect.top};
+      }
+    }
+  }
+  return {block, range:null, top:bounds.top};
+}
+
+function holdReadingPosition(anchor, done) {
+  if (!anchor || !anchor.block.isConnected) return;
+  if (state.readingMode === 'pages') {
+    cancelPark();
+    layoutReadingPage(anchor);
+    if (done) done();
+    return;
+  }
+  cancelPark();
+  const token = parkToken;
+  const block = anchor.block;
+  parkedBlock = block;
+  block.classList.add('position-target');
+  document.documentElement.classList.add('reader-positioning');
+  const started = performance.now();
+  let stable = 0;
+  const correct = () => {
+    if (token !== parkToken || !block.isConnected) return;
+    const rect = anchor.range ? anchor.range.getBoundingClientRect() : block.getBoundingClientRect();
+    const delta = rect.top - anchor.top;
+    if (Math.abs(delta) > 0.75) {
+      const before = window.scrollY;
+      window.scrollTo({top:Math.max(0, before + delta), behavior:'instant'});
+      stable = Math.abs(window.scrollY - before) < 0.5 ? stable + 1 : 0;
+    } else stable++;
+    // Only nearby blocks can settle now: no delayed whole-volume height table.
+    if ((stable >= 8 && performance.now() - started >= 250 && document.fonts?.status !== 'loading') ||
+        performance.now() - started > 2500) {
+      block.classList.remove('position-target');
+      parkedBlock = null;
+      parkFrame = 0;
+      document.documentElement.classList.remove('reader-positioning');
+      queueIndexLocationUpdate(true);
       if (done) done();
       return;
     }
-    if (++tries < 40) requestAnimationFrame(settle);
-    else if (done) done();
+    parkFrame = requestAnimationFrame(correct);
   };
-  setTimeout(() => requestAnimationFrame(settle), smooth ? 500 : 0);
+  correct();
+}
+
+function parkElementAt(el, offset, smooth, done) {
+  if (el) holdReadingPosition({block:el, range:null, top:offset}, done);
 }
 
 function scrollToSectionEl(idx, smooth) {
-  parkElementAt(document.getElementById('section-' + idx), 100, smooth);
+  parkElementAt(document.getElementById('section-' + idx), readerLine(), false);
 }
 
 function jumpToSection(idx) {
-  scrollToSectionEl(idx, true);
   closeIndex();
+  scrollToSectionEl(idx, false);
 }
+
 
 // ══════════════════════════════════════════════════════
 // RENDER CONTENT
@@ -6632,6 +6836,12 @@ function renderContent(opts) {
 
   area.classList.toggle('is-first-paint', animate);
   area.innerHTML = html;
+  trackedSectionNodes = Array.from(area.querySelectorAll('.section-block'));
+  trackedBlockNodes = Array.from(area.querySelectorAll('.block'));
+  area.querySelectorAll('img').forEach(img => img.addEventListener('load', () => {
+    scrollHeightCache = 0;
+    queuePageLayout();
+  }));
   syncScriptToggles();
 
   // Let the entrance play for the frame it was staged in, then take the
@@ -6645,6 +6855,12 @@ function renderContent(opts) {
   refrainOffsets = null;   // geometry cache is stale
   scrollHeightCache = 0;
   scheduleHeightTable();
+  if (state.readingMode === 'pages') {
+    readingPage.section = 0;
+    readingPage.index = 0;
+    layoutReadingPage();
+  }
+  queueIndexLocationUpdate(true);
 }
 
 /* A language switch genuinely changes the text, so the body has to be
@@ -6653,30 +6869,17 @@ function renderContent(opts) {
    With occlusion in place the rebuild itself only lays out what is on
    screen, so this is cheap. */
 function renderContentPreservingPlace() {
-  const area = document.getElementById('contentArea');
-  const scrollY = window.scrollY || window.pageYOffset || 0;
-
-  // Anchor on the first block still on screen rather than on its section.
-  // A section heading can sit thousands of pixels above the viewport, and
-  // every height that settles in between then moves the anchor with it;
-  // the nearest block is a few pixels away and barely moves at all.
-  let anchorId = null, anchorTop = 0;
-  if (area && scrollY > 0) {
-    const blocks = area.querySelectorAll('.block[data-bid]');
-    for (let i = 0; i < blocks.length; i++) {
-      const r = blocks[i].getBoundingClientRect();
-      if (r.height === 0) continue;         // collapsed by a script toggle
-      if (r.bottom > 0) { anchorId = blocks[i].dataset.bid; anchorTop = r.top; break; }
-    }
-  }
-
-  renderContent({ animate: false });
-
-  // The block may not exist in the new language — Polish omits some — in
-  // which case the browser keeps whatever position it had.
-  if (anchorId) {
-    const el = area.querySelector('.block[data-bid="' + (window.CSS && CSS.escape ? CSS.escape(anchorId) : anchorId) + '"]');
-    if (el) parkElementAt(el, anchorTop, false);
+  const anchor = captureReadingAnchor();
+  const bid = anchor?.block.dataset.bid;
+  const sectionIndex = anchor ? trackedSectionNodes.indexOf(anchor.block.closest('.section-block')) : 0;
+  const top = anchor?.range ? anchor.range.getBoundingClientRect().top : anchor?.block.getBoundingClientRect().top;
+  renderContent({animate:false});
+  const block = bid && document.querySelector('.block[data-bid="' + CSS.escape(bid) + '"]');
+  if (block) holdReadingPosition({block, range:null, top});
+  else if (state.readingMode === 'pages') {
+    readingPage.section = Math.max(0, sectionIndex);
+    readingPage.index = 0;
+    layoutReadingPage();
   }
 }
 
@@ -6863,6 +7066,7 @@ function invalidateGeometry() {
    property has already reflowed the text the reader can see — and the
    intrinsic sizes catch up a moment later. */
 function scheduleHeightTable() {
+  if (state.readingMode === 'pages') { queuePageLayout(); return; }
   if (geomPending) return;
   geomPending = 1;
   const run = () => { geomPending = 0; buildHeightTable(); };
@@ -6871,7 +7075,7 @@ function scheduleHeightTable() {
 }
 
 function buildHeightTable() {
-  if (!geomFontsReady || !window.Pretext) return;
+  if (state.readingMode === 'pages' || !geomFontsReady || !window.Pretext) return;
   const area = document.getElementById('contentArea');
   if (!area) return;
 
@@ -6899,6 +7103,7 @@ function buildHeightTable() {
   // ── compute and write, sliced so a long document never blocks a frame ──
   let cursor = 0;
   const step = () => {
+    if (state.readingMode === 'pages' || !jobs[0].el.isConnected) return;
     const end = Math.min(cursor + GEOM_CHUNK, jobs.length);
     for (; cursor < end; cursor++) {
       const job = jobs[cursor];
@@ -7081,6 +7286,7 @@ function toggleAutoScroll() {
 }
 
 function startAutoScroll() {
+  if (state.readingMode === 'pages') return;
   isAutoScrolling = true;
   lastScrollTime = 0;
   scrollAccumulator = 0;
@@ -7165,6 +7371,7 @@ let currentTiltSpeed = 0;
 let tiltScrollAccumulator = 0;
 
 async function toggleTiltScroll() {
+  if (state.readingMode === 'pages') return;
   if (isAutoScrolling) stopAutoScroll();
 
   if (isTiltScrolling) {
@@ -7194,6 +7401,7 @@ async function toggleTiltScroll() {
 }
 
 function startTiltScroll() {
+  if (state.readingMode === 'pages') return;
   isTiltScrolling = true;
   tiltReferenceBeta = null;
   targetTiltSpeed = 0;
@@ -7251,6 +7459,181 @@ function tiltLoop() {
   tiltRafId = requestAnimationFrame(tiltLoop);
 }
 
+// Page each section independently. Native columns fragment text at line boxes,
+// including paragraphs taller than the viewport; only the active section lays out.
+let trackedSectionNodes = [];
+let trackedBlockNodes = [];
+const readingPage = {section:0, index:0, count:1, stride:0, anchor:null};
+let pageLayoutFrame = 0;
+
+function syncReadingMode() {
+  const paged = state.readingMode === 'pages';
+  document.documentElement.classList.toggle('paged-reading', paged);
+  document.getElementById('btnPage').classList.toggle('active', paged);
+  document.getElementById('btnPage').setAttribute('aria-pressed', String(paged));
+  document.getElementById('pageNavigation').hidden = !paged;
+  document.querySelectorAll('.reader-toolbar [onclick^="changeSpeed"], #btnPlay, #btnTilt').forEach(button => {
+    button.disabled = paged;
+  });
+}
+
+function toggleReadingMode() {
+  const anchor = captureReadingAnchor();
+  stopAutoScroll();
+  stopTiltScroll();
+  cancelPark();
+  closeHelp(false);
+  state.readingMode = state.readingMode === 'pages' ? 'scroll' : 'pages';
+  syncReadingMode();
+  if (state.readingMode === 'pages') {
+    window.scrollTo({top:0, behavior:'instant'});
+    layoutReadingPage(anchor);
+  } else {
+    trackedSectionNodes.forEach(section => {
+      section.classList.remove('page-section');
+      section.style.transform = '';
+    });
+    invalidateGeometry();
+    if (anchor) holdReadingPosition({...anchor, top:readerLine()});
+  }
+  saveState();
+  updateReturnToTopButton();
+}
+
+function queuePageLayout() {
+  if (state.readingMode !== 'pages' || pageLayoutFrame) return;
+  pageLayoutFrame = requestAnimationFrame(() => {
+    pageLayoutFrame = 0;
+    if (state.readingMode === 'pages') layoutReadingPage(readingPage.anchor);
+  });
+}
+
+function layoutReadingPage(anchor = null) {
+  if (state.readingMode !== 'pages' || !trackedSectionNodes.length) return;
+  const area = document.getElementById('contentArea');
+  const target = anchor?.block.closest('.section-block');
+  if (target) readingPage.section = trackedSectionNodes.indexOf(target);
+  readingPage.section = Math.max(0, Math.min(trackedSectionNodes.length - 1, readingPage.section));
+  const section = trackedSectionNodes[readingPage.section];
+  trackedSectionNodes.forEach(node => node.classList.toggle('page-section', node === section));
+  section.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+  const barHeight = document.querySelector('.bottom-bar').getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--reader-bar-h', barHeight + 'px');
+  const top = isFullScreen ? 12 : document.getElementById('stickyStack').getBoundingClientRect().bottom + 12;
+  const height = Math.max(32, (window.visualViewport?.height || innerHeight) - top - barHeight - (isFullScreen ? 12 : 48));
+  area.style.setProperty('--page-top', top + 'px');
+  area.style.setProperty('--page-height', height + 'px');
+  // A very short landscape viewport must still fit the largest heading's line.
+  area.style.setProperty('--page-font-cap', Math.max(4, Math.floor((height - 8) / 3.7)) + 'px');
+  const width = area.clientWidth - 32;
+  area.style.setProperty('--page-width', width + 'px');
+  readingPage.stride = width + 32;
+  readingPage.count = Math.max(1, Math.ceil((section.scrollWidth + 31) / readingPage.stride));
+  if (target) {
+    const rect = anchor.range?.getClientRects()[0] || anchor.block.getClientRects()[0];
+    if (rect) readingPage.index = Math.floor((rect.left - section.getBoundingClientRect().left + 1) / readingPage.stride);
+  }
+  readingPage.index = Math.max(0, Math.min(readingPage.count - 1, readingPage.index));
+  showReadingPage();
+}
+
+function showReadingPage() {
+  const section = trackedSectionNodes[readingPage.section];
+  if (!section) return;
+  section.style.transform = 'translateX(' + (-readingPage.index * readingPage.stride) + 'px)';
+  const position = document.getElementById('pagePosition');
+  position.textContent = (readingPage.index + 1) + ' / ' + readingPage.count;
+  position.setAttribute('aria-label', t('pagePosition').replace('{page}', readingPage.index + 1).replace('{count}', readingPage.count)
+    .replace('{section}', readingPage.section + 1).replace('{sections}', trackedSectionNodes.length));
+  document.getElementById('btnPreviousPage').disabled = readingPage.section === 0 && readingPage.index === 0;
+  document.getElementById('btnNextPage').disabled = readingPage.section === trackedSectionNodes.length - 1 && readingPage.index === readingPage.count - 1;
+  readingPage.anchor = capturePageAnchor();
+  queueIndexLocationUpdate(true);
+  updateReturnToTopButton();
+}
+
+function capturePageAnchor() {
+  const section = trackedSectionNodes[readingPage.section];
+  if (!section) return null;
+  const area = document.getElementById('contentArea').getBoundingClientRect();
+  const left = area.left + 16, right = area.right - 16;
+  const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    if (!node.length) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    if (!Array.from(range.getClientRects()).some(rect => rect.width && rect.right > left && rect.left < right && rect.bottom > area.top && rect.top < area.bottom)) continue;
+    // Find the first character on this column, retaining its DOM identity on reflow.
+    let lo = 0, hi = node.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      const rect = characterRange(node, mid).getBoundingClientRect();
+      if (rect.right <= left) lo = mid + 1;
+      else hi = mid;
+    }
+    const character = characterRange(node, lo);
+    return {block:node.parentElement.closest('.block') || section, range:character, top:character.getBoundingClientRect().top};
+  }
+  const block = Array.from(section.querySelectorAll('.block')).find(block =>
+    Array.from(block.getClientRects()).some(rect => rect.right > left && rect.left < right));
+  return {block:block || section, range:null, top:area.top};
+}
+
+function turnReadingPage(direction) {
+  if (state.readingMode !== 'pages') return;
+  cancelPark();
+  const next = readingPage.index + direction;
+  if (next >= 0 && next < readingPage.count) {
+    readingPage.index = next;
+    showReadingPage();
+  } else {
+    const section = readingPage.section + direction;
+    if (section < 0 || section >= trackedSectionNodes.length) return;
+    readingPage.section = section;
+    readingPage.index = direction < 0 ? Number.MAX_SAFE_INTEGER : 0;
+    layoutReadingPage();
+  }
+}
+
+function pageInputBlocked(target) {
+  return target.closest('input,textarea,select,[contenteditable="true"],a,button,[role="dialog"],.index-panel') ||
+    helpOpen || introOpen || welcomeOpen || garlandOpen || document.getElementById('timerDialog').classList.contains('open') ||
+    document.getElementById('indexPanel').classList.contains('open') || document.getElementById('langSelect').classList.contains('open');
+}
+
+document.getElementById('contentArea').addEventListener('click', e => {
+  if (state.readingMode !== 'pages' || pageInputBlocked(e.target) || !window.getSelection().isCollapsed) return;
+  const bounds = e.currentTarget.getBoundingClientRect();
+  const fraction = (e.clientX - bounds.left) / bounds.width;
+  if (fraction < 0.25) turnReadingPage(-1);
+  else if (fraction > 0.75) turnReadingPage(1);
+});
+document.addEventListener('keydown', e => {
+  const button = e.target.closest('button');
+  if (button && (e.key === ' ' || e.key === 'Enter')) return;
+  if (state.readingMode !== 'pages' || pageInputBlocked(button?.parentElement || e.target) || e.altKey || e.ctrlKey || e.metaKey) return;
+  const direction = ['ArrowRight','ArrowDown','PageDown',' '].includes(e.key) ? (e.shiftKey && e.key === ' ' ? -1 : 1) :
+    ['ArrowLeft','ArrowUp','PageUp'].includes(e.key) ? -1 : 0;
+  if (direction) { e.preventDefault(); turnReadingPage(direction); }
+  else if (e.key === 'Home' || e.key === 'End') {
+    e.preventDefault();
+    readingPage.index = e.key === 'Home' ? 0 : readingPage.count - 1;
+    showReadingPage();
+  }
+});
+let lastPageWheel = 0;
+window.addEventListener('wheel', e => {
+  if (state.readingMode !== 'pages' || pageInputBlocked(e.target) || e.ctrlKey) return;
+  e.preventDefault();
+  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  if (Math.abs(delta) >= 10 && performance.now() - lastPageWheel > 300) {
+    lastPageWheel = performance.now();
+    turnReadingPage(delta > 0 ? 1 : -1);
+  }
+}, {passive:false});
+window.visualViewport?.addEventListener('resize', queuePageLayout);
+
 // ══════════════════════════════════════════════════════
 // FULLSCREEN
 // ══════════════════════════════════════════════════════
@@ -7261,21 +7644,19 @@ function updateFSIcon() {
   document.getElementById('iconFSEnter').style.display = isFullScreen ? 'none' : 'block';
   document.getElementById('iconFSExit').style.display = isFullScreen ? 'block' : 'none';
   document.getElementById('btnFS').classList.toggle('active', isFullScreen);
+  document.getElementById('btnFS').setAttribute('aria-pressed', String(isFullScreen));
+  document.getElementById('btnFS').setAttribute('aria-label', isFullScreen ? 'Exit fullscreen' : t('barFullscreen'));
 }
 
 function toggleFullScreen() {
-  const anchor = document.querySelector('.content-area .section-block') || document.getElementById('contentArea');
-  const beforeTop = anchor ? anchor.getBoundingClientRect().top : 0;
-
+  const anchor = captureReadingAnchor();
+  closeIndex();
   isFullScreen = !isFullScreen;
   document.body.classList.toggle('fullscreen', isFullScreen);
   updateFSIcon();
 
-  if (anchor) {
-    const afterTop = anchor.getBoundingClientRect().top;
-    const delta = afterTop - beforeTop;
-    if (delta) window.scrollBy(0, delta);
-  }
+  if (state.readingMode === 'pages') layoutReadingPage(anchor);
+  else if (anchor) holdReadingPosition({...anchor, top:readerLine()});
 
   if (isFullScreen && document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
@@ -7287,9 +7668,12 @@ function toggleFullScreen() {
 // Sync if user exits fullscreen via Escape
 document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement && isFullScreen) {
+    const anchor = captureReadingAnchor();
     isFullScreen = false;
     document.body.classList.remove('fullscreen');
     updateFSIcon();
+    if (state.readingMode === 'pages') layoutReadingPage(anchor);
+    else if (anchor) holdReadingPosition({...anchor, top:readerLine()});
   }
 });
 
@@ -7297,11 +7681,22 @@ document.addEventListener('fullscreenchange', () => {
 // SCROLL-TO-TOP BUTTON
 // ══════════════════════════════════════════════════════
 
-window.addEventListener('scroll', () => {
-  document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 300);
-});
+function updateReturnToTopButton() {
+  const visible = state.readingMode === 'pages' ? readingPage.section > 0 || readingPage.index > 0 : window.scrollY > 300;
+  document.getElementById('scrollTopBtn').classList.toggle('visible', visible);
+}
+window.addEventListener('scroll', updateReturnToTopButton, {passive:true});
 
-function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function scrollToTop() {
+  cancelPark();
+  stopAutoScroll();
+  stopTiltScroll();
+  if (state.readingMode === 'pages') {
+    readingPage.section = 0;
+    readingPage.index = 0;
+    layoutReadingPage();
+  } else window.scrollTo({top:0, behavior:'smooth'});
+}
 
 // ══════════════════════════════════════════════════════
 // PREVENT COPY / RIGHT-CLICK (matches existing apps)
@@ -7334,7 +7729,10 @@ function updateTabIndicator() {
 
 window.addEventListener('resize', measureStackHeight);
 window.addEventListener('resize', updateTabIndicator);
-window.addEventListener('resize', invalidateGeometry);
+window.addEventListener('resize', () => {
+  if (state.readingMode === 'pages') { queuePageLayout(); return; }
+  invalidateGeometry();
+});
 window.addEventListener('orientationchange', measureStackHeight);
 window.addEventListener('orientationchange', updateTabIndicator);
 
@@ -7736,7 +8134,7 @@ function omPhonetics() {
 }
 
 function omReducedMotion() {
-  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  return state.readingMode === 'pages' || !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 
 let garlandOpen = false;
@@ -7898,6 +8296,7 @@ function layoutGarland() {
   stage.style.width = (vw / s) + 'px';
   stage.style.height = (vh / s) + 'px';
   stage.style.transform = 'scale(' + s + ')';
+  if (omReducedMotion()) omRender(0);
 
   const field = document.getElementById('omField');
   field.style.left = fx + 'px';
@@ -8077,6 +8476,7 @@ function omNectarFrame(dt) {
 
 function omLoop(ts) {
   if (!garlandOpen) return;
+  if (omReducedMotion()) { omRender(0); omRt.raf = null; return; }
   const dt = omRt.lastTs ? Math.min(0.05, (ts - omRt.lastTs) / 1000) : 0;
   omRt.lastTs = ts;
   // The engine's clock: wall time loops over the scene's authored duration,
@@ -8151,7 +8551,7 @@ function openGarland() {
   layoutGarland();
   omRender(0);
 
-  omRt.raf = requestAnimationFrame(omLoop);
+  omRt.raf = omReducedMotion() ? null : requestAnimationFrame(omLoop);
   document.getElementById('gBtnClose').focus({ preventScroll: true });
 }
 
@@ -8260,6 +8660,7 @@ const HELP_TARGETS = [
   { sel: '.bar-btn[onclick="changeSpeed(-1)"]',    key: 'barSlower' },
   { sel: '#btnPlay',                               key: 'barPlayPause' },
   { sel: '.bar-btn[onclick="changeSpeed(1)"]',     key: 'barFaster' },
+  { sel: '#btnPage',                               key: 'barPages' },
   { sel: '#btnFS',                                 key: 'barFullscreen' },
   { sel: '#btnTilt',                               key: 'barTilt' },
   { sel: '#btnTimerCfg',                           key: 'timerSettings' },
@@ -8576,6 +8977,8 @@ const INTRO_L10N = {
     howTo: [
       { p: 'The app allows you to adapt the liturgy to the way you practise.' },
       { p: 'You can independently show or hide the Tibetan text, phonetic pronunciation and translation, change the text size, switch between day and night display, and use the index to move directly to any section of the practice.' },
+      { p: 'Select the **page icon** between Faster (+) and Fullscreen to turn pages without animation. Use the arrows below the text, tap the left or right edge, or use the arrow keys, Page Up/Down, or Space (Shift+Space to go back). Pages keep whole lines and adapt to portrait, landscape, text size, and your chosen scripts. Select the icon again to return to scrolling.' },
+      { p: '**Fullscreen** hides the header and bottom options, leaving only the expand/contract icon. Tap it to restore the controls. Edge taps and keyboard page turns work in fullscreen. The **up arrow** always returns to the beginning of the current text.' },
       { p: 'For hands-free recitation, use **Auto Scroll** and adjust its speed, or enable **Tilt to Scroll** to move through the text by tilting your device.' },
       { p: 'Where the liturgy calls for resting in meditation, the built-in timer can be started directly from the relevant section. If you pause it and continue reciting, the remaining meditation time carries over to the next meditation interval.' },
       { p: 'Visualisation aids are provided for the Refuge Tree, Vajrasattva and Guru Yoga. In the Vajrasattva section, tap **VISUALIZE** to open the interactive 100-syllable mantra, where its angle and speed of rotation can be adjusted.' },
@@ -8809,6 +9212,7 @@ window.addEventListener('hashchange', () => closeIntro(false));
 
 (function init() {
   applyTheme();
+  syncReadingMode();
 
   // Set active tab buttons
   document.querySelectorAll('.tab-btn').forEach(b => {

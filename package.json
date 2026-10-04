@@ -1,0 +1,6 @@
+{
+  "name": "ngondro-reader",
+  "private": true,
+  "scripts": { "test": "node tests/reader.cjs" },
+  "devDependencies": { "playwright": "1.62.1" }
+}
