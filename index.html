@@ -2141,7 +2141,7 @@
       animation:none !important; transition:none !important; scroll-behavior:auto !important;
     }
     .paged-reading .content-area { position:fixed; top:var(--page-top); left:0; right:0;
-      height:var(--page-height); padding:0 16px; overflow:hidden;
+      height:var(--page-height); padding:0 16px; overflow:hidden; touch-action:none;
       font-size:min(var(--reader-fs),var(--page-font-cap)); }
     .paged-reading .section-block { display:none; margin:0; }
     .paged-reading .section-block.page-section { display:block; width:var(--page-width); height:100%;
@@ -6497,8 +6497,8 @@ function toggleLang(which) {
 /* One custom property. The browser reflows the text it is already
    showing; nothing is rebuilt, no node is replaced, and the reading
    position is kept by the browser itself. */
-function changeFontSize(delta) {
-  const next = Math.max(12, Math.min(40, state.fontSize + delta * 2));
+function changeFontSize(delta, step = 2) {
+  const next = Math.max(12, Math.min(40, state.fontSize + delta * step));
   if (next === state.fontSize) return;
   const anchor = captureReadingAnchor();
   stopAutoScroll();
@@ -7468,6 +7468,7 @@ let pageLayoutFrame = 0;
 
 function syncReadingMode() {
   const paged = state.readingMode === 'pages';
+  readerGestures.syncMode();
   document.documentElement.classList.toggle('paged-reading', paged);
   document.getElementById('btnPage').classList.toggle('active', paged);
   document.getElementById('btnPage').setAttribute('aria-pressed', String(paged));
@@ -7601,6 +7602,130 @@ function pageInputBlocked(target) {
     helpOpen || introOpen || welcomeOpen || garlandOpen || document.getElementById('timerDialog').classList.contains('open') ||
     document.getElementById('indexPanel').classList.contains('open') || document.getElementById('langSelect').classList.contains('open');
 }
+
+/* EWAM_READER_GESTURES_START */
+// Shared touch behavior for the readers. App-specific navigation and sizing
+// are callbacks so Ngondro and Vajracchedika can use the same implementation.
+function installReaderGestures(area, {isPageMode, isBlocked, turnPage, resizeText}) {
+  let gesture = null;
+  let ignoreClickUntil = 0;
+  const distance = touches => Math.hypot(touches[0].clientX - touches[1].clientX,
+    touches[0].clientY - touches[1].clientY);
+  const eligible = target => isPageMode() && !isBlocked(target) && window.getSelection().isCollapsed;
+  const consume = event => {
+    if (event.cancelable) event.preventDefault();
+    ignoreClickUntil = performance.now() + 700;
+  };
+
+  function onTouchStart(event) {
+    const touches = [...event.touches];
+    if (!eligible(event.target) || touches.some(touch => !area.contains(touch.target)) || touches.length > 2) {
+      gesture = {kind:'ignore'};
+      return;
+    }
+    // A pinch never becomes a swipe when one finger lifts first.
+    if (gesture?.kind === 'pinch' || gesture?.kind === 'ignore') return;
+    if (touches.length === 2) {
+      gesture = {kind:'pinch', initial:distance(touches), last:distance(touches), finished:false};
+      consume(event);
+    } else if (touches.length === 1) {
+      const touch = touches[0];
+      gesture = {kind:'swipe', id:touch.identifier, x:touch.clientX, y:touch.clientY,
+        lastX:touch.clientX, lastY:touch.clientY, started:performance.now(),
+        paged:isPageMode(), vertical:false};
+    }
+  }
+
+  function onTouchMove(event) {
+    if (!gesture || gesture.kind === 'ignore') return;
+    if (!eligible(event.target)) { gesture = {kind:'ignore'}; return; }
+    const touches = [...event.touches];
+    if (gesture.kind === 'pinch') {
+      consume(event);
+      if (!gesture.finished && touches.length === 2) gesture.last = distance(touches);
+      return;
+    }
+    const touch = touches.find(touch => touch.identifier === gesture.id);
+    if (!touch) return;
+    gesture.lastX = touch.clientX;
+    gesture.lastY = touch.clientY;
+    const dx = Math.abs(gesture.lastX - gesture.x), dy = Math.abs(gesture.lastY - gesture.y);
+    if (dy > 12 && dy > dx) gesture.vertical = true;
+    if (gesture.paged && !gesture.vertical && dx > 8 && dx > dy * 1.4) consume(event);
+  }
+
+  function onTouchEnd(event) {
+    if (!gesture) return;
+    if (gesture.kind === 'pinch') {
+      consume(event);
+      if (!gesture.finished && eligible(event.target)) {
+        gesture.finished = true;
+        const delta = gesture.last - gesture.initial;
+        if (Math.abs(delta) >= Math.max(12, gesture.initial * .08)) resizeText(delta > 0 ? 1 : -1);
+      }
+      if (!event.touches.length) gesture = null;
+      return;
+    }
+    if (gesture.kind === 'swipe' && !event.touches.length) {
+      const touch = [...event.changedTouches].find(touch => touch.identifier === gesture.id);
+      const dx = (touch?.clientX ?? gesture.lastX) - gesture.x;
+      const dy = (touch?.clientY ?? gesture.lastY) - gesture.y;
+      if (gesture.paged && isPageMode() && !gesture.vertical && eligible(event.target) &&
+          performance.now() - gesture.started < 800 && Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        consume(event);
+        turnPage(dx < 0 ? 1 : -1);
+      }
+    }
+    if (!event.touches.length) gesture = null;
+  }
+
+  function onTouchCancel() {
+    if (gesture?.kind === 'pinch') ignoreClickUntil = performance.now() + 700;
+    gesture = null;
+  }
+
+  // Some browsers synthesize an edge-tap click after a swipe/pinch. Do not
+  // turn a second page; ordinary taps and keyboard activation still work.
+  function onClick(event) {
+    if (event.detail && performance.now() < ignoreClickUntil) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }
+
+  // Non-passive touch listeners make the browser wait for JavaScript before
+  // scrolling. Register them only while pages own the gesture, and remove
+  // them entirely when scrolling is native again.
+  const listeners = [
+    ['touchstart', onTouchStart, {passive:false}],
+    ['touchmove', onTouchMove, {passive:false}],
+    ['touchend', onTouchEnd, {passive:false}],
+    ['touchcancel', onTouchCancel, {passive:true}],
+    ['click', onClick, {capture:true}]
+  ];
+  let enabled = false;
+  function syncMode() {
+    const next = isPageMode();
+    if (next === enabled) return;
+    gesture = null;
+    ignoreClickUntil = 0;
+    enabled = next;
+    for (const [type, listener, options] of listeners) {
+      if (enabled) area.addEventListener(type, listener, options);
+      else area.removeEventListener(type, listener, options);
+    }
+  }
+  syncMode();
+  return {syncMode};
+}
+/* EWAM_READER_GESTURES_END */
+
+const readerGestures = installReaderGestures(document.getElementById('contentArea'), {
+  isPageMode:() => state.readingMode === 'pages',
+  isBlocked:pageInputBlocked,
+  turnPage:turnReadingPage,
+  resizeText:delta => changeFontSize(delta, 1)
+});
 
 document.getElementById('contentArea').addEventListener('click', e => {
   if (state.readingMode !== 'pages' || pageInputBlocked(e.target) || !window.getSelection().isCollapsed) return;
@@ -8977,7 +9102,7 @@ const INTRO_L10N = {
     howTo: [
       { p: 'The app allows you to adapt the liturgy to the way you practise.' },
       { p: 'You can independently show or hide the Tibetan text, phonetic pronunciation and translation, change the text size, switch between day and night display, and use the index to move directly to any section of the practice.' },
-      { p: 'Select the **page icon** between Faster (+) and Fullscreen to turn pages without animation. Use the arrows below the text, tap the left or right edge, or use the arrow keys, Page Up/Down, or Space (Shift+Space to go back). Pages keep whole lines and adapt to portrait, landscape, text size, and your chosen scripts. Select the icon again to return to scrolling.' },
+      { p: 'Select the **page icon** between Faster (+) and Fullscreen to turn pages without animation. Swipe left for the next page or right for the previous page. Pinch to decrease the text size by 1, or spread two fingers to increase it by 1, once per gesture in page mode. In scroll mode, use the text size controls. Use the arrows below the text, tap the left or right edge, or use the arrow keys, Page Up/Down, or Space (Shift+Space to go back). Pages keep whole lines and adapt to portrait, landscape, text size, and your chosen scripts. Select the icon again to return to scrolling.' },
       { p: '**Fullscreen** hides the header and bottom options, leaving only the expand/contract icon. Tap it to restore the controls. Edge taps and keyboard page turns work in fullscreen. The **up arrow** always returns to the beginning of the current text.' },
       { p: 'For hands-free recitation, use **Auto Scroll** and adjust its speed, or enable **Tilt to Scroll** to move through the text by tilting your device.' },
       { p: 'Where the liturgy calls for resting in meditation, the built-in timer can be started directly from the relevant section. If you pause it and continue reciting, the remaining meditation time carries over to the next meditation interval.' },

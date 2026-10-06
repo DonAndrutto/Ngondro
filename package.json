@@ -1,6 +1,9 @@
 {
   "name": "ngondro-reader",
   "private": true,
-  "scripts": { "test": "node tests/reader.cjs" },
+  "scripts": {
+    "test": "node tests/reader.cjs && node tests/gestures.cjs",
+    "test:gestures": "node tests/gestures.cjs"
+  },
   "devDependencies": { "playwright": "1.62.1" }
 }
