@@ -1,15 +1,11 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const http = require('node:http');
 const {chromium} = require('playwright');
 
 const root = path.resolve(__dirname, '..');
 const reference = process.env.EWAM_REFERENCE_HTML || path.join(root, '../Ewam/index.html');
-const server = http.createServer((req, res) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.end(fs.readFileSync(req.url === '/ewam' && fs.existsSync(reference) ? reference : path.join(root,'index.html')));
-});
+const server = require('./server.cjs').createServer(reference);
 
 async function main() {
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
@@ -39,7 +35,7 @@ async function main() {
     // Compare the shared controls against the actual reviewed Ewam revision.
     if (fs.existsSync(reference)) {
       const ewam = await browser.newPage({viewport:{width:390,height:844}});
-      await ewam.goto(url + '/ewam');
+      await ewam.goto(url + '/ewam/');
       await ewam.evaluate(() => {document.getElementById('ykLoader').remove(); closeWelcome(); toggleReadingMode();});
       const commonUI = () => {
         const selectors = ['#btnPage','#btnFS','#btnTilt','#btnTheme','[onclick="changeSpeed(-1)"]','[onclick="changeSpeed(1)"]',
