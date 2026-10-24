@@ -19,10 +19,8 @@ for (const mapping of approval.paragraph_mappings) {
   assert.equal(byId.get(mapping.block)?.[mapping.field], mapping.expected,
     `approved source paragraph ${mapping.source_paragraph}: ${mapping.block}.${mapping.field}`);
 }
-assert.equal(blocks.flatMap(block => block.editorialNotes || []).length, 19);
-for (const [id, notes] of Object.entries(approval.notes)) {
-  assert.equal(JSON.stringify(byId.get(id).editorialNotes), JSON.stringify(notes), `complete notes: ${id}`);
-}
+assert.equal(blocks.flatMap(block => block.editorialNotes || []).length, 0, 'no editorial notes in app data');
+assert(!/editorialNote|editorial-note|Editorial note|Textual note/.test(html), 'no editorial note content or controls bundled in app');
 for (const restored of approval.restored_blocks) {
   const section = sections.find(section => section.blocks.some(block => block.id === restored.block));
   assert(section.blocks.findIndex(block => block.id === restored.block) < section.blocks.findIndex(block => block.id === restored.before));
@@ -45,28 +43,13 @@ async function main() {
     await page.getByRole('button', { name: 'Enter — Kunzang Gongdu Ngöndro', exact: true }).click();
     await page.getByRole('button', { name: 'Proceed to the Text', exact: true }).click();
     await page.evaluate(() => document.fonts.ready);
-    let markers = 0;
-    for (const tab of ['YOGA', 'NGONDRO']) {
-      await page.evaluate(tab => { setLanguage('en'); switchTab(tab); }, tab);
-      markers += await page.locator('.editorial-note-marker').count();
+    for (const lang of ['en', 'pl']) {
+      for (const tab of ['YOGA', 'NGONDRO']) {
+        await page.evaluate(({ lang, tab }) => { setLanguage(lang); switchTab(tab); }, { lang, tab });
+        assert.equal(await page.locator('.editorial-note-marker, #editorialNotesDialog, .editorial-note-text').count(), 0,
+          'practice text has no editorial note controls or content');
+      }
     }
-    assert.equal(markers, 19, 'every approved note is reachable');
-    for (const [id, notes] of Object.entries(approval.notes)) {
-      await page.evaluate(id => openEditorialNotes(id), id);
-      assert.equal(await page.locator('#editorialNotesDialog').isVisible(), true);
-      assert.deepEqual(await page.locator('.editorial-note-text').allTextContents(), notes.map(note => note.text));
-      await page.getByRole('button', { name: 'Close', exact: true }).click();
-      await page.waitForFunction(() => !document.body.classList.contains('overlay-blur'));
-    }
-    await page.evaluate(() => { switchTab('YOGA'); });
-    const firstNote = page.locator('[data-bid="1-2"] .editorial-note-marker');
-    await firstNote.click();
-    await page.keyboard.press('Escape');
-    assert.equal(await page.locator('#editorialNotesDialog').isVisible(), false);
-    assert.equal(await firstNote.evaluate(el => el === document.activeElement), true, 'focus returns to note marker');
-    await page.evaluate(() => openEditorialNotes('1-10'));
-    await page.screenshot({ path: path.join(root, 'test-results/editorial-note-mobile.png') });
-    await page.getByRole('button', { name: 'Close', exact: true }).click();
     const visualization = await page.evaluate(() => ({
       same: OM_SCENE.mantra === TABS_DATA.NGONDRO.flatMap(section => section.blocks).find(block => block.id === 'ng-5-17').tibetan,
       syllables: omSyllables(OM_SCENE.mantra).length,
@@ -78,7 +61,7 @@ async function main() {
     await page.evaluate(() => { setLanguage('pl'); switchTab('NGONDRO'); });
     assert.equal(await page.locator('[data-bid="ng-7-drodul-lingpa"] .eng').count(), 0, 'no unapproved English-as-Polish fallback');
     assert.deepEqual(errors, []);
-    console.log('98 approved paragraphs, 19 notes, restored passages and mantra visualization verified.');
+    console.log('98 approved paragraphs, restored passages and mantra visualization verified; app contains no editorial notes.');
   } finally {
     await browser.close();
     server.close();

@@ -1,9 +1,9 @@
 # Ngondro
 Kunzang Gongpa Kundu Ngondro
 
-The English text and shared Tibetan include the approved editorial decisions of 24 October 2026, synchronized from the [aligned working copy](https://docs.google.com/document/d/1xjZtz_x-05xsvoPAXmvXRRlwK-VQpcv9c5k6W14ApuQ). Numbered note buttons open the approved terminology and textual notes separately from the recitation. The mantra visualization uses the same Tibetan as the recitation block.
+The English text and shared Tibetan include the approved editorial decisions of 24 October 2026, synchronized from the [aligned working copy](https://docs.google.com/document/d/1xjZtz_x-05xsvoPAXmvXRRlwK-VQpcv9c5k6W14ApuQ). The app displays only the approved practice text, with no editorial notes, note markers or commentary panels. The mantra visualization uses the same Tibetan as the recitation block.
 
-The [synchronization record](editorial/approved-text-2026-10-24.json) maps all 98 changed source paragraphs and 19 notes. It preserves the outstanding source questions: the dream/waking emendation and mantra normalizations are approved editorial readings, not a claim that source collation is complete. The separate Polish translation has not received this English editorial pass; restored passages without an approved Polish translation display their shared Tibetan without substituting English as Polish.
+The [synchronization record](editorial/approved-text-2026-10-24.json) maps all 98 changed source paragraphs and archives the 19 editorial notes outside the app. It preserves the outstanding source questions: the dream/waking emendation and mantra normalizations are approved editorial readings, not a claim that source collation is complete. The separate Polish translation has not received this English editorial pass; restored passages without an approved Polish translation display their shared Tibetan without substituting English as Polish.
 
 The page icon between **+** and **Fullscreen** switches between scrolling and page turning. Pages use native text columns without animation, keep whole lines, and reflow in portrait or landscape. Use the arrows, left/right edge taps, arrow keys, Page Up/Down, or Space / Shift+Space to turn pages. The reading mode is saved locally.
 
