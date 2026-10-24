@@ -1,0 +1,980 @@
+{
+  "date": "2026-10-24",
+  "source_document": "https://docs.google.com/document/d/1xjZtz_x-05xsvoPAXmvXRRlwK-VQpcv9c5k6W14ApuQ",
+  "source_revision": "AHj4eMTyDmBxiq2cAu8bhgMMlD-dY9jzihXlJHXIsy9bHlIkw9W53_kYTb6SeMyRfny3IwmnEpr-6FibveZmqaMmr24dbcAH8hxpSOYuGsxi",
+  "source_snapshot_sha256": "02d5c5b02b310b057fc1f167e9cd4fd9794c9538dd9e934ca4277b2b3ddcccdd",
+  "scope": "All 98 approved changed source paragraphs, their 19 approved editorial/textual notes, and source companion lines needed for the restored passages. English and shared Tibetan; Polish translation unchanged.",
+  "paragraph_mappings": [
+    {
+      "source_paragraph": 3,
+      "block": "1-1",
+      "field": "translation",
+      "expected": "For the purpose of clarifying the visualization during the yoga of arising at dawn, perform the recitation and meditation simultaneously.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 7,
+      "block": "1-2",
+      "field": "translation",
+      "expected": "From the empty state of Dharmakāya, Rūpakāya appears as a mere Self-Arisen illusory dance;",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 10,
+      "block": "1-3",
+      "field": "translation",
+      "expected": "all appearances are the nature of the self-luminous five Primal Awarenesses, the pure lands of the lama, yidam, and ḍākinī.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 24,
+      "block": "1-8",
+      "field": "translation",
+      "expected": "Recite it loudly and clearly while contemplating the meaning in mind.",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 29,
+      "block": "1-10",
+      "field": "tibetan",
+      "expected": "ཞེས་ལན་གསུམ་བརྗོད་ཅིང༌། རྨི་ལམ་སྒྱུ་མ་ཙམ་གྱི་ངང་ནས་ལྡང་ལ།",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 30,
+      "block": "1-10",
+      "field": "translation",
+      "expected": "Recite this three times. Then, as you rise from the illusory state of dreaming, recite:",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 36,
+      "block": "1-12",
+      "field": "translation",
+      "expected": "May all sentient beings rise up from Saṃsāra's bed.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 39,
+      "block": "1-13",
+      "field": "translation",
+      "expected": "May they attain the Buddha Dharmakāya.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 47,
+      "block": "2-1",
+      "field": "translation",
+      "expected": "Second is to sit on a comfortable seat, with the body in the seven-point posture of Vairochana. For the key point of speech, visualize all the misdeeds, downfalls, faults, obscurations and habitual tendencies accumulated since beginningless lifetimes under the influence of the three poisonous afflictions, together with illnesses and harmful spirit influences, as blue and red rainbow light. It gathers from every part of your body and passes out through your nostrils with the breath. Imagine that all misdeeds and obscurations are completely purified. Breathe from the left nostril three times, from the right nostril three times and then from both together three times, for a total of nine breaths. Alternatively, clear the stale breath as a threefold set, one each. To bless speech, follow the Lama Gongdü practice for enhancing the power of recitation.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 50,
+      "block": "2-speech-alternative",
+      "field": "translation",
+      "expected": "If you cannot do that, use this profound and excellent blessing of speech from the Intimate Operative Instructions of the Mañjuśrī Mudrā that Subdues by Splendor:",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 90,
+      "block": "2-15",
+      "field": "tibetan",
+      "expected": "ཨ་ཨཱ། ཨི་ཨཱི། ཨུ་ཨཱུ། རྀ་རཱྀ། ལྀ་ལཱྀ། ཨེ་ཨཻ། ཨོ་ཨཽ། ཨཾ་ཨཿ",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 91,
+      "block": "2-15",
+      "field": "phonetics",
+      "expected": "a ā | i ī | u ū | ṛ ṝ | ḷ ḹ | e ai | o au | aṃ aḥ",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 94,
+      "block": "2-16",
+      "field": "phonetics",
+      "expected": "ka kha ga gha ṅa | ca cha ja jha ña |\nṭa ṭha ḍa ḍha ṇa | ta tha da dha na |\npa pha ba bha ma | ya ra la va | śa ṣa sa ha kṣa",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 97,
+      "block": "2-17",
+      "field": "phonetics",
+      "expected": "ye dharma hetu prabhava hetum tekham tathagato hyavadat\ntekham tsa yo nirodha ewam wadi maha shramana soha",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 114,
+      "block": "3-4",
+      "field": "translation",
+      "expected": "the Guru-bead is the principal Deities Yab-Yum",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 123,
+      "block": "3-7",
+      "field": "translation",
+      "expected": "light radiates, inviting the deities of Primal Awareness, who dissolve [into the visualization].",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 131,
+      "block": "3-10",
+      "field": "translation",
+      "expected": "Thus make offerings and recite praise of the specific main deity you’re practicing or use the following:",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 157,
+      "block": "3-18",
+      "field": "translation",
+      "expected": "Recite it 108 or 21 times.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 164,
+      "block": "3-20",
+      "field": "translation",
+      "expected": "The deities of the Three Roots, pervading the Dharmadhātu,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 170,
+      "block": "3-22",
+      "field": "translation",
+      "expected": "Through just counting with the joined fingers of means and Discernment,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 179,
+      "block": "3-25",
+      "field": "translation",
+      "expected": "Again, after [reciting] the root mantra at the end, recite the vowels and consonants and the heart of interdependence (Ye dharma). However many you do, recite the mantra on the flowers and throw them while reciting auspiciousness prayers.",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 195,
+      "block": "4-1",
+      "field": "translation",
+      "expected": "Then, the key point of the Mind:",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 201,
+      "block": "4-3",
+      "field": "translation",
+      "expected": "By not realizing this, all beings wander around in Saṃsāra. How pitiful!",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 206,
+      "block": "4-5",
+      "field": "translation",
+      "expected": "Thus, from the depths of one's heart, making this aspiration with intense fervor is the Bodhicitta motivation. It is the unsurpassable method for accumulation and purification of the three gates as causes for perfect awakening. Having done it before the actual Ngondro practice, recite [the ngondro starting with] PAL DEN TSA WAI…",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 234,
+      "block": "ng-1-1",
+      "field": "translation",
+      "expected": "These preliminaries have two parts: the general and the particular. First, sit upright on a comfortable seat and let the Mind settle into naturalness. Expel the stale breath three times. Visualize your root lama seated joyfully above the crown of your head, and pray with intense, heartfelt devotion:",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 258,
+      "block": "ng-1-9",
+      "field": "translation",
+      "expected": "Bless me so that the exceptional Realization of the profound path will be born in me.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 263,
+      "block": "ng-1-11",
+      "field": "translation",
+      "expected": "After the prayer, the guru dissolves into light and is absorbed into you. Rest naturally at ease.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 267,
+      "block": "ng-1-12",
+      "field": "translation",
+      "expected": "Secondly, in the particular, pertinent preliminary, there are two parts: the common and the special. The common is the purification of one's mindstream through The Four Thoughts that Turn the Mind (away from Saṃsāra).",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 341,
+      "block": "ng-2-24",
+      "field": "translation",
+      "expected": "How pitiful they are, wandering without escape in Saṃsāra.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 347,
+      "block": "ng-2-26",
+      "field": "translation",
+      "expected": "obtain the ultimate bliss and be established in great Equanimity,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 397,
+      "block": "ng-3-14",
+      "field": "translation",
+      "expected": "is surrounded by the host of buddhas, the Sugatas of the ten directions.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 409,
+      "block": "ng-3-18",
+      "field": "translation",
+      "expected": "surrounded by the noble assembly of bodhisattvas, śrāvakas and pratyekabuddhas.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 418,
+      "block": "ng-3-21",
+      "field": "translation",
+      "expected": "with the ḍākinīs and dharma protectors all around.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 436,
+      "block": "ng-3-27",
+      "field": "translation",
+      "expected": "Namo! Within the Expanse without the array of appearances,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 439,
+      "block": "ng-3-28",
+      "field": "translation",
+      "expected": "The three Kāyas are complete in the Primal Awareness of Rigpa.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 442,
+      "block": "ng-3-29",
+      "field": "translation",
+      "expected": "In the youthful vase body of the Expanse",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 458,
+      "block": "ng-3-34",
+      "field": "translation",
+      "expected": "and draws all beings without exception to the pure land.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 467,
+      "block": "ng-3-37",
+      "field": "translation",
+      "expected": "Rest in Meditative Equipoise, with the objects of refuge and your own Mind inseparable in the utter simplicity of Rigpa–emptiness. This is the absolute, fruitional refuge.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 477,
+      "block": "ng-4-2",
+      "field": "translation",
+      "expected": "In the Expanse with the great array of appearances,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 480,
+      "block": "ng-4-3",
+      "field": "translation",
+      "expected": "the Kāya complete with the five lights of Primal Awareness,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 483,
+      "block": "ng-4-4",
+      "field": "translation",
+      "expected": "the completely pure and perfect Bindus,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 486,
+      "block": "ng-4-5",
+      "field": "translation",
+      "expected": "Within this state of great Self-Liberation, I generate Bodhicitta.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 490,
+      "block": "ng-4-6",
+      "field": "translation",
+      "expected": "Training in aspirational and engaged Bodhicitta is the relative engendering of aspiration. With the thought, “I will make inherent Primal Awareness manifest,” rest in the rootless state of Mind. This is the absolute engendering of aspiration.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 507,
+      "block": "ng-5-4",
+      "field": "translation",
+      "expected": "my own Mind, as the clear white letter HUNG,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 516,
+      "block": "ng-5-7",
+      "field": "translation",
+      "expected": "with all aspects of Sambhogakāya, sitting with legs in the hero's posture.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 543,
+      "block": "ng-5-17",
+      "field": "tibetan",
+      "expected": "ཨོཾ་བཛྲ་ས་ཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་ས་ཏྭ་ཏེ་ནོ་པ། ཏིཥྛ་དྲྀ་ཌྷོ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡ་ཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙི་ཏྟཾ་ཤྲི་ཡཾ། ཀུ༌རུ༌ཧཱུྃ༌ཧ༌ཧ༌ཧ༌ཧ༌ཧོ། བྷ༌ག༌ཝཱན། སརྦ་ཏ་ཐཱ་ག་ཏ་བཛྲ་མཱ་མེ་མུཉྩ་བཛྲཱི་བྷ་ཝ་མཧཱ་ས་མ་ཡ་ས་ཏྭ་ཨཱཿ",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 544,
+      "block": "ng-5-17",
+      "field": "phonetics",
+      "expected": "om vajra sattva samaya manu palaya\nvajra sattva teno pa tishta dridho me bhawa\nsuto khayo me bhawa supo khayo me bhawa\nanu rakto me bhawa\nsarwa siddhi me prayatsa\nsarwa karma sutsa me tsitam shriyam kuru\nhung ha ha ha ha ho\nbhagawan sarwa tathagata vajra ma me muntsa\nvajri bhawa maha samaya sattva ah",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 560,
+      "block": "ng-5-21",
+      "field": "translation",
+      "expected": "with unsullied Clarity, the unaltered original nature.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 563,
+      "block": "ng-5-22",
+      "field": "translation",
+      "expected": "Rigpa–emptiness, the vast expanse of Vajrasattva's enlightened intention, is all-present.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 565,
+      "block": "ng-5-fruitional",
+      "field": "translation",
+      "expected": "Resting in Meditative Equipoise in the Natural Mode of Abiding is the absolute, fruitional purification of obscurations.",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 568,
+      "block": "ng-6",
+      "field": "title",
+      "expected": "2.4 Gathering of Accumulations (Maṇḍala Offering)",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 570,
+      "block": "ng-6-preparation",
+      "field": "translation",
+      "expected": "Visualizing the field of accumulation in the sky in front of you, the same as the visualization for the objects of refuge, clean off a jeweled or other maṇḍala base and place five heaps of jewels, grains, herbs, and such.",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 577,
+      "block": "ng-6-2",
+      "field": "translation",
+      "expected": "the heaps of the five lights of Primal Awareness Rigpa are arrayed.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 583,
+      "block": "ng-6-4",
+      "field": "translation",
+      "expected": "I offer the maṇḍala of the Expanse in the joined gau.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 585,
+      "block": "ng-6-dharmakaya-cue",
+      "field": "translation",
+      "expected": "That is the offering to the Dharmakāya lama.",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 590,
+      "block": "ng-6-5",
+      "field": "translation",
+      "expected": "For the Sambhogakāya",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 593,
+      "block": "ng-6-6",
+      "field": "translation",
+      "expected": "In the utterly pure maṇḍala of the Expanse",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 596,
+      "block": "ng-6-7",
+      "field": "translation",
+      "expected": "the heaps of light of the self-luminous Bindu are arrayed.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 599,
+      "block": "ng-6-8",
+      "field": "translation",
+      "expected": "To all Sambhogakāya lamas",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 602,
+      "block": "ng-6-9",
+      "field": "translation",
+      "expected": "I offer the maṇḍala of the great array of appearances.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 604,
+      "block": "ng-6-sambhogakaya-cue",
+      "field": "translation",
+      "expected": "That is the Sambhogakāya lama offering.",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 610,
+      "block": "ng-6-10",
+      "field": "translation",
+      "expected": "For the Nirmāṇakāya",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 622,
+      "block": "ng-6-14",
+      "field": "translation",
+      "expected": "I offer them to the Nirmāṇakāya, pure appearance of Rigpa.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 624,
+      "block": "ng-6-15",
+      "field": "tibetan",
+      "expected": "ཞེས་བླ་མ་སྤྲུལ་སྐུར་ཕུལ་ནས། སླར་ཡང་ཚོམ་བུ་གསོ་བཞིན་དུ།",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 625,
+      "block": "ng-6-15",
+      "field": "translation",
+      "expected": "After offering that to the Nirmāṇakāya lama, replenish the heaps.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 628,
+      "block": "ng-6-16",
+      "field": "translation",
+      "expected": "I offer the Dharmakāya maṇḍala of emptiness and compassion.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 631,
+      "block": "ng-6-17",
+      "field": "translation",
+      "expected": "I offer the Sambhogakāya maṇḍala of unimpeded, innate Clarity.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 634,
+      "block": "ng-6-18",
+      "field": "translation",
+      "expected": "I offer the Nirmāṇakāya maṇḍala of various pleasing things.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 640,
+      "block": "ng-6-20",
+      "field": "translation",
+      "expected": "all the maṇḍala displays of excellent divine articles",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 651,
+      "block": "ng-6-24",
+      "field": "tibetan",
+      "expected": "ཞེས་སྐུ་གསུམ་གྱི་ཞིང་ཁམས་གྲངས་ཅི་ནུས་སུ་འབུལ་བ་ཀུན་རྫོབ་རྒྱུའི་ཚོགས་བསགས་དང། མཐར་ཚོགས་ཞིང་མཆོད་རྫས་དང་བཅས་པ་འོད་དུ་ཞུ་བ་ཧཱུྃ་གི་རྣམ་པས་རང་ལ་བསྡུས་ཏེ་འཁོར་གསུམ་མི་དམིགས་པའི་ངང་ལ་འཇོག་པ་དོན་དམ་འབྲས་བུའི་ཚོགས་བསགས་སོ།།",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 653,
+      "block": "ng-6-24",
+      "field": "translation",
+      "expected": "This offering of as many as possible realms of the three Kāyas is the relative causal accumulation. Afterwards, the field of accumulation together with articles of offering dissolve into light, and in the form of a letter HUNG are gathered into oneself. Abiding within this state without conceiving of the three cycles of offerer, offering, and recipients is the absolute, fruitional accumulation.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 655,
+      "block": "ng-6-25",
+      "field": "translation",
+      "expected": "If you cannot accumulate the Three Kāyas Maṇḍala Offering, then use the Short Maṇḍala Offering:",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 670,
+      "block": "ng-6-30",
+      "field": "translation",
+      "expected": "I send forth this jeweled maṇḍala to you, precious guru!",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 675,
+      "block": "ng-7-1",
+      "field": "translation",
+      "expected": "Since it is necessary to prepare oneself by relying on the crucial point of devotion, which is the effective connection in this profound path of Vajrayāna, cultivate unwavering faith: “You alone know.”",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 690,
+      "block": "ng-7-6",
+      "field": "translation",
+      "expected": "Above his head, the lineage lamas sit in tiers, in descending order.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 693,
+      "block": "ng-7-7",
+      "field": "translation",
+      "expected": "Around him are lamas and yidams, peaceful and wrathful,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 696,
+      "block": "ng-7-8",
+      "field": "translation",
+      "expected": "buddhas, bodhisattvas, ḍākas and ḍākinīs,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 708,
+      "block": "ng-7-12",
+      "field": "translation",
+      "expected": "Their minds hold the essence of the Primal Awareness of great bliss.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 723,
+      "block": "ng-7-16",
+      "field": "translation",
+      "expected": "OM AH HUNG Samantabhadra, masculine and feminine, the Coalescence of Rigpa and emptiness,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 726,
+      "block": "ng-7-17",
+      "field": "translation",
+      "expected": "blissful Sambhogakāya deities of the five families,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 729,
+      "block": "ng-7-18",
+      "field": "translation",
+      "expected": "and excellent Nirmāṇakāya, Garab Dorje,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 738,
+      "block": "ng-7-21",
+      "field": "translation",
+      "expected": "Ḍākinī of Kachö, Tsogyal, queen of the great court,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 753,
+      "block": "ng-7-26",
+      "field": "translation",
+      "expected": "and the excellent Nirmāṇakāya, Tenzin Drakpa,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 812,
+      "block": "ng-7-drodul-lingpa",
+      "field": "phonetics",
+      "expected": "zung juk kur zheng dro dul ling pa'i zhab",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 813,
+      "block": "ng-7-drodul-lingpa",
+      "field": "translation",
+      "expected": "To the feet of Drodül Lingpa, a kaya appearing a coalescence,",
+      "already_present": true
+    },
+    {
+      "source_paragraph": 828,
+      "block": "ng-7-50",
+      "field": "translation",
+      "expected": "mamos, ḍākinīs, dharma protectors, and treasure lords,",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 841,
+      "block": "ng-7-54",
+      "field": "translation",
+      "expected": "swaying, shimmering Kāyas and Bindus.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 862,
+      "block": "ng-7-61",
+      "field": "translation",
+      "expected": "Bless my Mind with Realization.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 865,
+      "block": "ng-7-62",
+      "field": "translation",
+      "expected": "Bless me to realize the Natural Mode of Abiding.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 877,
+      "block": "ng-7-66",
+      "field": "translation",
+      "expected": "Bless me to develop the Clear Light.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 880,
+      "block": "ng-7-67",
+      "field": "translation",
+      "expected": "Bless me to reach the point of Exhaustion.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 895,
+      "block": "ng-7-73",
+      "field": "translation",
+      "expected": "All their wisdom, love and power",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 971,
+      "block": "ng-8-21",
+      "field": "translation",
+      "expected": "The Body, Speech, and Mind of all buddhas and my body, speech, and mind become inseparable. Rest in relaxed, natural, uncontrived Meditative Equipoise for however long it lasts. When you emerge from that, your mind and the lama's are inseparable. Knowing appearance, sound and Rigpa to be the play of the lama's Body, Speech and Mind, recite:",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 980,
+      "block": "ng-9-2",
+      "field": "translation",
+      "expected": "may Saṃsāra be shaken from the depths of the lower realms",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 992,
+      "block": "ng-9-6",
+      "field": "translation",
+      "expected": "is Spontaneous Presence, upon which",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 995,
+      "block": "ng-9-7",
+      "field": "translation",
+      "expected": "the path arises as the appearances of Direct Perception.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 1001,
+      "block": "ng-9-9",
+      "field": "translation",
+      "expected": "So dedicating the virtue, seal it with the prayer. During all activities, do not neglect the yoga of the Coalescence of the two accumulations, and totally integrate a noble, lasting resolution.",
+      "already_present": false
+    },
+    {
+      "source_paragraph": 1003,
+      "block": "ng-9-10",
+      "field": "translation",
+      "expected": "May the virtue accrued from clearly propounding this Dharma of the preliminary that initially opens the door to the Great Completeness’ Synthesis of Samantabhadra's Entire Wisdom Mind bring fortunate ones the glory of maturation and liberation.",
+      "already_present": false
+    }
+  ],
+  "restored_blocks": [
+    {
+      "block": "2-speech-alternative",
+      "before": "2-2",
+      "content": {
+        "id": "2-speech-alternative",
+        "type": "INSTRUCTION",
+        "sourceAligned": true,
+        "tibetan": "དེ་ཙམ་མི་ནུས་ན་འཇམ་དཔལ་ཕྱག་རྒྱ་ཟིལ་གནོན་གྱི་མན་ངག་ལས་བྱུང་བའི་ངག་བྱིན་རླབས་མཆོག་ཏུ་ཟབ་ནི།",
+        "translation": "If you cannot do that, use this profound and excellent blessing of speech from the Intimate Operative Instructions of the Mañjuśrī Mudrā that Subdues by Splendor:"
+      }
+    },
+    {
+      "block": "ng-5-fruitional",
+      "before": "ng-5-timer",
+      "content": {
+        "id": "ng-5-fruitional",
+        "type": "INSTRUCTION",
+        "sourceAligned": true,
+        "tibetan": "ཞེས་གནས་ལུགས་ཀྱི་ངང་ལ་མཉམ་པར་བཞག་པ་དོན་དམ་འབྲས་བུའི་སྒྲིབ་སྦྱོང་ངོ༌།།",
+        "translation": "Resting in Meditative Equipoise in the Natural Mode of Abiding is the absolute, fruitional purification of obscurations."
+      }
+    },
+    {
+      "block": "ng-6-preparation",
+      "before": "ng-6-1",
+      "content": {
+        "id": "ng-6-preparation",
+        "type": "INSTRUCTION",
+        "sourceAligned": true,
+        "tibetan": "བཞི་པ་ཚོགས་བསགས་པ་ནི། མདུན་མཁར་ཚོགས་ཞིང་སྐྱབས་ཡུལ་བཞིན་གསལ་ལ། རིན་པོ་ཆེ་ལ་སོགས་པའི་མནྜལ་ཕྱིས་ནས་རིན་ཆེན་འབྲུ་་སྨན་སོགས་ཀྱིས་ཚོམ་བུ་ལྔ་བཀོད་དེ།",
+        "translation": "Visualizing the field of accumulation in the sky in front of you, the same as the visualization for the objects of refuge, clean off a jeweled or other maṇḍala base and place five heaps of jewels, grains, herbs, and such."
+      }
+    },
+    {
+      "block": "ng-6-dharmakaya-cue",
+      "before": "ng-6-5",
+      "content": {
+        "id": "ng-6-dharmakaya-cue",
+        "type": "INSTRUCTION",
+        "sourceAligned": true,
+        "tibetan": "ཞེས་བླ་མ་ཆོས་སྐུར་འབུལ།",
+        "translation": "That is the offering to the Dharmakāya lama."
+      }
+    },
+    {
+      "block": "ng-6-reset-five-heaps",
+      "before": "ng-6-5",
+      "content": {
+        "id": "ng-6-reset-five-heaps",
+        "type": "INSTRUCTION",
+        "sourceAligned": true,
+        "tibetan": "ཡང་ཚོམ་བུ་ལྔ་བཀོད་ལ།",
+        "translation": "Again place the five heaps:"
+      }
+    },
+    {
+      "block": "ng-6-sambhogakaya-cue",
+      "before": "ng-6-10",
+      "content": {
+        "id": "ng-6-sambhogakaya-cue",
+        "type": "INSTRUCTION",
+        "sourceAligned": true,
+        "tibetan": "ཞེས་བླ་མ་ལོངས་སྐུར་འབུལ།",
+        "translation": "That is the Sambhogakāya lama offering."
+      }
+    },
+    {
+      "block": "ng-6-reset-offerings",
+      "before": "ng-6-10",
+      "content": {
+        "id": "ng-6-reset-offerings",
+        "type": "INSTRUCTION",
+        "sourceAligned": true,
+        "tibetan": "ཡང་ཚོམ་བུ་སོ་བདུན་ནམ་བདུན་སོགས་གང་འོས་བཀོད་ལ།",
+        "translation": "Again place the offerings in heaps of thirty-seven, seven or whatever is appropriate."
+      }
+    },
+    {
+      "block": "ng-7-drodul-lingpa",
+      "before": "ng-7-46",
+      "content": {
+        "id": "ng-7-drodul-lingpa",
+        "type": "RECITATION",
+        "sourceAligned": true,
+        "tibetan": "ཟུང་འཇུག་སྐུར་བཞེངས་འགྲོ་འདུལ་གླིང་པའི་ཞབས།",
+        "phonetics": "zung juk kur zheng dro dul ling pa'i zhab",
+        "translation": "To the feet of Drodül Lingpa, a kaya appearing a coalescence,"
+      }
+    }
+  ],
+  "notes": {
+    "1-2": [
+      {
+        "number": 1,
+        "term": "Self-Arisen",
+        "field": "translation",
+        "text": "Editorial note: Self-Arisen translates rang byung. It indicates what is not manufactured through contrivance, rather than an independently existing self that causes itself. It is distinguished from rang shar and from Spontaneous Presence (lhun grub)."
+      }
+    ],
+    "1-3": [
+      {
+        "number": 2,
+        "term": "Primal Awarenesses",
+        "field": "translation",
+        "text": "Editorial terminology note: Primal Awareness translates ye shes. 'Primal' (ye) points to primordial presence prior to accumulated learning, while 'Awareness' (shes) here denotes non-dual cognitive lucidity (jñāna), distinct from both ordinary knowing (shes pa) and Consciousness (rnam shes). The expression Primal Awareness of Rigpa preserves the relationship stated in the Tibetan."
+      }
+    ],
+    "1-10": [
+      {
+        "number": 3,
+        "term": "NG-S02a",
+        "field": "tibetan",
+        "text": "Textual note: The baseline reads རང་ནས་སྡང་ལ. The reading ངང་ནས་ལྡང་ལ is an editorial emendation based on the context of rising from sleep.",
+        "label": "Rising from the dream state"
+      }
+    ],
+    "2-speech-alternative": [
+      {
+        "number": 4,
+        "term": "Intimate Operative Instructions",
+        "field": "translation",
+        "text": "Editorial terminology note: Intimate Operative Instructions translates man ngag, often rendered “pith instructions” or upadeśa. The wording emphasizes close, practical guidance that works at the decisive point of the practice. After this first explanation, the shorter form Operative Instructions is used."
+      }
+    ],
+    "2-15": [
+      {
+        "number": 5,
+        "term": "NG-S07b",
+        "field": "tibetan",
+        "text": "Textual note: The baseline vowel list reads ཨ་ཨཱཿ, ཨོ་ཨོཾ། and ends ཨཾ་ཨཱཿ. These have been normalized to the short/long vowel series, o/au, and aṃ/aḥ. The consonant text is unchanged.",
+        "label": "Sanskrit alphabet"
+      }
+    ],
+    "3-20": [
+      {
+        "number": 6,
+        "term": "Dharmadhātu",
+        "field": "translation",
+        "text": "Editorial terminology note: Dharmadhātu translates chos dbyings, the expanse of phenomena. “Expanse” here should not be understood simply as the physical space surrounding objects. The term is retained to keep it distinct from Dharmatā and from ordinary uses of space."
+      }
+    ],
+    "3-22": [
+      {
+        "number": 7,
+        "term": "Discernment",
+        "field": "translation",
+        "text": "Editorial note: Discernment translates shes rab. Here it is not restricted to discursive analysis: its function follows the passage, including direct, nonconceptual discernment. It remains distinct from Primal Awareness (ye shes)."
+      }
+    ],
+    "4-1": [
+      {
+        "number": 8,
+        "term": "Mind",
+        "field": "translation",
+        "text": "Editorial terminology note: Mind translates sems: conditioned Mind, with its changing perceptions, feelings, thoughts, and habitual ways of grasping experience. In passages distinguishing Mind from Rigpa, this conditioned activity is what is being examined. Mind Itself is explained separately."
+      }
+    ],
+    "ng-1-1": [
+      {
+        "number": 9,
+        "term": "settle into naturalness",
+        "field": "translation",
+        "text": "Editorial terminology note: Settling into Naturalness translates rnal du dbab pa. Let the body, speech, and Mind settle without contrivance. The phrase can also be evoked as “falling into normality”: releasing the effort to manufacture a special state. “Normality” here points to uncontrived naturalness, rather than to habitual distraction."
+      }
+    ],
+    "ng-2-26": [
+      {
+        "number": 10,
+        "term": "Equanimity",
+        "field": "translation",
+        "text": "Editorial note: Meditative Equipoise (mnyam bzhag), Equality (mnyam nyid), and Equanimity (btang snyoms) are distinct. The first names resting in meditation; the second equality or sameness in the specified context; the third, in the Immeasurables, an attitude free of partiality rather than indifference."
+      }
+    ],
+    "ng-4-4": [
+      {
+        "number": 11,
+        "term": "Bindu",
+        "field": "translation",
+        "text": "Editorial note: Bindu translates thig le. According to the passage, the term may name a luminous sphere or a subtle drop; these functional glosses do not make every occurrence an ordinary physical droplet."
+      }
+    ],
+    "ng-4-5": [
+      {
+        "number": 12,
+        "term": "Self-Liberation",
+        "field": "translation",
+        "text": "Editorial terminology note: Self-Liberation translates rang grol. “Automatic liberation,” or even “automatic freedom,” helps convey freedom that does not require a second act to release what has arisen. The text’s instructions on Recognition and familiarity establish the context. Pointing Out presents what is to be recognized; Recognition and Realization are kept distinct from that presentation and from each other."
+      }
+    ],
+    "ng-5-17": [
+      {
+        "number": 13,
+        "term": "NG-S07a",
+        "field": "tibetan",
+        "text": "Textual note: The baseline reads དྲྀ་ཌྷ and བཛཱི; the separate Tibetan copy reads དྲྀ་ཎྷོ in the first phrase. This edition normalizes these to དྲྀ་ཌྷོ and བཛྲཱི, corresponding to dṛḍho and vajrī. Other transmitted readings are retained.",
+        "label": "Vajrasattva mantra"
+      }
+    ],
+    "ng-5-fruitional": [
+      {
+        "number": 14,
+        "term": "Natural Mode of Abiding",
+        "field": "translation",
+        "text": "Editorial terminology note: Natural Mode of Abiding translates gnas lugs: the way things abide as they are. “Natural” does not mean a temporary state produced by arranging experience or holding the Mind in a particular condition."
+      }
+    ],
+    "ng-6-15": [
+      {
+        "number": 15,
+        "term": "NG-S05",
+        "field": "tibetan",
+        "text": "Textual note: བླ་མ་སྤྲུལ་སྐུར corrects the baseline reading བྱ་མ་སྤྲུལ་སྐར. The corrected reading is also present in the separate Ngondro KGK Tibetan text.",
+        "label": "Nirmāṇakāya lama"
+      }
+    ],
+    "ng-7-1": [
+      {
+        "number": 16,
+        "term": "NG-S06",
+        "field": "translation",
+        "text": "Editorial clarification (Andrzej): This is the faith with which the practitioner regards the Guru with total openness, as if saying “you alone know” [my situation].",
+        "label": "Faith in the Guru"
+      }
+    ],
+    "ng-7-drodul-lingpa": [
+      {
+        "number": 17,
+        "term": "NG-003",
+        "field": "translation",
+        "text": "Editorial note (Andrzej): Drodül Lingpa here denotes Dudjom Rinpoche.",
+        "label": "Drodül Lingpa"
+      }
+    ],
+    "ng-7-67": [
+      {
+        "number": 18,
+        "term": "NG-004",
+        "field": "translation",
+        "text": "Editorial note (Andrzej): This points to the fourth Appearance, Exhaustion of Phenomena in Dharmatā.",
+        "label": "The fourth Appearance"
+      }
+    ],
+    "ng-9-6": [
+      {
+        "number": 19,
+        "term": "Spontaneous Presence",
+        "field": "translation",
+        "text": "Editorial note (Andrzej): Spontaneous Presence translates lhun grub. “Spontaneous” here is closer to “inherent”; the established wording is retained, but it does not mean vivacious or unpredictable. It is distinct from Self-Arisen (rang byung)."
+      }
+    ]
+  },
+  "unresolved": [
+    {
+      "id": "NG-005",
+      "source": "ལྷ༔ in DK's first Bodhicitta line; དབྱིངས༔ in Ngöndro/NR",
+      "current": "Within the great array of appearances,",
+      "status": "deferred_by_user",
+      "user_decision": "Leave that English line pending",
+      "decision_date": "2026-10-24",
+      "unapproved_proposal": "The deity of the great array of appearances,",
+      "instruction": "Deferred by the author on 24 October 2026. Retain the current first English line and the Tibetan ལྷ; no replacement is approved."
+    },
+    {
+      "id": "NG-S02a-source",
+      "parent_id": "NG-S02a",
+      "status": "source_verification_pending",
+      "question": "Find an independent witness of the dream/waking sentence. The approved reading ངང་ནས་ལྡང་ལ is applied and explicitly identified as an editorial emendation; the baseline རང་ནས་སྡང་ལ is preserved in its textual note. Do not reopen the adopted reading without new evidence."
+    },
+    {
+      "id": "NG-S07a-source",
+      "parent_id": "NG-S07a",
+      "status": "source_verification_pending",
+      "question": "Collate the Vajrasattva mantra against an authoritative witness of this particular KGK text. The approved dṛḍho/vajrī normalizations are applied and the differing Tibetan readings preserved in a textual note; a parallel practice does not establish the original reading of this text."
+    },
+    {
+      "id": "NG-S07c-source",
+      "parent_id": "NG-S07c",
+      "status": "source_verification_pending",
+      "question": "Locate an independent witness of the exact mālā-consecration formula. The transmitted pramarta naye and abhikhintsa are retained by approval; no conjectural Sanskrit reconstruction is authorized."
+    }
+  ],
+  "visualization": "Tibetan reads from the canonical app recitation block. Both existing overlay pronunciation arrays are resegmented to its 87 written Tibetan units; the English overlay retains its IAST convention and its readings now follow the approved source.",
+  "review_caveat": "The approved dream/waking emendation and mantra normalizations do not establish original source readings. Keep their textual notes. No pending corpus item is marked settled.",
+  "interface_terminology": "English index and timer labels use Bodhicitta, Maṇḍala and Meditative Equipoise, matching the approved term base."
+}

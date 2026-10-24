@@ -2120,6 +2120,26 @@
       .welcome-actions { padding-left: var(--sp-4); padding-right: var(--sp-4); }
     }
 
+    /* Approved editorial notes stay separate from the liturgical text. */
+    .editorial-note-marker {
+      display:inline; margin-left:0.25em; padding:0 0.15em; border:0;
+      background:transparent; color:var(--accent); font:inherit;
+      font-size:0.7em; vertical-align:super; line-height:1; cursor:pointer;
+    }
+    .editorial-note-marker:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .editorial-notes-dialog {
+      margin:auto; width:min(38rem,calc(100% - 32px)); max-height:calc(100dvh - 40px);
+      overflow:auto; padding:24px; border:1px solid var(--border); border-radius:var(--radius-lg);
+      background:var(--bg); color:var(--text); box-shadow:var(--elev-3);
+    }
+    .editorial-notes-dialog::backdrop { background:rgba(0,0,0,0.55); }
+    .editorial-notes-header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .editorial-notes-header h2 { font:600 18px/1.4 'Inter',sans-serif; }
+    .editorial-notes-header button { padding:8px 12px; border:1px solid var(--border); border-radius:8px;
+      background:var(--bg-secondary); color:var(--text); cursor:pointer; }
+    .editorial-note-text { margin-top:20px; font:17px/1.7 'EB Garamond','Jomolhari',serif; white-space:pre-wrap; }
+    .editorial-notes-dialog h3 { margin-top:20px; font:600 14px/1.5 'Inter',sans-serif; }
+
     /* One proportional row; fullscreen leaves a single reachable control. */
     [hidden] { display:none !important; }
     .bar-inner { display:block; max-width:36rem; }
@@ -2476,6 +2496,14 @@
        depends on the tab, the scroll position and whether
        the app is in fullscreen.
        ══════════════════════════════════════════════════════ -->
+  <dialog id="editorialNotesDialog" class="editorial-notes-dialog" aria-labelledby="editorialNotesTitle">
+    <form method="dialog" class="editorial-notes-header">
+      <h2 id="editorialNotesTitle">Editorial notes</h2>
+      <button id="editorialNotesClose" type="submit">Close</button>
+    </form>
+    <div id="editorialNotesBody"></div>
+  </dialog>
+
   <div class="help-overlay" id="helpOverlay" role="dialog" aria-modal="true"
        data-i18n-aria="helpTitle" aria-label="Help" hidden>
     <button type="button" class="help-dismiss" id="helpDismiss" onclick="closeHelp()"
@@ -2737,7 +2765,7 @@ const UI_STRINGS = {
     idxInitialPrayer: 'Initial Prayer',
     idxFourThoughts: 'The Four Thoughts That Turn the Mind',
     idxRefuge: 'Refuge',
-    idxBodhichitta: 'Bodhichitta',
+    idxBodhichitta: 'Bodhicitta',
     idxVajrasattva: 'Vajrasattva',
     idxMandala: 'Mandala',
     idxGuruYoga: 'Guru Yoga',
@@ -2979,21 +3007,23 @@ const TABS_DATA = {
           id: '1-1',
           type: 'INSTRUCTION',
           tibetan: '༄༅། །དང་པོ་ནི། ཐོ་རེངས་ལྡང་བའི་རྣལ་འབྱོར་ལ་རྣམ་པ་གསལ་བའི་སླད་དུ་འདོན་བསྒོམ་ཆབས་ཅིག་པར།',
-          translation: 'First, The yoga of arising at dawn, which both clarifies and cultivates the meaning.'
+          translation: "For the purpose of clarifying the visualization during the yoga of arising at dawn, perform the recitation and meditation simultaneously."
         },
         {
           id: '1-2',
+          editorialNotes: [{"number": 1, "term": "Self-Arisen", "field": "translation", "text": "Editorial note: Self-Arisen translates rang byung. It indicates what is not manufactured through contrivance, rather than an independently existing self that causes itself. It is distinguished from rang shar and from Spontaneous Presence (lhun grub)."}],
           type: 'RECITATION',
           tibetan: 'ཆོས་སྐུ་སྟོང་པའི་ངང་ལས་གཟུགས་སྐུ་སྒྱུ་མའི་རོལ་པར་རང་བྱུང་བ་ཙམ་དུ།',
           phonetics: 'chö ku tong pe ngang le zug ku gyu me rol par rang-jung-wa tsam du',
-          translation: 'Dharmakaya from the state of emptiness; Rupakaya as mere self-arising illusory dance;'
+          translation: "From the empty state of Dharmakāya, Rūpakāya appears as a mere Self-Arisen illusory dance;"
         },
         {
           id: '1-3',
+          editorialNotes: [{"number": 2, "term": "Primal Awarenesses", "field": "translation", "text": "Editorial terminology note: Primal Awareness translates ye shes. 'Primal' (ye) points to primordial presence prior to accumulated learning, while 'Awareness' (shes) here denotes non-dual cognitive lucidity (jñāna), distinct from both ordinary knowing (shes pa) and Consciousness (rnam shes). The expression Primal Awareness of Rigpa preserves the relationship stated in the Tibetan."}],
           type: 'RECITATION',
           tibetan: 'སྣང་བ་ཐམས་ཅད་བླ་མ་ཡི་དམ་མཁའ་འགྲོའི་ཞིང་ཁམས་ཡེ་ཤེས་ལྔའི་རང་འོད་ཀྱི་རང་བཞིན།',
           phonetics: 'nang wa tam che la ma yi dam khan drö zhing kam ye she nge rang ö kyi rang zhin',
-          translation: 'all appearances are the nature of the self-luminous five wisdoms, the pure lands of the lama, yidam, and dakini.'
+          translation: "all appearances are the nature of the self-luminous five Primal Awarenesses, the pure lands of the lama, yidam, and ḍākinī."
         },
         {
           id: '1-4',
@@ -3027,7 +3057,7 @@ const TABS_DATA = {
           id: '1-8',
           type: 'INSTRUCTION',
           tibetan: 'ཞེས་ལྷང་ལྷང་སྒྲོགས་པར་བསམ་པའི་དོན་ལ་བློ་བཞག་ཅིང༌།',
-          translation: 'Recite it loudly and clearly while contemplating the meaning in mind.'
+          translation: "Recite it loudly and clearly while contemplating the meaning in mind."
         },
         {
           id: '1-9',
@@ -3038,9 +3068,10 @@ const TABS_DATA = {
         },
         {
           id: '1-10',
+          editorialNotes: [{"number": 3, "term": "NG-S02a", "field": "tibetan", "text": "Textual note: The baseline reads རང་ནས་སྡང་ལ. The reading ངང་ནས་ལྡང་ལ is an editorial emendation based on the context of rising from sleep.", "label": "Rising from the dream state"}],
           type: 'INSTRUCTION',
-          tibetan: 'ཞེས་ལན་གསུམ་བརྗོད་ཅིང༌། རྨི་ལམ་སྒྱུ་མ་ཙམ་གྱི་རང་ནས་སྡང་ལ།',
-          translation: 'Recite thus three times. As for dreams, mere illusions arising from oneself:'
+          tibetan: "ཞེས་ལན་གསུམ་བརྗོད་ཅིང༌། རྨི་ལམ་སྒྱུ་མ་ཙམ་གྱི་ངང་ནས་ལྡང་ལ།",
+          translation: "Recite this three times. Then, as you rise from the illusory state of dreaming, recite:"
         },
         {
           id: '1-11',
@@ -3054,14 +3085,14 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སེམས་ཅན་ཐམས་ཅད་འཁོར་བའི་མལ་ནས་ལྡང་བར་གྱུར་ཅིག །',
           phonetics: 'sem chen tam che kor we mal ne dang war gyur chik',
-          translation: 'May all sentient beings rise up from samsara\'s bed.'
+          translation: "May all sentient beings rise up from Saṃsāra's bed."
         },
         {
           id: '1-13',
           type: 'RECITATION',
           tibetan: 'སངས་རྒྱས་ཆོས་ཀྱི་སྐུ་ཐོབ་པར་གྱུར་ཅིག །',
           phonetics: 'sang gye cho-kyi-ku tob par gyur chik',
-          translation: 'May they attain the Buddha Dharmakaya.'
+          translation: "May they attain the Buddha Dharmakāya."
         },
         {
           id: '1-14',
@@ -3079,7 +3110,15 @@ const TABS_DATA = {
           id: '2-1',
           type: 'INSTRUCTION',
           tibetan: '༄༅། །གཉིས་པ་ནི། བདེ་བའི་སྟན་ལ་ལུས་གནད་རྣམ་སྣང་གི་ཆོས་བདུན་དང་ ལྡན་པས་འདུག་སྟེ། ངག་གནད་ཚེ་རབས་ཐོག་མེད་ནས་ཉོན་མོངས་པ་དུག་ གསུམ་གྱི་ཀུན་ནས་བསླང་བའི་སྡིག་ལྟུང་ཉེས་སྒྲིབ་བག་ཆག་ནད་གདོན་དང་ བཅས་པ་ཐམས་ཅད་འཇའ་ཚོན་སྔོ་དམར་གྱི་རྣམ་པ་ལུས་ཀྱི་ཆ་ཐམས་ཅད་ནས་ འུབ་ཀྱི་འདུས་པ་སྣ་སྒོའི་རླུང་དང་འགྲོགས་ཏེ་ཕྱིར་སང་སང་སོང་བས་སྡིག་སྒྲིབ་ ཐམས་ཅད་སངས་ཀྱིས་དག་པའི་མོས་པ་དང་བཅས། སྣ་བུག་གཡོན་ནས་ གསུམ། གཡས་ནས་གསུམ། ཆ་མཉམ་གསུམ་རེ་སྟེ་དགུ་ཕྲུགས་སམ། ཡང་ན་ ལན་རེ་རེ་སྟེ་གསུམ་ཕྲུགས་སུ་རླུང་རོ་བསལ། ངག་བྱིན་གྱིས་རླབས་པའི་ཕྱིར་བླ་ མ་དགོངས་འདུས་ཀྱི་བཟླས་བརྗོད་ནུས་པ་སྟོབས་བསྐྱེད་ལྟར་བྱ་བའམ།',
-          translation: 'Second is to sit on a comfortable seat, with the body in the seven-point posture of Vairochana. For beginningless successive lives, through the three poisons of conflicting emotions, the speech has sown downfalls, obscurations, tendencies, sickness, and dön. Visualize these as a rainbow of blue and red colors gathering into a mass from all the parts of the body and expel them from the gateway of the nose, aided by the breath. By clearing it out, think that all sins and obscurations are purified. Breathe from the left nostril three times, from the right nostril three times and then from both together three times, for a total of ninefold times. Alternatively, clear the stale breath as a threefold set, one each. By blessing the speech, you cultivate the embodiment of the Lama\'s recitation with its expression, power, and strength:'
+          translation: "Second is to sit on a comfortable seat, with the body in the seven-point posture of Vairochana. For the key point of speech, visualize all the misdeeds, downfalls, faults, obscurations and habitual tendencies accumulated since beginningless lifetimes under the influence of the three poisonous afflictions, together with illnesses and harmful spirit influences, as blue and red rainbow light. It gathers from every part of your body and passes out through your nostrils with the breath. Imagine that all misdeeds and obscurations are completely purified. Breathe from the left nostril three times, from the right nostril three times and then from both together three times, for a total of nine breaths. Alternatively, clear the stale breath as a threefold set, one each. To bless speech, follow the Lama Gongdü practice for enhancing the power of recitation."
+        },
+        {
+          id: "2-speech-alternative",
+          editorialNotes: [{"number": 4, "term": "Intimate Operative Instructions", "field": "translation", "text": "Editorial terminology note: Intimate Operative Instructions translates man ngag, often rendered “pith instructions” or upadeśa. The wording emphasizes close, practical guidance that works at the decisive point of the practice. After this first explanation, the shorter form Operative Instructions is used."}],
+          type: "INSTRUCTION",
+          sourceAligned: true,
+          tibetan: "དེ་ཙམ་མི་ནུས་ན་འཇམ་དཔལ་ཕྱག་རྒྱ་ཟིལ་གནོན་གྱི་མན་ངག་ལས་བྱུང་བའི་ངག་བྱིན་རླབས་མཆོག་ཏུ་ཟབ་ནི།",
+          translation: "If you cannot do that, use this profound and excellent blessing of speech from the Intimate Operative Instructions of the Mañjuśrī Mudrā that Subdues by Splendor:"
         },
         {
           id: '2-2',
@@ -3173,23 +3212,24 @@ const TABS_DATA = {
         },
         {
           id: '2-15',
+          editorialNotes: [{"number": 5, "term": "NG-S07b", "field": "tibetan", "text": "Textual note: The baseline vowel list reads ཨ་ཨཱཿ, ཨོ་ཨོཾ། and ends ཨཾ་ཨཱཿ. These have been normalized to the short/long vowel series, o/au, and aṃ/aḥ. The consonant text is unchanged.", "label": "Sanskrit alphabet"}],
           type: 'RECITATION',
-          tibetan: 'ཨ་ཨཱཿ ཨི་ཨཱི། ཨུ་ཨཱུ། རྀ་རཱྀ། ལྀ་ལཱྀ། ཨེ་ཨཻ། ཨོ་ཨོཾ། ཨཾ་ཨཱཿ',
-          phonetics: 'aa, ii, uū, riri, li li, e ai, o au, am ah',
+          tibetan: "ཨ་ཨཱ། ཨི་ཨཱི། ཨུ་ཨཱུ། རྀ་རཱྀ། ལྀ་ལཱྀ། ཨེ་ཨཻ། ཨོ་ཨཽ། ཨཾ་ཨཿ",
+          phonetics: "a ā | i ī | u ū | ṛ ṝ | ḷ ḹ | e ai | o au | aṃ aḥ",
           translation: '(Sanskrit vowels)'
         },
         {
           id: '2-16',
           type: 'RECITATION',
           tibetan: 'ཀ་ཁ་ག་གྷ་ང༌། ཙ་ཚ་ཛ་ཛྷ་ཉ། ཊ་ཋ་ཌ་ཌྷ་ཎ། ཏ་ཐ་ད་དྷ་ན། པ་ཕ་བ་བྷ་མ། ཡ་ར་ལ་ཝ། ཤ་ཥ་ས་ཧ་ཀྵ།',
-          phonetics: 'ka kha ga gha nga | cha chha ja jha nya | tra t\'hra dra dhra nra | ta t\'ha da dha na | pa p\'ha ba bha ma | ya ra la wa | sha kha sa ha ksha',
+          phonetics: "ka kha ga gha ṅa | ca cha ja jha ña |\nṭa ṭha ḍa ḍha ṇa | ta tha da dha na |\npa pha ba bha ma | ya ra la va | śa ṣa sa ha kṣa",
           translation: '(Sanskrit consonants)'
         },
         {
           id: '2-17',
           type: 'RECITATION',
           tibetan: 'ཡེ་དྷརྨ་ཧེ་ཏུ་པྲ་བྷ་ཝ་ཧེ་ཏུནྟེ་ཥནྟ་ཐཱ་ག་ཏ་ཧྱ་བ་དཏ། ཏེ་ཥཱཉྩ་ཡོ་ནི་རོ་དྷ་ཡེ་ཝཾ་བ་དཱི་མ་ཧཱ་ཤྲ་མ་ཎ་སྭཱ་ཧཱ།',
-          phonetics: 'ye dharma hetu prabhava hetum tekham tathagato hyavadat tekkham tsa yo nirodha ewam wadi mahashramana soha',
+          phonetics: "ye dharma hetu prabhava hetum tekham tathagato hyavadat\ntekham tsa yo nirodha ewam wadi maha shramana soha",
           translation: '(Ye Dharma Formula)'
         }
       ]
@@ -3223,7 +3263,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'མདོ་འཛིན་གཙོ་བོ་ཡབ་ཡུམ་ལ༔',
           phonetics: 'do dzin tso wo yab yum la',
-          translation: 'the Guru-bead is the principle Deities Yab-Yum'
+          translation: "the Guru-bead is the principal Deities Yab-Yum"
         },
         {
           id: '3-5',
@@ -3244,7 +3284,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'འོད་འཕྲོས་ཡེ་ཤེས་སྤྱན་དྲངས་ཐིམ༔',
           phonetics: 'ö trö ye she chen drang thim',
-          translation: 'light radiates, invites primordial wisdom deities and melts [into the visualization].'
+          translation: "light radiates, inviting the deities of Primal Awareness, who dissolve [into the visualization]."
         },
         {
           id: '3-8',
@@ -3264,7 +3304,7 @@ const TABS_DATA = {
           id: '3-10',
           type: 'INSTRUCTION',
           tibetan: 'སོགས་ཀྱིས་མཆོད། སྒྲུབ་བྱའི་ལྷ་སོ་སོའི་གཙོ་བོའི་བསྟོད་པ་ཙམ་མམ། སྤྱི་ཙམ་དུ། བསྟོད་པར་འོས་པ་སོགས་ཀྱིས་བསྟོད།',
-          translation: 'Thus make offerings and recite praise of the specific main deity you’re practicing or use the with the following:'
+          translation: "Thus make offerings and recite praise of the specific main deity you’re practicing or use the following:"
         },
         {
           id: '3-11',
@@ -3318,7 +3358,7 @@ const TABS_DATA = {
           id: '3-18',
           type: 'INSTRUCTION',
           tibetan: 'ཞེས་བརྒྱ་རྩའམ་ཉེར་གཅིག་ཙམ་བཟླས།',
-          translation: 'Recite it a 100 or 21 times.'
+          translation: "Recite it 108 or 21 times."
         },
         {
           id: '3-19',
@@ -3329,10 +3369,11 @@ const TABS_DATA = {
         },
         {
           id: '3-20',
+          editorialNotes: [{"number": 6, "term": "Dharmadhātu", "field": "translation", "text": "Editorial terminology note: Dharmadhātu translates chos dbyings, the expanse of phenomena. “Expanse” here should not be understood simply as the physical space surrounding objects. The term is retained to keep it distinct from Dharmatā and from ordinary uses of space."}],
           type: 'RECITATION',
           tibetan: 'ཆོས་དབྱིངས་ཀུན་ཁྱབ་རྩ་གསུམ་ལྷ། །',
           phonetics: 'chö ying kun kyab tsa sum lha',
-          translation: 'The three roots deities that pervade throughout Dharmadhatu'
+          translation: "The deities of the Three Roots, pervading the Dharmadhātu,"
         },
         {
           id: '3-21',
@@ -3343,10 +3384,11 @@ const TABS_DATA = {
         },
         {
           id: '3-22',
+          editorialNotes: [{"number": 7, "term": "Discernment", "field": "translation", "text": "Editorial note: Discernment translates shes rab. Here it is not restricted to discursive analysis: its function follows the passage, including direct, nonconceptual discernment. It remains distinct from Primal Awareness (ye shes)."}],
           type: 'RECITATION',
           tibetan: 'ཐབས་ཤེས་སོར་མོའི་སྦྱར་བ་ཡིས། །',
           phonetics: 'tab she sor mö jar wa yi',
-          translation: 'Through just counting with the joined fingers of means and wisdom,'
+          translation: "Through just counting with the joined fingers of means and Discernment,"
         },
         {
           id: '3-23',
@@ -3366,7 +3408,7 @@ const TABS_DATA = {
           id: '3-25',
           type: 'INSTRUCTION',
           tibetan: 'ཅེས་མོས་ལ་སླར་རྩ་སྔགས་མཐར་དབྱངས་གསལ་རྟེན་སྙིང་བཏགས་པ་གང་འགྲུབ་མེ་ཏོག་ལ་སྔགས་ཏེ་གཏོར་ཞིང་ཤིས་བརྗོད་བྱ།',
-          translation: 'Again, after [reciting] the root mantra at the end, recite the vowels and consonants and the heart of interdependence (Ye dharma). However many you do, recite the mantra on the flowers and throw them while reciting auspiciousness prayers.'
+          translation: "Again, after [reciting] the root mantra at the end, recite the vowels and consonants and the heart of interdependence (Ye dharma). However many you do, recite the mantra on the flowers and throw them while reciting auspiciousness prayers."
         },
         {
           id: '3-26',
@@ -3408,9 +3450,10 @@ const TABS_DATA = {
       blocks: [
         {
           id: '4-1',
+          editorialNotes: [{"number": 8, "term": "Mind", "field": "translation", "text": "Editorial terminology note: Mind translates sems: conditioned Mind, with its changing perceptions, feelings, thoughts, and habitual ways of grasping experience. In passages distinguishing Mind from Rigpa, this conditioned activity is what is being examined. Mind Itself is explained separately."}],
           type: 'INSTRUCTION',
           tibetan: 'དེ་ནས་སེམས་གྱི་གནད།',
-          translation: 'Then, the key point of the mind:'
+          translation: "Then, the key point of the Mind:"
         },
         {
           id: '4-2',
@@ -3424,7 +3467,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'དེ་ལྟར་མ་རྟོགས་པས་འཁོར་བ་ན་འཁྱམས་པའི་སེམས་ཅན་ཐམས་ཅད་སྙིང་རེ་རྗེ།',
           phonetics: 'de tar ma-tok-pe kor-wa-na kyam pe sem chen tam che nying re je',
-          translation: 'By not realizing this, all beings wander around in samsara. How pitiful!'
+          translation: "By not realizing this, all beings wander around in Saṃsāra. How pitiful!"
         },
         {
           id: '4-4',
@@ -3437,7 +3480,7 @@ const TABS_DATA = {
           id: '4-5',
           type: 'INSTRUCTION',
           tibetan: 'ཞེས་ཚིག་དོན་སྦྲག་མར་སྙིང་ཐག་པ་ནས་འདུན་པ་ཤུགས་དྲག་ཏུ་གཏོང་བ་བྱང་ཆུབ་སེམས་ཀྱི་ཀུན་སློང་ཏེ། སྒོ་གསུམ་གྱི་དགེ་ཚོགས་མ་ལུས་རྫོགས་བྱང་གི་རྒྱུར་འརྒྱུར་བའི་ཐབས་ཚུལ་བླ་ན་མེད་པའོ། དེ་ནད་དཔལ་ལྡན་རྩ་བའི་སོགས་སྔོན་འགྲོ་དངོས་ལ་བཞུག་པར་བྱ།།',
-          translation: 'Thus, from the depths of one\'s heart, making this aspiration with intense fervor is the bodhicitta motivation. It is the unsurpassable method for accumulation and purification of the three gates as causes for perfect awakening. Having done it before the actual Ngondro practice, recite [the ngondro starting with] PAL DEN TSA WAI…'
+          translation: "Thus, from the depths of one's heart, making this aspiration with intense fervor is the Bodhicitta motivation. It is the unsurpassable method for accumulation and purification of the three gates as causes for perfect awakening. Having done it before the actual Ngondro practice, recite [the ngondro starting with] PAL DEN TSA WAI…"
         },
         {
           id: '4-6',
@@ -3468,9 +3511,10 @@ const TABS_DATA = {
         },
         {
           id: 'ng-1-1',
+          editorialNotes: [{"number": 9, "term": "settle into naturalness", "field": "translation", "text": "Editorial terminology note: Settling into Naturalness translates rnal du dbab pa. Let the body, speech, and Mind settle without contrivance. The phrase can also be evoked as “falling into normality”: releasing the effort to manufacture a special state. “Normality” here points to uncontrived naturalness, rather than to habitual distraction."}],
           type: 'INSTRUCTION',
           tibetan: 'འདི་ལ་གཉིས། ཐུན་སྤྱིའི་སྔོན་འགྲོ་དང༌། སྐཔས་དོན་སྒོས་ཀྱི་སྔོན་འགྲོའོ། །དང་པོ་ནི། བདེ་བའི་སྟན་ལ་ལུས་གནད་དྲང་པོར་བསྲང་ཞིང་སེམས་རྣལ་དུ་ཕབ་ནས་རླུང་རོ་ལན་གསུམ་ཕྱིར་བསལ། སྤྱི་བོར་རྩ་བའི་བླ་མ་དགྱེས་བཞིན་དུ་བཞུགས་པར་བསྒོམ་ལ། མོས་གུས་གདུང་ཤུགས་དྲག་པོས།',
-          translation: 'In this there are two parts: The general, common preliminary and the particular, pertinent preliminary. For the first, sit upright on a comfortable seat, and after settling the mind naturally, clear out the stale breath three times. Then meditate that your root lama sits cheerfully on the crown of your head and with intense, heartfelt devotion pray as follows:'
+          translation: "These preliminaries have two parts: the general and the particular. First, sit upright on a comfortable seat and let the Mind settle into naturalness. Expel the stale breath three times. Visualize your root lama seated joyfully above the crown of your head, and pray with intense, heartfelt devotion:"
         },
         {
           id: 'ng-1-2',
@@ -3525,7 +3569,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཟབ་ལམ་གྱི་རྟོགས་པ་ཁྱད་པར་ཅན་རྒྱུད་ལ་སྐྱེ་བར་བྱིན་གྱིས་བརླབ་ཏུ་གསོལ།།',
           phonetics: 'zab lam gyi tok pa kye par chen gyü la kye war jin gyi lap tu söl',
-          translation: 'Bless me so that the exceptional realization of the profound path will be born in me.'
+          translation: "Bless me so that the exceptional Realization of the profound path will be born in me."
         },
         {
           id: 'ng-1-10',
@@ -3538,13 +3582,13 @@ const TABS_DATA = {
           id: 'ng-1-11',
           type: 'INSTRUCTION',
           tibetan: 'ཞེས་གསོལ་བ་བཏབ་མཐར། བླ་མ་འོད་དུ་ཞུ་ནས་རང་ལ་ཐིམ་པར་བསམ་ཞིང་རང་བབས་སུ་ཀློད་དེ་འཇོག་གོ །',
-          translation: 'After the prayer, Guru dissolves into light and absorbs into you. Rest naturally at ease.'
+          translation: "After the prayer, the guru dissolves into light and is absorbed into you. Rest naturally at ease."
         },
         {
           id: 'ng-1-12',
           type: 'INSTRUCTION',
           tibetan: '།གཉིས་པ་སྐབས་དོན་སྔོན་འགྲོ་དངོས་ལ། ཐུན་མོང་དང། ཁྱད་པར་གཉིས་ཀྱི། དང་པོ་ཐུན་མོང་བློ་ལྡོག་རྣམ་པ་བཞིས་རྒྱུད་སྦྱོང་བ་ནི།',
-          translation: 'Secondly, in the particular, pertinent preliminary, there are two parts: the common and the special. The common is the cultivation of one\'s being through The Four Thoughts that Turn the Mind.'
+          translation: "Secondly, in the particular, pertinent preliminary, there are two parts: the common and the special. The common is the purification of one's mindstream through The Four Thoughts that Turn the Mind (away from Saṃsāra)."
         }
       ]
     },
@@ -3717,7 +3761,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཐར་མེད་འཁོར་བར་འཁྱམས་པ་སྙིང་རེ་རྗེ།།',
           phonetics: 'tar me khor war khyam pa nying re je',
-          translation: 'How pitiful they are, wandering without escape in samsara.'
+          translation: "How pitiful they are, wandering without escape in Saṃsāra."
         },
         {
           id: 'ng-2-25',
@@ -3728,10 +3772,11 @@ const TABS_DATA = {
         },
         {
           id: 'ng-2-26',
+          editorialNotes: [{"number": 10, "term": "Equanimity", "field": "translation", "text": "Editorial note: Meditative Equipoise (mnyam bzhag), Equality (mnyam nyid), and Equanimity (btang snyoms) are distinct. The first names resting in meditation; the second equality or sameness in the specified context; the third, in the Immeasurables, an attitude free of partiality rather than indifference."}],
           type: 'RECITATION',
           tibetan: 'འཕགས་པའི་བདེ་ཐོབ་བཏང་སྙོམས་ཆེར་འགོད་ཕྱིར།།',
           phonetics: 'pak pay de top tang nyom cher gö chir',
-          translation: 'obtain the ultimate bliss and be established in great equanimity,'
+          translation: "obtain the ultimate bliss and be established in great Equanimity,"
         },
         {
           id: 'ng-2-27',
@@ -3847,7 +3892,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཕྱོགས་བཅུའི་བདེ་གཤེགས་སངས་རྒྱས་ཚོགས་ཀྱིས་བསྐོར།།',
           phonetics: 'chok chuy de shek sang gye tsok kyi kor',
-          translation: 'is surrounded by an ocean of tathagata buddhas of the three times.'
+          translation: "is surrounded by the host of buddhas, the Sugatas of the ten directions."
         },
         {
           id: 'ng-3-15',
@@ -3875,7 +3920,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'བྱང་སེམས་ཉན་རང་འཕགས་པའི་ཚོགས་ཀྱིས་བསྐོར།།',
           phonetics: 'jang sem nyen rang pak pay tsok kyi kor',
-          translation: 'surrounded by the noble assembly of bodhisattvas, sravakas and pratyekabuddhas.'
+          translation: "surrounded by the noble assembly of bodhisattvas, śrāvakas and pratyekabuddhas."
         },
         {
           id: 'ng-3-19',
@@ -3896,7 +3941,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'མཐའ་བསྐོར་མཁའ་འགྲོ་ཆོས་སྐྱོང་ཚོགས་ཀྱིས་བསྐོར།།',
           phonetics: 'ta kor khan dro cho kyong tsok kyi kor',
-          translation: 'with the dakinis and dharma protectors all around.'
+          translation: "with the ḍākinīs and dharma protectors all around."
         },
         {
           id: 'ng-3-22',
@@ -3944,7 +3989,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ན་མོ་༔ སྣང་བ་མ་བཀོད་དབྱིངས་ཀྱི་ནང༔',
           phonetics: 'namo nang wa ma kö ying kyi nang',
-          translation: 'Namo! Within basic space without the array of appearances,',
+          translation: "Namo! Within the Expanse without the array of appearances,",
           variant: 'repeated'
         },
         {
@@ -3952,7 +3997,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'རིག་པ་ཡེ་ཤེས་སྐུ་གསུམ་རྫོགས༔',
           phonetics: 'rik pa ye she ku sum dzok',
-          translation: 'The three kayas are perfect in intrinsic awareness wisdom.',
+          translation: "The three Kāyas are complete in the Primal Awareness of Rigpa.",
           variant: 'repeated'
         },
         {
@@ -3960,7 +4005,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'གཞོན་ནུ་དབྱིངས་ཀྱི་བུམ་སྐུ་ལ༔',
           phonetics: 'shön nu ying kyi bum ku la',
-          translation: 'In the youthful vase body of basic space',
+          translation: "In the youthful vase body of the Expanse",
           variant: 'repeated'
         },
         {
@@ -3995,7 +4040,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སེམས་ཅན་མ་ལུས་དག་པའི་ཞིང་དུ་དྲངས།།',
           phonetics: 'sem chen ma lu dak pay shing du drang',
-          translation: 'and draws all beings without exception to the pureland.'
+          translation: "and draws all beings without exception to the pure land."
         },
         {
           id: 'ng-3-35',
@@ -4015,7 +4060,7 @@ const TABS_DATA = {
           id: 'ng-3-37',
           type: 'INSTRUCTION',
           tibetan: 'ཞེས་སྐྱབས་ཡུལ་རང་སེམས་དབྱེར་མེད་རིག་སྟོང་སྤྲོས་བྲལ་གྱི་ངང་དུ་མཉམ་པར་བཞག་པ་དོན་དམ་འབྲས་བུའི་སྐྱབས་འགྲོའོ། །',
-          translation: 'Rest in equipoise with the objects of refuge and one\'s own mind inseparable within the utter simplicity of awareness-emptiness. This is the absolute, fruitional refuge.'
+          translation: "Rest in Meditative Equipoise, with the objects of refuge and your own Mind inseparable in the utter simplicity of Rigpa–emptiness. This is the absolute, fruitional refuge."
         }
       ]
     },
@@ -4034,7 +4079,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སྣང་བ་བཀོད་པ་ཆེན་པོའི་དབྱིངས༔',
           phonetics: 'nang wa kö pa chen poy ying',
-          translation: 'In basic space with the great array of appearances,',
+          translation: "In the Expanse with the great array of appearances,",
           variant: 'repeated'
         },
         {
@@ -4042,36 +4087,38 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཡེ་ཤེས་འོད་ལྔ་རྫོགས་པའི་སྐུ༔',
           phonetics: 'ye she ö nga dzok pay ku',
-          translation: 'the body of the five wisdom lights perfected,',
+          translation: "the Kāya complete with the five lights of Primal Awareness,",
           variant: 'repeated'
         },
         {
           id: 'ng-4-4',
+          editorialNotes: [{"number": 11, "term": "Bindu", "field": "translation", "text": "Editorial note: Bindu translates thig le. According to the passage, the term may name a luminous sphere or a subtle drop; these functional glosses do not make every occurrence an ordinary physical droplet."}],
           type: 'RECITATION',
           tibetan: 'ཐིག་ལེ་རྣམ་དག་རྫོགས་ལྡན་ལ༔',
           phonetics: 'tig le nam dak dzok den la',
-          translation: 'the completely pure and perfect sphere,',
+          translation: "the completely pure and perfect Bindus,",
           variant: 'repeated'
         },
         {
           id: 'ng-4-5',
+          editorialNotes: [{"number": 12, "term": "Self-Liberation", "field": "translation", "text": "Editorial terminology note: Self-Liberation translates rang grol. “Automatic liberation,” or even “automatic freedom,” helps convey freedom that does not require a second act to release what has arisen. The text’s instructions on Recognition and familiarity establish the context. Pointing Out presents what is to be recognized; Recognition and Realization are kept distinct from that presentation and from each other."}],
           type: 'RECITATION',
           tibetan: 'རང་གྲོལ་ཆེན་པོར་སེམས་བསྐྱེད་དོ༔',
           phonetics: 'rang drol chen por sem kye do',
-          translation: 'Within this state of great self-liberation, I generate bodhichitta.',
+          translation: "Within this state of great Self-Liberation, I generate Bodhicitta.",
           variant: 'repeated'
         },
         {
           id: 'ng-4-6',
           type: 'INSTRUCTION',
           tibetan: 'ཞེས་སྨོན་འཇུག་གི་བདག་ཉིད་ཅན་ལ་སློབ་པ་ཀུན་རྫོབ་སེམས་བསྐྱེད་དང་། རང་གནས་ཀྱི་ཡེ་ཤེས་མངོན་དུ་བྱའོ་སྙམ་དུ་སེམས་རྩ་བྲལ་གྱི་ངང་ལ་འཇོག་པ་དོན་དམ་སེམས་བསྐྱེད་དོ། །',
-          translation: 'The training in the aspects of wishful and engaging bodhichitta is the relative engendering of aspiration, and thinking, "I actualize inherent wisdom," abiding in the state of mind without root, is the absolute engendering of aspiration.'
+          translation: "Training in aspirational and engaged Bodhicitta is the relative engendering of aspiration. With the thought, “I will make inherent Primal Awareness manifest,” rest in the rootless state of Mind. This is the absolute engendering of aspiration."
         },
         {
           id: 'ng-4-timer',
           type: 'TIMER',
           timerKey: 0,
-          label: 'Bodhichitta — rest in equipoise'
+          label: 'Bodhicitta — rest in Meditative Equipoise'
         }
       ]
     },
@@ -4105,7 +4152,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'རང་སེམས་ཧཱུྃ་ཡིག་དཀར་གསལ་ཡོངས་གྱུར་པ།།',
           phonetics: 'rang sem hung yik kar sal yong gyur pa',
-          translation: 'one\'s own mind as the clear white letter HUNG'
+          translation: "my own Mind, as the clear white letter HUNG,"
         },
         {
           id: 'ng-5-5',
@@ -4126,7 +4173,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ལོངས་སྤྱོད་ཆས་རྫོགས་ཞབས་ཟུང་སེམས་སྐྱིལ་བཞུགས༎',
           phonetics: 'long cho che dzok shap zung sem kyil shuk',
-          translation: 'with all aspects of sambhogakaya, sitting with legs in the hero\'s posture.'
+          translation: "with all aspects of Sambhogakāya, sitting with legs in the hero's posture."
         },
         {
           id: 'ng-5-8',
@@ -4199,9 +4246,10 @@ const TABS_DATA = {
         },
         {
           id: 'ng-5-17',
+          editorialNotes: [{"number": 13, "term": "NG-S07a", "field": "tibetan", "text": "Textual note: The baseline reads དྲྀ་ཌྷ and བཛཱི; the separate Tibetan copy reads དྲྀ་ཎྷོ in the first phrase. This edition normalizes these to དྲྀ་ཌྷོ and བཛྲཱི, corresponding to dṛḍho and vajrī. Other transmitted readings are retained.", "label": "Vajrasattva mantra"}],
           type: 'RECITATION',
-          tibetan: 'ཨོཾ་བཛྲ་ས་ཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་ས་ཏྭ་ཏེ་ནོ་པ། ཏིཥྛ་དྲྀ་ཌྷ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡ་ཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙི་ཏྟཾ་ཤྲི་ཡཾ། ཀུརུཧཱུྃཧཧཧཧཧོ། བྷགཝཱན། སརྦ་ཏ་ཐཱ་ག་ཏ་བཛྲ་མཱ་མེ་མུཉྩ་བཛཱི་བྷ་ཝ་མཧཱ་ས་མ་ཡ་ས་ཏྭ་ཨཱཿ',
-          phonetics: 'om vajra sattva samaya manu palaya vajra sattva teno pa tikta dridho me bhawa suto khayo mebhawa supo khayo mebhawa anu rakto mebhawa sarwa siddhi me prayatsa sarwa karma sutsa me tsitam shriyamkuru hung ha ha ha ha ho bhagawan sarwa tathagata vajra mamemuntsa vajri bhawa maha samaya sattva ah',
+          tibetan: "ཨོཾ་བཛྲ་ས་ཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་ས་ཏྭ་ཏེ་ནོ་པ། ཏིཥྛ་དྲྀ་ཌྷོ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡ་ཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙི་ཏྟཾ་ཤྲི་ཡཾ། ཀུ༌རུ༌ཧཱུྃ༌ཧ༌ཧ༌ཧ༌ཧ༌ཧོ། བྷ༌ག༌ཝཱན། སརྦ་ཏ་ཐཱ་ག་ཏ་བཛྲ་མཱ་མེ་མུཉྩ་བཛྲཱི་བྷ་ཝ་མཧཱ་ས་མ་ཡ་ས་ཏྭ་ཨཱཿ",
+          phonetics: "om vajra sattva samaya manu palaya\nvajra sattva teno pa tishta dridho me bhawa\nsuto khayo me bhawa supo khayo me bhawa\nanu rakto me bhawa\nsarwa siddhi me prayatsa\nsarwa karma sutsa me tsitam shriyam kuru\nhung ha ha ha ha ho\nbhagawan sarwa tathagata vajra ma me muntsa\nvajri bhawa maha samaya sattva ah",
           translation: '(The Hundred Syllable Mantra)',
           variant: 'repeated',
           visualize: true
@@ -4233,27 +4281,42 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'གསལ་ལ་རྙོག་མེད་རང་བབས་གདོད་མའི་གཤིས།།',
           phonetics: 'sal la nyok me rang bap dö may shi',
-          translation: 'with unsullied clarity, the unaltered original nature.'
+          translation: "with unsullied Clarity, the unaltered original nature."
         },
         {
           id: 'ng-5-22',
           type: 'RECITATION',
           tibetan: 'རིག་སྟོང་རྡོར་སེམས་དགོངས་ཀློང་ཡངས་པར་བརྡལ།།',
           phonetics: 'rik tong dor sem gong long yang par dal',
-          translation: 'Awareness-emptiness, the vast expanse of Vajrasattva\'s enlightened intention, is all-present.'
+          translation: "Rigpa–emptiness, the vast expanse of Vajrasattva's enlightened intention, is all-present."
+        },
+        {
+          id: "ng-5-fruitional",
+          editorialNotes: [{"number": 14, "term": "Natural Mode of Abiding", "field": "translation", "text": "Editorial terminology note: Natural Mode of Abiding translates gnas lugs: the way things abide as they are. “Natural” does not mean a temporary state produced by arranging experience or holding the Mind in a particular condition."}],
+          type: "INSTRUCTION",
+          sourceAligned: true,
+          tibetan: "ཞེས་གནས་ལུགས་ཀྱི་ངང་ལ་མཉམ་པར་བཞག་པ་དོན་དམ་འབྲས་བུའི་སྒྲིབ་སྦྱོང་ངོ༌།།",
+          translation: "Resting in Meditative Equipoise in the Natural Mode of Abiding is the absolute, fruitional purification of obscurations."
         },
         {
           id: 'ng-5-timer',
           type: 'TIMER',
           timerKey: 1,
-          label: 'Vajrasattva — rest in equipoise'
+          label: 'Vajrasattva — rest in Meditative Equipoise'
         }
       ]
     },
     {
       id: 'ng-6',
-      title: '2.4 Gathering of Accumulations (Mandala Offering)',
+      title: "2.4 Gathering of Accumulations (Maṇḍala Offering)",
       blocks: [
+        {
+          id: "ng-6-preparation",
+          type: "INSTRUCTION",
+          sourceAligned: true,
+          tibetan: "བཞི་པ་ཚོགས་བསགས་པ་ནི། མདུན་མཁར་ཚོགས་ཞིང་སྐྱབས་ཡུལ་བཞིན་གསལ་ལ། རིན་པོ་ཆེ་ལ་སོགས་པའི་མནྜལ་ཕྱིས་ནས་རིན་ཆེན་འབྲུ་་སྨན་སོགས་ཀྱིས་ཚོམ་བུ་ལྔ་བཀོད་དེ།",
+          translation: "Visualizing the field of accumulation in the sky in front of you, the same as the visualization for the objects of refuge, clean off a jeweled or other maṇḍala base and place five heaps of jewels, grains, herbs, and such."
+        },
         {
           id: 'ng-6-1',
           type: 'RECITATION',
@@ -4266,7 +4329,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཡེ་ཤེས་རིག་པ་འོད་ལྔའི་ཚོམ་བུ་བཀོད༔',
           phonetics: 'ye she rik pa ö ngay tsom bu kö',
-          translation: 'the heaps of the five lights of wisdom awareness are arrayed.'
+          translation: "the heaps of the five lights of Primal Awareness Rigpa are arrayed."
         },
         {
           id: 'ng-6-3',
@@ -4280,45 +4343,73 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'གའུ་མཁ་སྦྱོར་དབྱིངས་ཀྱི་མནྜལ་འབུལ༔',
           phonetics: 'gau kha jor ying kyi mandal bul',
-          translation: 'I offer the mandala of basic space in the joined gau.'
+          translation: "I offer the maṇḍala of the Expanse in the joined gau."
+        },
+        {
+          id: "ng-6-dharmakaya-cue",
+          type: "INSTRUCTION",
+          sourceAligned: true,
+          tibetan: "ཞེས་བླ་མ་ཆོས་སྐུར་འབུལ།",
+          translation: "That is the offering to the Dharmakāya lama."
+        },
+        {
+          id: "ng-6-reset-five-heaps",
+          type: "INSTRUCTION",
+          sourceAligned: true,
+          tibetan: "ཡང་ཚོམ་བུ་ལྔ་བཀོད་ལ།",
+          translation: "Again place the five heaps:"
         },
         {
           id: 'ng-6-5',
           type: 'HEADER',
-          translation: 'For the Sambhogakaya'
+          translation: "For the Sambhogakāya"
         },
         {
           id: 'ng-6-6',
           type: 'RECITATION',
           tibetan: 'དབྱིངས་ཀྱི་དཀྱིལ་འཁོར་རྣམ་པར་དག་པ་རུ༔',
           phonetics: 'ying kyi kyil khor nam par dak pa rus',
-          translation: 'In the utterly pure mandala of basic space'
+          translation: "In the utterly pure maṇḍala of the Expanse"
         },
         {
           id: 'ng-6-7',
           type: 'RECITATION',
           tibetan: 'ཐིག་ལེ་རང་གསལ་འོད་ཀྱི་ཚོམ་བུ་བཀོད༔',
           phonetics: 'tig le rang sal ö kyi tsom bu kö',
-          translation: 'the heaps of light of the self-luminous sphere are arrayed.'
+          translation: "the heaps of light of the self-luminous Bindu are arrayed."
         },
         {
           id: 'ng-6-8',
           type: 'RECITATION',
           tibetan: 'བླ་མ་ལོངས་སྤྱོད་རྫོགས་པའི་སྐུ་རྣམ་ལ༔',
           phonetics: 'la ma long chö dzok pay ku nam la',
-          translation: 'To all sambhogakaya lamas'
+          translation: "To all Sambhogakāya lamas"
         },
         {
           id: 'ng-6-9',
           type: 'RECITATION',
           tibetan: 'སྣང་བ་བཀོད་པ་ཆེན་པོའི་མནྜལ་འབུལ༔',
           phonetics: 'nang wa kö pa chen poy mandal bul',
-          translation: 'I offer the mandala of the great array of appearances.'
+          translation: "I offer the maṇḍala of the great array of appearances."
+        },
+        {
+          id: "ng-6-sambhogakaya-cue",
+          type: "INSTRUCTION",
+          sourceAligned: true,
+          tibetan: "ཞེས་བླ་མ་ལོངས་སྐུར་འབུལ།",
+          translation: "That is the Sambhogakāya lama offering."
+        },
+        {
+          id: "ng-6-reset-offerings",
+          type: "INSTRUCTION",
+          sourceAligned: true,
+          tibetan: "ཡང་ཚོམ་བུ་སོ་བདུན་ནམ་བདུན་སོགས་གང་འོས་བཀོད་ལ།",
+          translation: "Again place the offerings in heaps of thirty-seven, seven or whatever is appropriate."
         },
         {
           id: 'ng-6-10',
           type: 'HEADER',
-          translation: 'For the Nirmanakaya'
+          translation: "For the Nirmāṇakāya"
         },
         {
           id: 'ng-6-11',
@@ -4346,20 +4437,21 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'རིག་སྣང་དག་པ་སྤྲུལ་པའི་སྐུ་ལ་འབུལ༔',
           phonetics: 'rik nang dak pa trul pay ku la bul',
-          translation: 'I offer them to the nirmanakaya, pure appearance of awareness.'
+          translation: "I offer them to the Nirmāṇakāya, pure appearance of Rigpa."
         },
         {
           id: 'ng-6-15',
+          editorialNotes: [{"number": 15, "term": "NG-S05", "field": "tibetan", "text": "Textual note: བླ་མ་སྤྲུལ་སྐུར corrects the baseline reading བྱ་མ་སྤྲུལ་སྐར. The corrected reading is also present in the separate Ngondro KGK Tibetan text.", "label": "Nirmāṇakāya lama"}],
           type: 'INSTRUCTION',
-          tibetan: 'ཞེས་བྱ་མ་སྤྲུལ་སྐར་འཕུལ་ནས། སླར་ཡང་ཚོམ་བུ་གསོ་བཞིན་དུ།',
-          translation: 'After offering that to the nirmanakaya lama, replenish the heaps.'
+          tibetan: "ཞེས་བླ་མ་སྤྲུལ་སྐུར་ཕུལ་ནས། སླར་ཡང་ཚོམ་བུ་གསོ་བཞིན་དུ།",
+          translation: "After offering that to the Nirmāṇakāya lama, replenish the heaps."
         },
         {
           id: 'ng-6-16',
           type: 'RECITATION',
           tibetan: 'ཆོས་སྐུའི་མནྜལ་སྟོང་ཉིད་སྙིང་རྗེ་འབུལ༔',
           phonetics: 'chö kuy mandal tong nyi nying je bul',
-          translation: 'I offer the dharmakaya mandala of emptiness and compassion.',
+          translation: "I offer the Dharmakāya maṇḍala of emptiness and compassion.",
           variant: 'repeated'
         },
         {
@@ -4367,7 +4459,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ལོངས་སྐུའི་མནྜལ་མ་འགགས་རང་གསལ་འབུལ༔',
           phonetics: 'long kuy mandal ma gak rang sal bul',
-          translation: 'I offer the sambhogakaya mandala of unimpeded, innate luminosity.',
+          translation: "I offer the Sambhogakāya maṇḍala of unimpeded, innate Clarity.",
           variant: 'repeated'
         },
         {
@@ -4375,7 +4467,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སྤྲུལ་སྐུའི་མནྜལ་སྣ་ཚོགས་ཡིད་འོང་འབུལ༔',
           phonetics: 'trul kuy mandal na tsok yi ong bul',
-          translation: 'I offer the nirmanakaya mandala of various pleasing things.',
+          translation: "I offer the Nirmāṇakāya maṇḍala of various pleasing things.",
           variant: 'repeated'
         },
         {
@@ -4391,7 +4483,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ལྷ་རྫས་མཆོག་གི་མནྜལ་བཀོད་པ་རྣམས་༔',
           phonetics: 'lha dze chok gi mandal kö pa nam',
-          translation: 'all the mandala displays of excellent divine articles',
+          translation: "all the maṇḍala displays of excellent divine articles",
           variant: 'repeated'
         },
         {
@@ -4421,13 +4513,13 @@ const TABS_DATA = {
         {
           id: 'ng-6-24',
           type: 'INSTRUCTION',
-          tibetan: 'ཞེས་སྐ་གསུམ་གྱི་ཞིང་ཁམས་གྲངས་ཅི་ནས་སུ་འབུལ་བ་ཀུན་རྫོབ་རྒྱུའི་ཚོགས་བསགས་དང། མཐར་ཚོགས་ཞིང་མཆོད་རྫས་དང་མི་དམིགས་པའི་ངང་ལ་འཇོག་པ་དོན་དམ་འབྲས་བུའི་ཚོགས་བསགས་སོ།།',
-          translation: 'This offering of as many as possible realms of the three kayas is the relative causal accumulation. Afterwards, the field of accumulation together with articles of offering dissolve into light, and in the form of a letter HUNG are gathered into myself.'
+          tibetan: "ཞེས་སྐུ་གསུམ་གྱི་ཞིང་ཁམས་གྲངས་ཅི་ནུས་སུ་འབུལ་བ་ཀུན་རྫོབ་རྒྱུའི་ཚོགས་བསགས་དང། མཐར་ཚོགས་ཞིང་མཆོད་རྫས་དང་བཅས་པ་འོད་དུ་ཞུ་བ་ཧཱུྃ་གི་རྣམ་པས་རང་ལ་བསྡུས་ཏེ་འཁོར་གསུམ་མི་དམིགས་པའི་ངང་ལ་འཇོག་པ་དོན་དམ་འབྲས་བུའི་ཚོགས་བསགས་སོ།།",
+          translation: "This offering of as many as possible realms of the three Kāyas is the relative causal accumulation. Afterwards, the field of accumulation together with articles of offering dissolve into light, and in the form of a letter HUNG are gathered into oneself. Abiding within this state without conceiving of the three cycles of offerer, offering, and recipients is the absolute, fruitional accumulation."
         },
         {
           id: 'ng-6-25',
           type: 'INSTRUCTION',
-          translation: 'If you cannot accumulate the Three Kayas Mandala Offering, then use the Short Mandala Offering:'
+          translation: "If you cannot accumulate the Three Kāyas Maṇḍala Offering, then use the Short Maṇḍala Offering:"
         },
         {
           id: 'ng-6-26',
@@ -4462,13 +4554,13 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཨི་དམ་གུ་རུ་རཏྣ་མནྜལ་ཀཾ་ནིརྱ་ཏ་ཡཱ་མི།',
           phonetics: 'idam guru ratna mandala kamnirya tayami',
-          translation: 'I send forth this jeweled mandala to you, precious guru!'
+          translation: "I send forth this jeweled maṇḍala to you, precious guru!"
         },
         {
           id: 'ng-6-timer',
           type: 'TIMER',
           timerKey: 2,
-          label: 'Mandala — rest in equipoise'
+          label: 'Maṇḍala — rest in Meditative Equipoise'
         }
       ]
     },
@@ -4478,9 +4570,10 @@ const TABS_DATA = {
       blocks: [
         {
           id: 'ng-7-1',
+          editorialNotes: [{"number": 16, "term": "NG-S06", "field": "translation", "text": "Editorial clarification (Andrzej): This is the faith with which the practitioner regards the Guru with total openness, as if saying “you alone know” [my situation].", "label": "Faith in the Guru"}],
           type: 'INSTRUCTION',
           tibetan: 'ལྔ་པ་བླ་མའི་རྣལ་འབྱོར་ནི། ཟབ་ལམ་གྱི་རྟེན་འབྲེལ་མོས་གུས་ཀྱི་གནད་ལ་བརྟེན་ནས་བསྒྲིགས་དགོས་པས་ན་ཡིད་མཁྱེད་ཤེས་ཀྱི་དད་པ་གཏིང་ཚུགས་པའི་སྒོ་ནས།',
-          translation: 'Since it is necessary to prepare oneself by relying on the crucial point of devotion, which is the effective connection in this profound path of Vajrayana, develop the firm conviction of belief in the lama\'s awareness of your mind.'
+          translation: "Since it is necessary to prepare oneself by relying on the crucial point of devotion, which is the effective connection in this profound path of Vajrayāna, cultivate unwavering faith: “You alone know.”"
         },
         {
           id: 'ng-7-2',
@@ -4515,21 +4608,21 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཡས་རིམ་བརྒྱུད་པའི་བླ་མ་ཐོ་བརྩེགས་བཞུགས།།',
           phonetics: 'ye rim gyü pay la ma to tsek shuk',
-          translation: 'Above his head are the lamas, yidams,'
+          translation: "Above his head, the lineage lamas sit in tiers, in descending order."
         },
         {
           id: 'ng-7-7',
           type: 'RECITATION',
           tibetan: 'མཐའ་བསྐོར་བླ་མ་ཡི་དམ་ཞི་དང་ཁྲོ་།།',
           phonetics: 'ta kor la ma yi dam shi dang tro',
-          translation: 'peaceful and wrathful ones,'
+          translation: "Around him are lamas and yidams, peaceful and wrathful,"
         },
         {
           id: 'ng-7-8',
           type: 'RECITATION',
           tibetan: 'སངས་རྒྱས་བྱང་སེམས་དཔའ་བོ་མཁའ་འགྲོ་དང༌།།',
           phonetics: 'sang gye jang sem pa wo khan dro dang',
-          translation: 'buddhas, bodhisattvas, dakas and dakinis,'
+          translation: "buddhas, bodhisattvas, ḍākas and ḍākinīs,"
         },
         {
           id: 'ng-7-9',
@@ -4557,7 +4650,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཐུགས་ནི་བདེ་ཆེན་ཡེ་ཤེས་སྙིང་པོ་ཅན།།',
           phonetics: 'tuk ni de chen ye she nying po chen',
-          translation: 'Their minds possess the essence of the wisdom of great bliss.'
+          translation: "Their minds hold the essence of the Primal Awareness of great bliss."
         },
         {
           id: 'ng-7-13',
@@ -4585,21 +4678,21 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'ཨོཾ་ཨཱཿཧཱུྃ། རིག་སྟོང་ཟུང་འཇུག་ཀུན་ཏུ་བཟང་ཡབ་ཡུམ་།།',
           phonetics: 'om ah hung rik tong zung juk kun tu zang yab yum',
-          translation: 'OM AH HUNG Samantabhadra, masculine and feminine, the union of awareness and emptiness,'
+          translation: "OM AH HUNG Samantabhadra, masculine and feminine, the Coalescence of Rigpa and emptiness,"
         },
         {
           id: 'ng-7-17',
           type: 'RECITATION',
           tibetan: 'བདེ་ལྡན་ལོངས་སྤྱོད་རྫོགས་སྐུ་རིགས་ལྔའི་ལྷ།།',
           phonetics: 'de den long cho dzok ku rik ngay lha',
-          translation: 'blissful sambhogakaya deities of the five families,'
+          translation: "blissful Sambhogakāya deities of the five families,"
         },
         {
           id: 'ng-7-18',
           type: 'RECITATION',
           tibetan: 'མཆོག་གི་སྤྲུལ་སྐུ་དགའ་རབ་རྡོ་རྗེ་ལ།།',
           phonetics: 'chok gi trul ku ga rab dor je la',
-          translation: 'and excellent nirmanakaya, Garab Dorje,'
+          translation: "and excellent Nirmāṇakāya, Garab Dorje,"
         },
         {
           id: 'ng-7-19',
@@ -4620,7 +4713,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'མཁའ་སྤྱོད་ཌཱ་ཀི་མཁར་ཆེན་བཟའ་མཚོ་རྒྱལ།།',
           phonetics: 'kha chö da ki khar chen za tso gyal',
-          translation: 'Dakini of Kachö, Tsogyal, queen of the great court,'
+          translation: "Ḍākinī of Kachö, Tsogyal, queen of the great court,"
         },
         {
           id: 'ng-7-22',
@@ -4655,7 +4748,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སྤྲུལ་པའི་སྐུ་མཆོག་བསྟན་འཛིན་གྲགས་པ་ལ།།',
           phonetics: 'trul pay ku chok ten dzin drak pa la',
-          translation: 'and the excellent nirmanakaya, Tenzin Drakpa,'
+          translation: "and the excellent Nirmāṇakāya, Tenzin Drakpa,"
         },
         {
           id: 'ng-7-27',
@@ -4791,6 +4884,15 @@ const TABS_DATA = {
           translation: 'the mighty vajra holder, Gendun Gyamtso,'
         },
         {
+          id: "ng-7-drodul-lingpa",
+          editorialNotes: [{"number": 17, "term": "NG-003", "field": "translation", "text": "Editorial note (Andrzej): Drodül Lingpa here denotes Dudjom Rinpoche.", "label": "Drodül Lingpa"}],
+          type: "RECITATION",
+          sourceAligned: true,
+          tibetan: "ཟུང་འཇུག་སྐུར་བཞེངས་འགྲོ་འདུལ་གླིང་པའི་ཞབས།",
+          phonetics: "zung juk kur zheng dro dul ling pa'i zhab",
+          translation: "To the feet of Drodül Lingpa, a kaya appearing a coalescence,"
+        },
+        {
           id: 'ng-7-46',
           type: 'RECITATION',
           tibetan: 'རིགས་ཀུན་མཁྱབ་བདག་རྩ་བའི་བླ་མ་ལ།།',
@@ -4823,7 +4925,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'མ་དང་མཁའ་འགྲོ་ཆོས་སྐྱོང་གཏེར་བདག་ལ།།',
           phonetics: 'ma dang kha dro cho kyong ter dak la',
-          translation: 'mamos, dakinis, dharma protectors, and treasure lords,'
+          translation: "mamos, ḍākinīs, dharma protectors, and treasure lords,"
         },
         {
           id: 'ng-7-51',
@@ -4858,7 +4960,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སྐུ་དང་ཐིག་ལེར་ཤིགས་སེ་ཤིག༔',
           phonetics: 'ku dang tig ler shik se shik',
-          translation: 'trembling shimmering forms and spheres.',
+          translation: "swaying, shimmering Kāyas and Bindus.",
           variant: 'repeated'
         },
         {
@@ -4914,7 +5016,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སེམས་ལ་རྟོགས་པར་བྱིན་གྱིས་རློབས༔',
           phonetics: 'sem la tok par jin gyi lop',
-          translation: 'Bless my mind with realization.',
+          translation: "Bless my Mind with Realization.",
           variant: 'repeated'
         },
         {
@@ -4922,7 +5024,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'གནས་ལུགས་རྟོགས་པར་བྱིན་གྱིས་རློབས༔',
           phonetics: 'ne luk tok par jin gyi lop',
-          translation: 'Bless me to realize the true nature.',
+          translation: "Bless me to realize the Natural Mode of Abiding.",
           variant: 'repeated'
         },
         {
@@ -4954,15 +5056,16 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'འོད་གསལ་འབྱོངས་པར་བྱིན་གྱིས་རློབས༔',
           phonetics: 'ö sal jong war jin gyi lop',
-          translation: 'Bless me to develop the clear light.',
+          translation: "Bless me to develop the Clear Light.",
           variant: 'repeated'
         },
         {
           id: 'ng-7-67',
+          editorialNotes: [{"number": 18, "term": "NG-004", "field": "translation", "text": "Editorial note (Andrzej): This points to the fourth Appearance, Exhaustion of Phenomena in Dharmatā.", "label": "The fourth Appearance"}],
           type: 'RECITATION',
           tibetan: 'ཟད་སར་འཁྱོལ་བར་བྱིན་གྱིས་རློབས༔',
           phonetics: 'ze sar khyol war jin gyi lop',
-          translation: 'Bless me so all the visions subside into dharmata.',
+          translation: "Bless me to reach the point of Exhaustion.",
           variant: 'repeated'
         },
         {
@@ -4998,7 +5101,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'དེ་དག་ཀུན་གྱི་མཁྱེན་བརྩེ་ནུས་པའི་སྟོབས།།',
           phonetics: 'de dak kun gyi khyen tse nü pay top',
-          translation: 'All of their wisdom, love, and strength of capabilities'
+          translation: "All their wisdom, love and power"
         },
         {
           id: 'ng-7-74',
@@ -5164,13 +5267,13 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'སངས་རྒྱས་ཐམས་ཅད་ཀྱི་སྐུ་གསུང་ཐུགས་དང་རང་གི་ལུས་ངག་ཡིད་གསུམ་དབྱེར་མེད་གྱུར་པར་བསམ་ལ་མ་བཅོས་རང་བབས་སུ་ཀློད་དེ་ཅི་གནས་སུ་མཉམ་པར་བཞག དེ་ལས་ལྡང་བ་ན་རང་དང་བླ་མ་དབྱེར་མེད་སྣང་སྒྲགས་རིག་གསུམ་བླ་མའི་སྐུ་གསུང་ཐུགས་ཀྱི་རོལ་པར་ཤེས་པའི་ངང་ནས།',
           phonetics: 'sang gye tam che kyi ku sung tuk dang rang gi lu ngak yid sum yer me du gyur',
-          translation: 'The Body, Speech, and Mind of all buddhas and my body, speech, and mind become inseparable. Rest in relaxed, natural, uncontrived equipoise for however long it lasts. When you emerge from that, your mind and the lama\'s are inseparable. With the understanding that appearance, sound, and awareness are the play of the lama\'s Body, Speech, and Mind, recite:'
+          translation: "The Body, Speech, and Mind of all buddhas and my body, speech, and mind become inseparable. Rest in relaxed, natural, uncontrived Meditative Equipoise for however long it lasts. When you emerge from that, your mind and the lama's are inseparable. Knowing appearance, sound and Rigpa to be the play of the lama's Body, Speech and Mind, recite:"
         },
         {
           id: 'ng-8-timer',
           type: 'TIMER',
           timerKey: 3,
-          label: 'Guru Yoga — rest in equipoise'
+          label: 'Guru Yoga — rest in Meditative Equipoise'
         }
       ]
     },
@@ -5190,7 +5293,7 @@ const TABS_DATA = {
           type: 'RECITATION',
           tibetan: 'འཁོར་བ་ངན་སོང་དོང་སྤྲུགས་ནས༔',
           phonetics: 'khor wa ngen song dong truk ne',
-          translation: 'May the depths of the lower realms of samsara be stirred,'
+          translation: "may Saṃsāra be shaken from the depths of the lower realms"
         },
         {
           id: 'ng-9-3',
@@ -5215,17 +5318,18 @@ const TABS_DATA = {
         },
         {
           id: 'ng-9-6',
+          editorialNotes: [{"number": 19, "term": "Spontaneous Presence", "field": "translation", "text": "Editorial note (Andrzej): Spontaneous Presence translates lhun grub. “Spontaneous” here is closer to “inherent”; the established wording is retained, but it does not mean vivacious or unpredictable. It is distinct from Self-Arisen (rang byung)."}],
           type: 'RECITATION',
           tibetan: 'གཞི་ནི་ལྷུན་གྱིས་གྲུབ་པ་ལ༔',
           phonetics: 'zhi ni lhun gyi drup pa la',
-          translation: 'is spontaneous presence, upon which'
+          translation: "is Spontaneous Presence, upon which"
         },
         {
           id: 'ng-9-7',
           type: 'RECITATION',
           tibetan: 'ལམ་ནི་མངོན་སུམ་སྣང་བར་ཤར༔',
           phonetics: 'lam ni ngön sum nang war shar',
-          translation: 'the path arises as actual appearances.'
+          translation: "the path arises as the appearances of Direct Perception."
         },
         {
           id: 'ng-9-8',
@@ -5238,13 +5342,13 @@ const TABS_DATA = {
           id: 'ng-9-9',
           type: 'INSTRUCTION',
           tibetan: 'ཅེས་དགེ་བ་བསྔོས་ཏེ་སྨོན་ལམ་གྱིས་རྒྱས་བཏབ་ཅིང༌། སྤྱོད་ལམ་ཀུན་ཏུ་ཚོགས་གཉིས་ཟུང་འཇུག་གི་རྣལ་འབྱོར་ལས་མི་འདའ་བས་གཏན་གྱི་འདུན་མ་བཟང་པོ་ཉམས་འོག་ཏུ་ཚུད་པར་བྱའོ།།',
-          translation: 'So dedicating the virtue, seal it with the prayer. During all activities, do not neglect the yoga of the union of the two accumulations, and totally integrate a noble, lasting resolution.'
+          translation: "So dedicating the virtue, seal it with the prayer. During all activities, do not neglect the yoga of the Coalescence of the two accumulations, and totally integrate a noble, lasting resolution."
         },
         {
           id: 'ng-9-10',
           type: 'INSTRUCTION',
           tibetan: 'ཀུན་བཟང་དགོངས་འདུས་རྫོགས་པ་ཆེའི། །ཐོགས་མེད་སྒོ་བྱེད་སྔོན་འགྲོའི་ཆོས། །གསལ་བདེར་སྤེལ་ལས་ཐོབ་པའི་དགེ །སྐན་ལྡན་སྨིན་གྲོལ་དཔལ་དུ་ཤོག །',
-          translation: 'May the virtue accrued from clearly propounding this Dharma of the preliminary that initially opens the door to the Great Completion’s Synthesis of Samantabhadra\'s Entire Wisdom Mind bring fortunate ones the glory of maturation and liberation.'
+          translation: "May the virtue accrued from clearly propounding this Dharma of the preliminary that initially opens the door to the Great Completeness’ Synthesis of Samantabhadra's Entire Wisdom Mind bring fortunate ones the glory of maturation and liberation."
         },
         {
           id: 'ng-9-11',
@@ -6342,6 +6446,7 @@ function localizedBlock(id) {
 function blockText(b, field) {
   const loc = localizedBlock(b.id);
   if (loc && loc[field]) return loc[field];
+  if (b.sourceAligned && state.lang !== 'en' && (field === 'translation' || field === 'phonetics')) return '';
   return b[field];
 }
 
@@ -6893,6 +6998,37 @@ function renderContentPreservingPlace() {
   }
 }
 
+function editorialNoteMarkers(b, field) {
+  return (b.editorialNotes || []).filter(note => note.field === field).map(note =>
+    ' <button type="button" class="editorial-note-marker" aria-haspopup="dialog" aria-controls="editorialNotesDialog"' +
+    ' aria-label="' + (state.lang === 'pl' ? 'Nota redakcyjna po angielsku ' : 'Editorial note ') + note.number + '"' +
+    ' onclick="openEditorialNotes(\'' + esc(b.id) + '\')">[' + note.number + ']</button>'
+  ).join('');
+}
+
+function openEditorialNotes(id) {
+  const block = Object.values(TABS_DATA).flatMap(sections => sections.flatMap(section => section.blocks)).find(b => b.id === id);
+  if (!block || !block.editorialNotes) return;
+  const dialog = document.getElementById('editorialNotesDialog');
+  const body = document.getElementById('editorialNotesBody');
+  body.replaceChildren();
+  document.getElementById('editorialNotesTitle').textContent = state.lang === 'pl' ? 'Noty redakcyjne (po angielsku)' : 'Editorial notes';
+  document.getElementById('editorialNotesClose').textContent = state.lang === 'pl' ? 'Zamknij' : 'Close';
+  for (const note of block.editorialNotes) {
+    const heading = document.createElement('h3');
+    heading.textContent = note.number + '. ' + (note.label || note.term);
+    const paragraph = document.createElement('p');
+    paragraph.className = 'editorial-note-text';
+    paragraph.lang = 'en';
+    paragraph.textContent = note.text;
+    body.append(heading, paragraph);
+  }
+  dialog.showModal();
+  overlaySync();
+}
+
+document.getElementById('editorialNotesDialog').addEventListener('close', () => overlaySync());
+
 function renderBlock(b) {
   const isRepeated = b.variant === 'repeated';
 
@@ -6912,9 +7048,9 @@ function renderBlock(b) {
 
   if (b.type === 'TITLE') {
     let h = '<div class="' + marks({ t: b.tibetan, p: pho, e: tr }) + ' block-title' + bid + '">';
-    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + '</div>';
-    if (pho) h += '<div class="pho">' + esc(pho) + '</div>';
-    if (tr) h += '<div class="eng">' + esc(tr) + '</div>';
+    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + editorialNoteMarkers(b, 'tibetan') + '</div>';
+    if (pho) h += '<div class="pho">' + esc(pho) + editorialNoteMarkers(b, 'phonetics') + '</div>';
+    if (tr) h += '<div class="eng">' + esc(tr) + editorialNoteMarkers(b, 'translation') + '</div>';
     h += '<div class="divider-line"></div></div>';
     return h;
   }
@@ -6932,8 +7068,8 @@ function renderBlock(b) {
 
   if (b.type === 'INSTRUCTION') {
     let h = '<div class="' + marks({ t: b.tibetan, e: tr }) + ' block-instruction' + bid + '">';
-    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + '</div>';
-    if (tr) h += '<div class="eng">' + esc(tr) + '</div>';
+    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + editorialNoteMarkers(b, 'tibetan') + '</div>';
+    if (tr) h += '<div class="eng">' + esc(tr) + editorialNoteMarkers(b, 'translation') + '</div>';
     h += '</div>';
     return h;
   }
@@ -6955,9 +7091,9 @@ function renderBlock(b) {
   let cls = marks({ t: b.tibetan, p: pho, e: tr, v: b.visualize }) +
     ' block-recitation' + (isRepeated ? ' block-repeated' : '');
   let h = '<div class="' + cls + bid + '">';
-  if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + '</div>';
-  if (pho) h += '<div class="pho">' + esc(pho) + '</div>';
-  if (tr) h += '<div class="eng">' + esc(tr) + '</div>';
+  if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + editorialNoteMarkers(b, 'tibetan') + '</div>';
+  if (pho) h += '<div class="pho">' + esc(pho) + editorialNoteMarkers(b, 'phonetics') + '</div>';
+  if (tr) h += '<div class="eng">' + esc(tr) + editorialNoteMarkers(b, 'translation') + '</div>';
   if (b.visualize) {
     h += '<div class="block-visualize">' +
       '<button type="button" class="visualize-btn" onclick="openGarland()">' +
@@ -7609,7 +7745,7 @@ function turnReadingPage(direction) {
 
 function pageInputBlocked(target) {
   return target.closest('input,textarea,select,[contenteditable="true"],a,button,[role="dialog"],.index-panel') ||
-    helpOpen || introOpen || welcomeOpen || garlandOpen || document.getElementById('timerDialog').classList.contains('open') ||
+    helpOpen || introOpen || welcomeOpen || garlandOpen || document.getElementById('editorialNotesDialog').open || document.getElementById('timerDialog').classList.contains('open') ||
     document.getElementById('indexPanel').classList.contains('open') || document.getElementById('langSelect').classList.contains('open');
 }
 
@@ -8163,7 +8299,7 @@ document.addEventListener('visibilitychange', () => {
 //
 // Port of the Claude Design project "Mantra Garland.dc.html".
 // The scene data, the tweak defaults and every number in the
-// projection below are taken from that project unchanged —
+// projection below retain the original scene design —
 // OM_SCENES / TWEAK_DEFAULTS from the document <helmet>, the
 // geometry from garland.jsx's GarlandField and Rotation.
 // Only the React scaffolding is rewritten as plain DOM: the
@@ -8171,11 +8307,13 @@ document.addEventListener('visibilitychange', () => {
 // the components would have rendered.
 // ══════════════════════════════════════════════════════
 
+// The scene takes its Tibetan from the approved recitation block, so the
+// visualization cannot silently retain a different mantra reading.
 // window.OM_SCENES — the single "Rotation" scene
 const OM_SCENE = {
   name: 'Rotation',
   dur: 150,
-  mantra: 'ཨོཾ་བཛྲ་སཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་སཏྭ་ཏྭེ་ནོ་པ་ཏིཥྛ། དྲྀ་ཌྷོ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙིཏྟཾ་ཤྲེ་ཡཿ་ཀུ་རུ་ཧཱུྃ། ཧ་ཧ་ཧ་ཧ་ཧོཿ བྷ་ག་ཝན། སརྦ་ཏ་ཐཱ་ག་ཏ། བཛྲ་མཱ་མེ་མུཉྩ། བཛྲཱི་བྷ་ཝ། མ་ཧཱ་ས་མ་ཡ་སཏྭ་ཨཱཿ',
+  mantra: TABS_DATA.NGONDRO.flatMap(section => section.blocks).find(block => block.id === 'ng-5-17').tibetan,
   center: 'ཧཱུྃ',
   seedFront: 'ཨོཾ',
   seedRight: 'ཨཱཿ',
@@ -8197,7 +8335,7 @@ const OM_W = 1080, OM_H = 1920;   // the Rotation scene's stage size
 const OM_GRAIN_SVG = "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='300' height='300' filter='url(#n)'/></svg>";
 const OM_GRAIN_URL = 'url("data:image/svg+xml,' + encodeURIComponent(OM_GRAIN_SVG) + '")';
 
-function omSyllables(str) { return str.split(/[་།\s]+/).filter(Boolean); }
+function omSyllables(str) { return str.split(/[་༌།\s]+/).filter(Boolean); }
 function omLerp(a, b, t) { return a + (b - a) * t; }
 function omClamp01(v) { return Math.max(0, Math.min(1, v)); }
 function omRgbMix(c1, c2, t) {
@@ -8230,38 +8368,8 @@ function omGeom(viewAngle) {
 // syllable of OM_SCENE.mantra. English uses the scholarly IAST transliteration;
 // Polish follows the transcription of the Polish liturgy.
 const OM_PHONETICS_BY_LANG = {
-  en: ('om vajra sattva sa ma ya ' +
-    'ma nu pā la ya ' +
-    'vajra sattva tve no pa tiṣṭha ' +
-    'dṛ ḍho me bha va ' +
-    'su to ṣyo me bha va ' +
-    'su po ṣyo me bha va ' +
-    'a nu rakto me bha va ' +
-    'sarva siddhi mme pra yaccha ' +
-    'sarva karma su ca me ' +
-    'cittaṃ śre yaḥ ku ru hūṃ ' +
-    'ha ha ha ha hoḥ ' +
-    'bha ga van ' +
-    'sarva ta thā ga ta ' +
-    'vajra mā me muñca ' +
-    'vajrī bha va ' +
-    'ma hā sa ma ya sattva āḥ').split(' '),
-  pl: ('om bendza sato sa ma ja ' +
-    'ma nu pa la ja ' +
-    'bendza sato te no pa tiszta ' +
-    'dri dho me bha ła ' +
-    'su to khajo me bha ła ' +
-    'su po khajo me bha ła ' +
-    'a nu rakto me bha ła ' +
-    'sarła siddhi me pra jactsa ' +
-    'sarła karma su tsa me ' +
-    'tsittam szri jam ku ru hung ' +
-    'ha ha ha ha ho ' +
-    'bha ga łan ' +
-    'sarła ta tha ga ta ' +
-    'bendza ma me muntsa ' +
-    'bendzi bha ła ' +
-    'ma ha sa ma ja sato ah').split(' ')
+  en: "om vajra sa ttva sa ma ya ma nu pā la ya vajra sa ttva te no pa tiṣṭha dṛ ḍho me bha va su to ṣyo me bha va su po ṣyo me bha va a nu rakto me bha va sarva siddhi mme pra ya ccha sarva karma su ca me ci ttaṃ śri yaṃ ku ru hūṃ ha ha ha ha ho bha ga vān sarva ta thā ga ta vajra mā me muñca vajrī bha va mahā sa ma ya sa ttva āḥ".split(' '),
+  pl: "om bendza sa to sa ma ja ma nu pa la ja bendza sa to te no pa tiszta dri dho me bha ła su to khajo me bha ła su po khajo me bha ła a nu rakto me bha ła sarła siddhi me pra ja ctsa sarła karma su tsa me tsi ttam szri jam ku ru hung ha ha ha ha ho bha ga łan sarła ta tha ga ta bendza ma me muntsa bendzi bha ła maha sa ma ja sa to ah".split(' ')
 };
 
 function omPhonetics() {
@@ -8715,6 +8823,7 @@ window.addEventListener('orientationchange', () => setTimeout(layoutGarland, 120
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (document.getElementById('editorialNotesDialog').open) return;
   /* The welcome card and the introduction sheet cover the whole app,
      the ? included, so they answer Escape before anything below. */
   if (welcomeOpen) { e.preventDefault(); closeWelcome(); return; }
@@ -9219,7 +9328,7 @@ let overlayResumeTilt = false;
    handing over from the welcome card to the sheet does not flash the
    liturgy back into focus in between. */
 function overlaySync() {
-  const want = introOpen || welcomeOpen;
+  const want = introOpen || welcomeOpen || document.getElementById('editorialNotesDialog').open;
   if (want === overlayLocked) return;
   overlayLocked = want;
 
