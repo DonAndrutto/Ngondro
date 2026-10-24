@@ -3,7 +3,7 @@
   "source_document": "https://docs.google.com/document/d/1xjZtz_x-05xsvoPAXmvXRRlwK-VQpcv9c5k6W14ApuQ",
   "source_revision": "AHj4eMTyDmBxiq2cAu8bhgMMlD-dY9jzihXlJHXIsy9bHlIkw9W53_kYTb6SeMyRfny3IwmnEpr-6FibveZmqaMmr24dbcAH8hxpSOYuGsxi",
   "source_snapshot_sha256": "02d5c5b02b310b057fc1f167e9cd4fd9794c9538dd9e934ca4277b2b3ddcccdd",
-  "scope": "All 98 approved changed source paragraphs, their 19 approved editorial/textual notes, and source companion lines needed for the restored passages. English and shared Tibetan; Polish translation unchanged.",
+  "scope": "All 98 approved changed source paragraphs and source companion lines needed for the restored passages. English and shared Tibetan; Polish translation unchanged. The 19 approved editorial/textual notes are retained in this archive only and excluded from the app.",
   "paragraph_mappings": [
     {
       "source_paragraph": 3,
@@ -975,6 +975,12 @@
     }
   ],
   "visualization": "Tibetan reads from the canonical app recitation block. Both existing overlay pronunciation arrays are resegmented to its 87 written Tibetan units; the English overlay retains its IAST convention and its readings now follow the approved source.",
-  "review_caveat": "The approved dream/waking emendation and mantra normalizations do not establish original source readings. Keep their textual notes. No pending corpus item is marked settled.",
-  "interface_terminology": "English index and timer labels use Bodhicitta, Maṇḍala and Meditative Equipoise, matching the approved term base."
+  "review_caveat": "The approved dream/waking emendation and mantra normalizations do not establish original source readings. Preserve their textual notes in the editorial archive, outside the app. No pending corpus item is marked settled.",
+  "interface_terminology": "English index and timer labels use Bodhicitta, Maṇḍala and Meditative Equipoise, matching the approved term base.",
+  "app_presentation": {
+    "user_instruction": "NO NOTES in the app, only the finished authoritative text",
+    "date": "2026-10-24",
+    "editorial_notes_in_app": false,
+    "approved_practice_text_preserved": true
+  }
 }

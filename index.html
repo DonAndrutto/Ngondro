@@ -2120,26 +2120,6 @@
       .welcome-actions { padding-left: var(--sp-4); padding-right: var(--sp-4); }
     }
 
-    /* Approved editorial notes stay separate from the liturgical text. */
-    .editorial-note-marker {
-      display:inline; margin-left:0.25em; padding:0 0.15em; border:0;
-      background:transparent; color:var(--accent); font:inherit;
-      font-size:0.7em; vertical-align:super; line-height:1; cursor:pointer;
-    }
-    .editorial-note-marker:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-    .editorial-notes-dialog {
-      margin:auto; width:min(38rem,calc(100% - 32px)); max-height:calc(100dvh - 40px);
-      overflow:auto; padding:24px; border:1px solid var(--border); border-radius:var(--radius-lg);
-      background:var(--bg); color:var(--text); box-shadow:var(--elev-3);
-    }
-    .editorial-notes-dialog::backdrop { background:rgba(0,0,0,0.55); }
-    .editorial-notes-header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .editorial-notes-header h2 { font:600 18px/1.4 'Inter',sans-serif; }
-    .editorial-notes-header button { padding:8px 12px; border:1px solid var(--border); border-radius:8px;
-      background:var(--bg-secondary); color:var(--text); cursor:pointer; }
-    .editorial-note-text { margin-top:20px; font:17px/1.7 'EB Garamond','Jomolhari',serif; white-space:pre-wrap; }
-    .editorial-notes-dialog h3 { margin-top:20px; font:600 14px/1.5 'Inter',sans-serif; }
-
     /* One proportional row; fullscreen leaves a single reachable control. */
     [hidden] { display:none !important; }
     .bar-inner { display:block; max-width:36rem; }
@@ -2496,14 +2476,6 @@
        depends on the tab, the scroll position and whether
        the app is in fullscreen.
        ══════════════════════════════════════════════════════ -->
-  <dialog id="editorialNotesDialog" class="editorial-notes-dialog" aria-labelledby="editorialNotesTitle">
-    <form method="dialog" class="editorial-notes-header">
-      <h2 id="editorialNotesTitle">Editorial notes</h2>
-      <button id="editorialNotesClose" type="submit">Close</button>
-    </form>
-    <div id="editorialNotesBody"></div>
-  </dialog>
-
   <div class="help-overlay" id="helpOverlay" role="dialog" aria-modal="true"
        data-i18n-aria="helpTitle" aria-label="Help" hidden>
     <button type="button" class="help-dismiss" id="helpDismiss" onclick="closeHelp()"
@@ -3011,7 +2983,6 @@ const TABS_DATA = {
         },
         {
           id: '1-2',
-          editorialNotes: [{"number": 1, "term": "Self-Arisen", "field": "translation", "text": "Editorial note: Self-Arisen translates rang byung. It indicates what is not manufactured through contrivance, rather than an independently existing self that causes itself. It is distinguished from rang shar and from Spontaneous Presence (lhun grub)."}],
           type: 'RECITATION',
           tibetan: 'ཆོས་སྐུ་སྟོང་པའི་ངང་ལས་གཟུགས་སྐུ་སྒྱུ་མའི་རོལ་པར་རང་བྱུང་བ་ཙམ་དུ།',
           phonetics: 'chö ku tong pe ngang le zug ku gyu me rol par rang-jung-wa tsam du',
@@ -3019,7 +2990,6 @@ const TABS_DATA = {
         },
         {
           id: '1-3',
-          editorialNotes: [{"number": 2, "term": "Primal Awarenesses", "field": "translation", "text": "Editorial terminology note: Primal Awareness translates ye shes. 'Primal' (ye) points to primordial presence prior to accumulated learning, while 'Awareness' (shes) here denotes non-dual cognitive lucidity (jñāna), distinct from both ordinary knowing (shes pa) and Consciousness (rnam shes). The expression Primal Awareness of Rigpa preserves the relationship stated in the Tibetan."}],
           type: 'RECITATION',
           tibetan: 'སྣང་བ་ཐམས་ཅད་བླ་མ་ཡི་དམ་མཁའ་འགྲོའི་ཞིང་ཁམས་ཡེ་ཤེས་ལྔའི་རང་འོད་ཀྱི་རང་བཞིན།',
           phonetics: 'nang wa tam che la ma yi dam khan drö zhing kam ye she nge rang ö kyi rang zhin',
@@ -3068,7 +3038,6 @@ const TABS_DATA = {
         },
         {
           id: '1-10',
-          editorialNotes: [{"number": 3, "term": "NG-S02a", "field": "tibetan", "text": "Textual note: The baseline reads རང་ནས་སྡང་ལ. The reading ངང་ནས་ལྡང་ལ is an editorial emendation based on the context of rising from sleep.", "label": "Rising from the dream state"}],
           type: 'INSTRUCTION',
           tibetan: "ཞེས་ལན་གསུམ་བརྗོད་ཅིང༌། རྨི་ལམ་སྒྱུ་མ་ཙམ་གྱི་ངང་ནས་ལྡང་ལ།",
           translation: "Recite this three times. Then, as you rise from the illusory state of dreaming, recite:"
@@ -3114,7 +3083,6 @@ const TABS_DATA = {
         },
         {
           id: "2-speech-alternative",
-          editorialNotes: [{"number": 4, "term": "Intimate Operative Instructions", "field": "translation", "text": "Editorial terminology note: Intimate Operative Instructions translates man ngag, often rendered “pith instructions” or upadeśa. The wording emphasizes close, practical guidance that works at the decisive point of the practice. After this first explanation, the shorter form Operative Instructions is used."}],
           type: "INSTRUCTION",
           sourceAligned: true,
           tibetan: "དེ་ཙམ་མི་ནུས་ན་འཇམ་དཔལ་ཕྱག་རྒྱ་ཟིལ་གནོན་གྱི་མན་ངག་ལས་བྱུང་བའི་ངག་བྱིན་རླབས་མཆོག་ཏུ་ཟབ་ནི།",
@@ -3212,7 +3180,6 @@ const TABS_DATA = {
         },
         {
           id: '2-15',
-          editorialNotes: [{"number": 5, "term": "NG-S07b", "field": "tibetan", "text": "Textual note: The baseline vowel list reads ཨ་ཨཱཿ, ཨོ་ཨོཾ། and ends ཨཾ་ཨཱཿ. These have been normalized to the short/long vowel series, o/au, and aṃ/aḥ. The consonant text is unchanged.", "label": "Sanskrit alphabet"}],
           type: 'RECITATION',
           tibetan: "ཨ་ཨཱ། ཨི་ཨཱི། ཨུ་ཨཱུ། རྀ་རཱྀ། ལྀ་ལཱྀ། ཨེ་ཨཻ། ཨོ་ཨཽ། ཨཾ་ཨཿ",
           phonetics: "a ā | i ī | u ū | ṛ ṝ | ḷ ḹ | e ai | o au | aṃ aḥ",
@@ -3369,7 +3336,6 @@ const TABS_DATA = {
         },
         {
           id: '3-20',
-          editorialNotes: [{"number": 6, "term": "Dharmadhātu", "field": "translation", "text": "Editorial terminology note: Dharmadhātu translates chos dbyings, the expanse of phenomena. “Expanse” here should not be understood simply as the physical space surrounding objects. The term is retained to keep it distinct from Dharmatā and from ordinary uses of space."}],
           type: 'RECITATION',
           tibetan: 'ཆོས་དབྱིངས་ཀུན་ཁྱབ་རྩ་གསུམ་ལྷ། །',
           phonetics: 'chö ying kun kyab tsa sum lha',
@@ -3384,7 +3350,6 @@ const TABS_DATA = {
         },
         {
           id: '3-22',
-          editorialNotes: [{"number": 7, "term": "Discernment", "field": "translation", "text": "Editorial note: Discernment translates shes rab. Here it is not restricted to discursive analysis: its function follows the passage, including direct, nonconceptual discernment. It remains distinct from Primal Awareness (ye shes)."}],
           type: 'RECITATION',
           tibetan: 'ཐབས་ཤེས་སོར་མོའི་སྦྱར་བ་ཡིས། །',
           phonetics: 'tab she sor mö jar wa yi',
@@ -3450,7 +3415,6 @@ const TABS_DATA = {
       blocks: [
         {
           id: '4-1',
-          editorialNotes: [{"number": 8, "term": "Mind", "field": "translation", "text": "Editorial terminology note: Mind translates sems: conditioned Mind, with its changing perceptions, feelings, thoughts, and habitual ways of grasping experience. In passages distinguishing Mind from Rigpa, this conditioned activity is what is being examined. Mind Itself is explained separately."}],
           type: 'INSTRUCTION',
           tibetan: 'དེ་ནས་སེམས་གྱི་གནད།',
           translation: "Then, the key point of the Mind:"
@@ -3511,7 +3475,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-1-1',
-          editorialNotes: [{"number": 9, "term": "settle into naturalness", "field": "translation", "text": "Editorial terminology note: Settling into Naturalness translates rnal du dbab pa. Let the body, speech, and Mind settle without contrivance. The phrase can also be evoked as “falling into normality”: releasing the effort to manufacture a special state. “Normality” here points to uncontrived naturalness, rather than to habitual distraction."}],
           type: 'INSTRUCTION',
           tibetan: 'འདི་ལ་གཉིས། ཐུན་སྤྱིའི་སྔོན་འགྲོ་དང༌། སྐཔས་དོན་སྒོས་ཀྱི་སྔོན་འགྲོའོ། །དང་པོ་ནི། བདེ་བའི་སྟན་ལ་ལུས་གནད་དྲང་པོར་བསྲང་ཞིང་སེམས་རྣལ་དུ་ཕབ་ནས་རླུང་རོ་ལན་གསུམ་ཕྱིར་བསལ། སྤྱི་བོར་རྩ་བའི་བླ་མ་དགྱེས་བཞིན་དུ་བཞུགས་པར་བསྒོམ་ལ། མོས་གུས་གདུང་ཤུགས་དྲག་པོས།',
           translation: "These preliminaries have two parts: the general and the particular. First, sit upright on a comfortable seat and let the Mind settle into naturalness. Expel the stale breath three times. Visualize your root lama seated joyfully above the crown of your head, and pray with intense, heartfelt devotion:"
@@ -3772,7 +3735,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-2-26',
-          editorialNotes: [{"number": 10, "term": "Equanimity", "field": "translation", "text": "Editorial note: Meditative Equipoise (mnyam bzhag), Equality (mnyam nyid), and Equanimity (btang snyoms) are distinct. The first names resting in meditation; the second equality or sameness in the specified context; the third, in the Immeasurables, an attitude free of partiality rather than indifference."}],
           type: 'RECITATION',
           tibetan: 'འཕགས་པའི་བདེ་ཐོབ་བཏང་སྙོམས་ཆེར་འགོད་ཕྱིར།།',
           phonetics: 'pak pay de top tang nyom cher gö chir',
@@ -4092,7 +4054,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-4-4',
-          editorialNotes: [{"number": 11, "term": "Bindu", "field": "translation", "text": "Editorial note: Bindu translates thig le. According to the passage, the term may name a luminous sphere or a subtle drop; these functional glosses do not make every occurrence an ordinary physical droplet."}],
           type: 'RECITATION',
           tibetan: 'ཐིག་ལེ་རྣམ་དག་རྫོགས་ལྡན་ལ༔',
           phonetics: 'tig le nam dak dzok den la',
@@ -4101,7 +4062,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-4-5',
-          editorialNotes: [{"number": 12, "term": "Self-Liberation", "field": "translation", "text": "Editorial terminology note: Self-Liberation translates rang grol. “Automatic liberation,” or even “automatic freedom,” helps convey freedom that does not require a second act to release what has arisen. The text’s instructions on Recognition and familiarity establish the context. Pointing Out presents what is to be recognized; Recognition and Realization are kept distinct from that presentation and from each other."}],
           type: 'RECITATION',
           tibetan: 'རང་གྲོལ་ཆེན་པོར་སེམས་བསྐྱེད་དོ༔',
           phonetics: 'rang drol chen por sem kye do',
@@ -4246,7 +4206,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-5-17',
-          editorialNotes: [{"number": 13, "term": "NG-S07a", "field": "tibetan", "text": "Textual note: The baseline reads དྲྀ་ཌྷ and བཛཱི; the separate Tibetan copy reads དྲྀ་ཎྷོ in the first phrase. This edition normalizes these to དྲྀ་ཌྷོ and བཛྲཱི, corresponding to dṛḍho and vajrī. Other transmitted readings are retained.", "label": "Vajrasattva mantra"}],
           type: 'RECITATION',
           tibetan: "ཨོཾ་བཛྲ་ས་ཏྭ་ས་མ་ཡ། མ་ནུ་པཱ་ལ་ཡ། བཛྲ་ས་ཏྭ་ཏེ་ནོ་པ། ཏིཥྛ་དྲྀ་ཌྷོ་མེ་བྷ་ཝ། སུ་ཏོ་ཥྱོ་མེ་བྷ་ཝ། སུ་པོ་ཥྱོ་མེ་བྷ་ཝ། ཨ་ནུ་རཀྟོ་མེ་བྷ་ཝ། སརྦ་སིདྡྷི་མྨེ་པྲ་ཡ་ཙྪ། སརྦ་ཀརྨ་སུ་ཙ་མེ། ཙི་ཏྟཾ་ཤྲི་ཡཾ། ཀུ༌རུ༌ཧཱུྃ༌ཧ༌ཧ༌ཧ༌ཧ༌ཧོ། བྷ༌ག༌ཝཱན། སརྦ་ཏ་ཐཱ་ག་ཏ་བཛྲ་མཱ་མེ་མུཉྩ་བཛྲཱི་བྷ་ཝ་མཧཱ་ས་མ་ཡ་ས་ཏྭ་ཨཱཿ",
           phonetics: "om vajra sattva samaya manu palaya\nvajra sattva teno pa tishta dridho me bhawa\nsuto khayo me bhawa supo khayo me bhawa\nanu rakto me bhawa\nsarwa siddhi me prayatsa\nsarwa karma sutsa me tsitam shriyam kuru\nhung ha ha ha ha ho\nbhagawan sarwa tathagata vajra ma me muntsa\nvajri bhawa maha samaya sattva ah",
@@ -4292,7 +4251,6 @@ const TABS_DATA = {
         },
         {
           id: "ng-5-fruitional",
-          editorialNotes: [{"number": 14, "term": "Natural Mode of Abiding", "field": "translation", "text": "Editorial terminology note: Natural Mode of Abiding translates gnas lugs: the way things abide as they are. “Natural” does not mean a temporary state produced by arranging experience or holding the Mind in a particular condition."}],
           type: "INSTRUCTION",
           sourceAligned: true,
           tibetan: "ཞེས་གནས་ལུགས་ཀྱི་ངང་ལ་མཉམ་པར་བཞག་པ་དོན་དམ་འབྲས་བུའི་སྒྲིབ་སྦྱོང་ངོ༌།།",
@@ -4441,7 +4399,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-6-15',
-          editorialNotes: [{"number": 15, "term": "NG-S05", "field": "tibetan", "text": "Textual note: བླ་མ་སྤྲུལ་སྐུར corrects the baseline reading བྱ་མ་སྤྲུལ་སྐར. The corrected reading is also present in the separate Ngondro KGK Tibetan text.", "label": "Nirmāṇakāya lama"}],
           type: 'INSTRUCTION',
           tibetan: "ཞེས་བླ་མ་སྤྲུལ་སྐུར་ཕུལ་ནས། སླར་ཡང་ཚོམ་བུ་གསོ་བཞིན་དུ།",
           translation: "After offering that to the Nirmāṇakāya lama, replenish the heaps."
@@ -4570,7 +4527,6 @@ const TABS_DATA = {
       blocks: [
         {
           id: 'ng-7-1',
-          editorialNotes: [{"number": 16, "term": "NG-S06", "field": "translation", "text": "Editorial clarification (Andrzej): This is the faith with which the practitioner regards the Guru with total openness, as if saying “you alone know” [my situation].", "label": "Faith in the Guru"}],
           type: 'INSTRUCTION',
           tibetan: 'ལྔ་པ་བླ་མའི་རྣལ་འབྱོར་ནི། ཟབ་ལམ་གྱི་རྟེན་འབྲེལ་མོས་གུས་ཀྱི་གནད་ལ་བརྟེན་ནས་བསྒྲིགས་དགོས་པས་ན་ཡིད་མཁྱེད་ཤེས་ཀྱི་དད་པ་གཏིང་ཚུགས་པའི་སྒོ་ནས།',
           translation: "Since it is necessary to prepare oneself by relying on the crucial point of devotion, which is the effective connection in this profound path of Vajrayāna, cultivate unwavering faith: “You alone know.”"
@@ -4885,7 +4841,6 @@ const TABS_DATA = {
         },
         {
           id: "ng-7-drodul-lingpa",
-          editorialNotes: [{"number": 17, "term": "NG-003", "field": "translation", "text": "Editorial note (Andrzej): Drodül Lingpa here denotes Dudjom Rinpoche.", "label": "Drodül Lingpa"}],
           type: "RECITATION",
           sourceAligned: true,
           tibetan: "ཟུང་འཇུག་སྐུར་བཞེངས་འགྲོ་འདུལ་གླིང་པའི་ཞབས།",
@@ -5061,7 +5016,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-7-67',
-          editorialNotes: [{"number": 18, "term": "NG-004", "field": "translation", "text": "Editorial note (Andrzej): This points to the fourth Appearance, Exhaustion of Phenomena in Dharmatā.", "label": "The fourth Appearance"}],
           type: 'RECITATION',
           tibetan: 'ཟད་སར་འཁྱོལ་བར་བྱིན་གྱིས་རློབས༔',
           phonetics: 'ze sar khyol war jin gyi lop',
@@ -5318,7 +5272,6 @@ const TABS_DATA = {
         },
         {
           id: 'ng-9-6',
-          editorialNotes: [{"number": 19, "term": "Spontaneous Presence", "field": "translation", "text": "Editorial note (Andrzej): Spontaneous Presence translates lhun grub. “Spontaneous” here is closer to “inherent”; the established wording is retained, but it does not mean vivacious or unpredictable. It is distinct from Self-Arisen (rang byung)."}],
           type: 'RECITATION',
           tibetan: 'གཞི་ནི་ལྷུན་གྱིས་གྲུབ་པ་ལ༔',
           phonetics: 'zhi ni lhun gyi drup pa la',
@@ -6998,37 +6951,6 @@ function renderContentPreservingPlace() {
   }
 }
 
-function editorialNoteMarkers(b, field) {
-  return (b.editorialNotes || []).filter(note => note.field === field).map(note =>
-    ' <button type="button" class="editorial-note-marker" aria-haspopup="dialog" aria-controls="editorialNotesDialog"' +
-    ' aria-label="' + (state.lang === 'pl' ? 'Nota redakcyjna po angielsku ' : 'Editorial note ') + note.number + '"' +
-    ' onclick="openEditorialNotes(\'' + esc(b.id) + '\')">[' + note.number + ']</button>'
-  ).join('');
-}
-
-function openEditorialNotes(id) {
-  const block = Object.values(TABS_DATA).flatMap(sections => sections.flatMap(section => section.blocks)).find(b => b.id === id);
-  if (!block || !block.editorialNotes) return;
-  const dialog = document.getElementById('editorialNotesDialog');
-  const body = document.getElementById('editorialNotesBody');
-  body.replaceChildren();
-  document.getElementById('editorialNotesTitle').textContent = state.lang === 'pl' ? 'Noty redakcyjne (po angielsku)' : 'Editorial notes';
-  document.getElementById('editorialNotesClose').textContent = state.lang === 'pl' ? 'Zamknij' : 'Close';
-  for (const note of block.editorialNotes) {
-    const heading = document.createElement('h3');
-    heading.textContent = note.number + '. ' + (note.label || note.term);
-    const paragraph = document.createElement('p');
-    paragraph.className = 'editorial-note-text';
-    paragraph.lang = 'en';
-    paragraph.textContent = note.text;
-    body.append(heading, paragraph);
-  }
-  dialog.showModal();
-  overlaySync();
-}
-
-document.getElementById('editorialNotesDialog').addEventListener('close', () => overlaySync());
-
 function renderBlock(b) {
   const isRepeated = b.variant === 'repeated';
 
@@ -7048,9 +6970,9 @@ function renderBlock(b) {
 
   if (b.type === 'TITLE') {
     let h = '<div class="' + marks({ t: b.tibetan, p: pho, e: tr }) + ' block-title' + bid + '">';
-    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + editorialNoteMarkers(b, 'tibetan') + '</div>';
-    if (pho) h += '<div class="pho">' + esc(pho) + editorialNoteMarkers(b, 'phonetics') + '</div>';
-    if (tr) h += '<div class="eng">' + esc(tr) + editorialNoteMarkers(b, 'translation') + '</div>';
+    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + '</div>';
+    if (pho) h += '<div class="pho">' + esc(pho) + '</div>';
+    if (tr) h += '<div class="eng">' + esc(tr) + '</div>';
     h += '<div class="divider-line"></div></div>';
     return h;
   }
@@ -7068,8 +6990,8 @@ function renderBlock(b) {
 
   if (b.type === 'INSTRUCTION') {
     let h = '<div class="' + marks({ t: b.tibetan, e: tr }) + ' block-instruction' + bid + '">';
-    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + editorialNoteMarkers(b, 'tibetan') + '</div>';
-    if (tr) h += '<div class="eng">' + esc(tr) + editorialNoteMarkers(b, 'translation') + '</div>';
+    if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + '</div>';
+    if (tr) h += '<div class="eng">' + esc(tr) + '</div>';
     h += '</div>';
     return h;
   }
@@ -7091,9 +7013,9 @@ function renderBlock(b) {
   let cls = marks({ t: b.tibetan, p: pho, e: tr, v: b.visualize }) +
     ' block-recitation' + (isRepeated ? ' block-repeated' : '');
   let h = '<div class="' + cls + bid + '">';
-  if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + editorialNoteMarkers(b, 'tibetan') + '</div>';
-  if (pho) h += '<div class="pho">' + esc(pho) + editorialNoteMarkers(b, 'phonetics') + '</div>';
-  if (tr) h += '<div class="eng">' + esc(tr) + editorialNoteMarkers(b, 'translation') + '</div>';
+  if (b.tibetan) h += '<div class="tib">' + esc(b.tibetan) + '</div>';
+  if (pho) h += '<div class="pho">' + esc(pho) + '</div>';
+  if (tr) h += '<div class="eng">' + esc(tr) + '</div>';
   if (b.visualize) {
     h += '<div class="block-visualize">' +
       '<button type="button" class="visualize-btn" onclick="openGarland()">' +
@@ -7745,7 +7667,7 @@ function turnReadingPage(direction) {
 
 function pageInputBlocked(target) {
   return target.closest('input,textarea,select,[contenteditable="true"],a,button,[role="dialog"],.index-panel') ||
-    helpOpen || introOpen || welcomeOpen || garlandOpen || document.getElementById('editorialNotesDialog').open || document.getElementById('timerDialog').classList.contains('open') ||
+    helpOpen || introOpen || welcomeOpen || garlandOpen || document.getElementById('timerDialog').classList.contains('open') ||
     document.getElementById('indexPanel').classList.contains('open') || document.getElementById('langSelect').classList.contains('open');
 }
 
@@ -8823,7 +8745,6 @@ window.addEventListener('orientationchange', () => setTimeout(layoutGarland, 120
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
-  if (document.getElementById('editorialNotesDialog').open) return;
   /* The welcome card and the introduction sheet cover the whole app,
      the ? included, so they answer Escape before anything below. */
   if (welcomeOpen) { e.preventDefault(); closeWelcome(); return; }
@@ -9328,7 +9249,7 @@ let overlayResumeTilt = false;
    handing over from the welcome card to the sheet does not flash the
    liturgy back into focus in between. */
 function overlaySync() {
-  const want = introOpen || welcomeOpen || document.getElementById('editorialNotesDialog').open;
+  const want = introOpen || welcomeOpen;
   if (want === overlayLocked) return;
   overlayLocked = want;
 
